@@ -1,4 +1,4 @@
 build
 coverage
-app/javascript/components/ui
+app/javascript/shared/components/ui
 app/javascript/routes

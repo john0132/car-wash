@@ -37,6 +37,23 @@ class User < ApplicationRecord
     sessions.where.not(id: Current.session).delete_all
   end
 
+  def staff?
+    admin? || employee?
+  end
+
+  # "resource.action" keys the user is granted, e.g. ["bookings.read"].
+  def permission_names
+    scope = if admin?
+      Permission.all
+    elsif employee?
+      Permission.joins(:role_permissions).where(role_permissions: { role_id: user_roles.select(:role_id) }).distinct
+    else
+      Permission.none
+    end
+
+    scope.order(:resource, :action).pluck(:resource, :action).map { |resource, action| "#{resource}.#{action}" }
+  end
+
   def permission?(resource, action)
     return true if admin?
     return false unless employee?

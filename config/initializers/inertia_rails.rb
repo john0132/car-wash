@@ -10,4 +10,7 @@ InertiaRails.configure do |config|
 
   # Flip to true (and rebuild with --build-arg SSR_ENABLED=true) to enable SSR.
   config.ssr_enabled = true
+  # Only the public website is server-rendered (entry: entrypoints/website.tsx).
+  # Admin controllers opt out via `inertia_config ssr_enabled: false`.
+  config.ssr_bundle = Rails.root.join("ssr/website.js").to_s
 end

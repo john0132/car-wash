@@ -9,7 +9,12 @@ import tseslint from "typescript-eslint"
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   { files: ["app/javascript/**/*.{js,mjs,cjs,ts,jsx,tsx}"] },
-  { ignores: ["app/javascript/components/ui/**", "app/javascript/routes/**"] },
+  {
+    ignores: [
+      "app/javascript/shared/components/ui/**",
+      "app/javascript/routes/**",
+    ],
+  },
   {
     settings: {
       react: {
@@ -65,6 +70,49 @@ export default [
       ],
       "@typescript-eslint/consistent-type-imports": "error",
       "react/prop-types": "off",
+    },
+  },
+  // Architectural boundaries: admin and website are separate apps; shared is domain-free.
+  {
+    files: ["app/javascript/**/*.{ts,tsx}"],
+    rules: {
+      "import/no-restricted-paths": [
+        "error",
+        {
+          basePath: import.meta.dirname,
+          zones: [
+            {
+              target: "./app/javascript/shared",
+              from: [
+                "./app/javascript/admin",
+                "./app/javascript/website",
+                "./app/javascript/entrypoints",
+                "./app/javascript/routes",
+              ],
+              message:
+                "shared/ must stay app- and domain-independent: it may only import from shared/.",
+            },
+            {
+              target: [
+                "./app/javascript/admin",
+                "./app/javascript/entrypoints/admin.tsx",
+              ],
+              from: "./app/javascript/website",
+              message:
+                "Admin must not import website code. Move genuinely reusable code to shared/.",
+            },
+            {
+              target: [
+                "./app/javascript/website",
+                "./app/javascript/entrypoints/website.tsx",
+              ],
+              from: "./app/javascript/admin",
+              message:
+                "Website must not import admin code. Move genuinely reusable code to shared/.",
+            },
+          ],
+        },
+      ],
     },
   },
   {

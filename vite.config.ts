@@ -20,6 +20,7 @@ export default defineConfig(({ command }) => ({
     babel({ presets: [reactCompilerPreset()] }),
     tailwindcss(),
     rails(),
-    inertia({ ssr: "app/javascript/entrypoints/inertia.tsx" }),
+    // Only the public website is server-rendered; the admin entrypoint is client-only.
+    inertia({ ssr: "app/javascript/entrypoints/website.tsx" }),
   ],
 }))

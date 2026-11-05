@@ -28,7 +28,7 @@ RSpec.describe "Users", type: :request do
           password_confirmation: "Secret1*3*5*"
         }
       }.to change(User, :count).by(1)
-      expect(response).to redirect_to(dashboard_path)
+      expect(response).to redirect_to(root_path)
     end
 
     it "rejects invalid user" do

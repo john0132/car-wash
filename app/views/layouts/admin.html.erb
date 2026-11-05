@@ -1,0 +1,14 @@
+<%# Admin dashboard layout: loads the client-only admin.tsx Inertia entrypoint (no SSR). %>
+<!DOCTYPE html>
+<html>
+  <head>
+    <%= render "layouts/head" %>
+    <meta name="robots" content="noindex, nofollow">
+
+    <%= vite_tags "application.css", "admin.tsx" %>
+  </head>
+
+  <body>
+    <%= yield %>
+  </body>
+</html>

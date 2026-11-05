@@ -22,10 +22,10 @@ RSpec.describe "Sessions", type: :request do
     context "with valid credentials" do
       it "signs in and sets a session cookie" do
         post sign_in_path, params: { email: users(:one).email, password: "Secret1*3*5*" }
-        expect(response).to redirect_to(dashboard_path)
+        expect(response).to redirect_to(root_path)
         expect(cookies[:session_token]).to be_present
 
-        get dashboard_path
+        get settings_profile_path
         expect(response).to have_http_status(:success)
       end
     end
@@ -36,7 +36,7 @@ RSpec.describe "Sessions", type: :request do
         expect(response).to redirect_to(sign_in_path)
         expect(flash[:alert]).to eq("That email or password is incorrect")
 
-        get dashboard_path
+        get settings_profile_path
         expect(response).to redirect_to(sign_in_path)
       end
     end
