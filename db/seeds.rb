@@ -2,13 +2,21 @@
 # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
+# Every environment: the dashboard permission catalog and the role that holds all of it.
+# Admins only get permissions through roles, so assign this role to the first production admin.
+super_admin = Role.super_admin!
+
 # Development-only staff account for signing in at /admin/sign_in.
 # Override with ADMIN_EMAIL / ADMIN_PASSWORD. Production admins must be created explicitly.
 if Rails.env.development?
-  User.find_or_create_by!(email: ENV.fetch("ADMIN_EMAIL", "admin@example.com")) do |user|
+  admin = User.find_or_create_by!(email: ENV.fetch("ADMIN_EMAIL", "admin@example.com")) do |user|
     user.name = "Admin"
     user.password = ENV.fetch("ADMIN_PASSWORD", "password123456")
     user.role = :admin
     user.verified = true
   end
+  admin.roles << super_admin unless admin.roles.include?(super_admin)
+
+  # Demo catalog, customers, staff and bookings so the dashboard has something to show.
+  load Rails.root.join("db/seeds/development.rb")
 end

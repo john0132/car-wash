@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Area < ApplicationRecord
+  include Translatable
+
   belongs_to :city
   has_many :area_translations, dependent: :destroy
 

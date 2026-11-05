@@ -7,6 +7,14 @@ Rails.application.routes.draw do
     post   "sign_in",  to: "sessions#create"
     delete "sign_out", to: "sessions#destroy", as: :sign_out
 
+    concern :activatable do
+      patch :activation, on: :member
+    end
+
+    resources :customers, only: %i[index show], concerns: :activatable
+    resources :administrators, concerns: :activatable
+    resources :employees, concerns: :activatable
+
     root "dashboard#index"
   end
 

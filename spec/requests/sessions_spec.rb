@@ -30,6 +30,18 @@ RSpec.describe "Sessions", type: :request do
       end
     end
 
+    context "with a disabled account" do
+      it "refuses to sign in" do
+        users(:one).update!(is_active: false)
+
+        expect {
+          post sign_in_path, params: { email: users(:one).email, password: "Secret1*3*5*" }
+        }.not_to change(Session, :count)
+        expect(response).to redirect_to(sign_in_path)
+        expect(flash[:alert]).to eq("Your account has been disabled")
+      end
+    end
+
     context "with invalid credentials" do
       it "redirects back with an alert" do
         post sign_in_path, params: { email: users(:one).email, password: "wrongpassword" }

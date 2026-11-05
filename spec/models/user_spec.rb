@@ -26,25 +26,93 @@ RSpec.describe User, type: :model do
   end
 
   describe "#permission?" do
-    it "grants admins every permission" do
-      admin = User.create!(name: "Jane", email: "jane@example.com", password: "a-very-long-password", role: "admin")
-      expect(admin.permission?("booking", "destroy")).to be(true)
+    let(:admin) { User.create!(name: "Jane", email: "jane@example.com", password: "a-very-long-password", role: "admin") }
+
+    it "denies an admin without roles every permission" do
+      expect(admin.permission?("customers", "read")).to be(false)
     end
 
-    it "denies customers every permission" do
+    it "grants an admin a permission only when one of their roles has it" do
+      role = Role.create!(name: "support")
+      role.permissions << Permission.find_or_create_by!(resource: "customers", action: "read")
+      admin.roles << role
+
+      expect(admin.permission?("customers", "read")).to be(true)
+      expect(admin.permission?("customers", "update")).to be(false)
+      expect(admin.permission_names).to eq([ "customers.read" ])
+    end
+
+    it "grants a super admin every catalog permission" do
+      admin.roles << Role.super_admin!
+
+      expect(admin.permission_names).to match_array(Permission::CATALOG.flat_map { |r, actions| actions.map { "#{r}.#{_1}" } })
+    end
+
+    it "denies customers and employees every permission" do
       customer = User.create!(name: "John", email: "john@example.com", password: "a-very-long-password")
-      expect(customer.permission?("booking", "create")).to be(false)
-    end
-
-    it "grants an employee a permission only when their role has it" do
       employee = User.create!(name: "Amy", email: "amy@example.com", password: "a-very-long-password", role: "employee")
-      role = Role.create!(name: "cashier")
-      permission = Permission.create!(resource: "booking", action: "create")
-      role.permissions << permission
-      employee.roles << role
 
-      expect(employee.permission?("booking", "create")).to be(true)
-      expect(employee.permission?("booking", "destroy")).to be(false)
+      expect(customer.permission?("customers", "read")).to be(false)
+      expect(employee.permission?("customers", "read")).to be(false)
+      expect(employee.permission_names).to eq([])
+    end
+  end
+
+  describe "deactivation" do
+    it "signs the user out everywhere" do
+      user = User.create!(name: "Jane", email: "jane@example.com", password: "a-very-long-password")
+      user.sessions.create!
+      user.sessions.create!
+
+      expect { user.update!(is_active: false) }.to change { user.sessions.count }.from(2).to(0)
+    end
+  end
+
+  describe ".with_status" do
+    it "filters active and disabled users, and returns everyone otherwise" do
+      active = User.create!(name: "Jane", email: "jane@example.com", password: "a-very-long-password")
+      disabled = User.create!(name: "John", email: "john@example.com", password: "a-very-long-password", is_active: false)
+
+      users = User.where(id: [ active, disabled ])
+
+      expect(users.with_status("active")).to contain_exactly(active)
+      expect(users.with_status("inactive")).to contain_exactly(disabled)
+      expect(users.with_status(nil)).to contain_exactly(active, disabled)
+    end
+  end
+
+  describe ".with_customer_totals" do
+    it "adds lifetime value (paid bookings only) and booking count" do
+      user = User.create!(name: "Jane", email: "jane@example.com", password: "a-very-long-password")
+      user.bookings.create!(total_amount: 100, payment_status: :paid)
+      user.bookings.create!(total_amount: 50, payment_status: :paid)
+      user.bookings.create!(total_amount: 70, payment_status: :unpaid)
+
+      row = User.with_customer_totals.find(user.id)
+      expect(row.lifetime_value).to eq(150)
+      expect(row.bookings_count).to eq(3)
+    end
+  end
+
+  describe ".with_assignment_counts" do
+    it "adds assigned, completed and open counts" do
+      customer = User.create!(name: "Jane", email: "jane@example.com", password: "a-very-long-password")
+      employee = User.create!(name: "Amy", email: "amy@example.com", password: "a-very-long-password", role: "employee")
+      %i[completed pending in_progress cancelled].each { customer.bookings.create!(employee: employee, status: _1) }
+
+      row = User.with_assignment_counts.find(employee.id)
+      expect([ row.assigned_count, row.completed_count, row.open_count ]).to eq([ 4, 1, 2 ])
+    end
+  end
+
+  describe ".search" do
+    it "matches name, last name and email case-insensitively" do
+      jane = User.create!(name: "Jane", last_name: "Doe", email: "jane@example.com", password: "a-very-long-password")
+      User.create!(name: "John", email: "john@example.com", password: "a-very-long-password")
+
+      expect(User.search("doe")).to contain_exactly(jane)
+      expect(User.search("JANE@")).to contain_exactly(jane)
+      expect(User.search("")).to include(jane)
     end
   end
 end

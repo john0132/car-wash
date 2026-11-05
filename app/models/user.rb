@@ -14,6 +14,9 @@ class User < ApplicationRecord
   enum :role, { admin: "admin", employee: "employee", customer: "customer" }
 
   has_many :sessions, dependent: :destroy
+  has_many :bookings, dependent: :restrict_with_error
+  has_many :assigned_bookings, class_name: "Booking", foreign_key: :employee_id,
+    inverse_of: :employee, dependent: :nullify
   has_many :payment_transactions, dependent: :restrict_with_error
   has_many :addresses, dependent: :destroy
   has_many :user_roles, dependent: :destroy
@@ -29,6 +32,43 @@ class User < ApplicationRecord
 
   normalizes :email, with: -> { _1.strip.downcase }
 
+  # "active" / "inactive" filter from the dashboard lists; anything else means all.
+  scope :with_status, ->(status) {
+    case status
+    when "active" then where(is_active: true)
+    when "inactive" then where(is_active: false)
+    else all
+    end
+  }
+
+  # Adds `lifetime_value` and `bookings_count` columns, one subquery each, for customer lists.
+  scope :with_customer_totals, -> {
+    bookings = Booking.where("bookings.user_id = users.id")
+    select(
+      "users.*",
+      "(#{bookings.select(Booking.lifetime_value_sql).to_sql}) AS lifetime_value",
+      "(#{bookings.select('COUNT(*)').to_sql}) AS bookings_count"
+    )
+  }
+
+  # Adds `assigned_count`, `completed_count` and `open_count` columns for employee lists.
+  scope :with_assignment_counts, -> {
+    assigned = Booking.where("bookings.employee_id = users.id")
+    select(
+      "users.*",
+      "(#{assigned.select('COUNT(*)').to_sql}) AS assigned_count",
+      "(#{assigned.completed.select('COUNT(*)').to_sql}) AS completed_count",
+      "(#{assigned.open.select('COUNT(*)').to_sql}) AS open_count"
+    )
+  }
+
+  scope :search, ->(query) {
+    next all if query.blank?
+
+    term = "%#{sanitize_sql_like(query.strip)}%"
+    where("users.name ILIKE :term OR users.last_name ILIKE :term OR users.email ILIKE :term", term: term)
+  }
+
   before_validation if: :email_changed?, on: :update do
     self.verified = false
   end
@@ -37,27 +77,43 @@ class User < ApplicationRecord
     sessions.where.not(id: Current.session).delete_all
   end
 
+  # A disabled account is signed out everywhere; sign-in rejects it until re-enabled.
+  after_update if: -> { is_active_previously_changed?(to: false) } do
+    sessions.delete_all
+  end
+
+  def full_name
+    [ name, last_name ].compact_blank.join(" ")
+  end
+
+  def last_seen_at
+    sessions.maximum(:updated_at)
+  end
+
   def staff?
     admin? || employee?
   end
 
-  # "resource.action" keys the user is granted, e.g. ["bookings.read"].
+  # "resource.action" keys granted through the user's roles, e.g. ["customers.read"].
+  # Only admins hold roles; employees and customers have no dashboard permissions.
+  #
+  # Memoized on the instance, so a request (one Current.user) loads it once and
+  # every policy check reuses it. `reload` clears it.
   def permission_names
-    scope = if admin?
-      Permission.all
-    elsif employee?
-      Permission.joins(:role_permissions).where(role_permissions: { role_id: user_roles.select(:role_id) }).distinct
-    else
-      Permission.none
-    end
+    return [] unless admin?
 
-    scope.order(:resource, :action).pluck(:resource, :action).map { |resource, action| "#{resource}.#{action}" }
+    @permission_names ||= Permission.joins(:role_permissions)
+      .where(role_permissions: { role_id: user_roles.select(:role_id) })
+      .distinct.order(:resource, :action)
+      .pluck(:resource, :action).map { |resource, action| "#{resource}.#{action}" }
   end
 
   def permission?(resource, action)
-    return true if admin?
-    return false unless employee?
+    permission_names.include?("#{resource}.#{action}")
+  end
 
-    roles.joins(:permissions).exists?(permissions: { resource: resource, action: action })
+  def reload(*)
+    @permission_names = nil
+    super
   end
 end

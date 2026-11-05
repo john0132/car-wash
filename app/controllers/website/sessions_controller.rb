@@ -9,9 +9,13 @@ class Website::SessionsController < Website::BaseController
   end
 
   def create
-    if user = User.authenticate_by(email: params[:email], password: params[:password])
+    user = User.authenticate_by(email: params[:email], password: params[:password])
+
+    if user&.is_active?
       start_new_session_for(user)
       redirect_to after_authentication_path, notice: "Signed in successfully"
+    elsif user
+      redirect_to sign_in_path, alert: "Your account has been disabled"
     else
       redirect_to sign_in_path, alert: "That email or password is incorrect"
     end

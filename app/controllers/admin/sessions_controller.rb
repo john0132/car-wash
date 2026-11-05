@@ -13,9 +13,13 @@ class Admin::SessionsController < Admin::BaseController
   def create
     user = User.authenticate_by(email: params[:email], password: params[:password])
 
-    if user && AdminPolicy.new(user, :admin).access?
+    staff = user if user && AdminPolicy.new(user, :admin).access?
+
+    if staff && !staff.is_active?
+      redirect_to admin_sign_in_path, alert: "Your account has been disabled"
+    elsif staff
       Current.session&.destroy # replace a signed-in customer session instead of orphaning it
-      start_new_session_for(user)
+      start_new_session_for(staff)
       redirect_to admin_root_path, notice: "Signed in successfully"
     else
       redirect_to admin_sign_in_path, alert: "That email or password is incorrect"

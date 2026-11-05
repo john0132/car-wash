@@ -6,3 +6,10 @@ export interface AdminSharedProps {
     permissions: string[]
   }
 }
+
+/** Page-number pagination from Admin::UserManagement#paginate. */
+export interface Pagination {
+  page: number
+  pages: number
+  total: number
+}

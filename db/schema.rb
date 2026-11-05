@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_05_150010) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_05_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -111,6 +111,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_150010) do
     t.integer "payment_status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "employee_id"
+    t.datetime "scheduled_at"
+    t.index ["employee_id", "status"], name: "index_bookings_on_employee_id_and_status"
     t.index ["package_id"], name: "index_bookings_on_package_id"
     t.index ["user_id"], name: "index_bookings_on_user_id"
   end
@@ -385,6 +388,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_150010) do
   add_foreign_key "booking_items", "bookings"
   add_foreign_key "bookings", "packages"
   add_foreign_key "bookings", "users"
+  add_foreign_key "bookings", "users", column: "employee_id", on_delete: :nullify
   add_foreign_key "city_translations", "cities"
   add_foreign_key "city_translations", "languages"
   add_foreign_key "extra_translations", "extras"

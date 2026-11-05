@@ -56,6 +56,15 @@ RSpec.describe "Admin sessions", type: :request do
       expect(flash[:alert]).to eq("That email or password is incorrect")
     end
 
+    it "rejects disabled staff" do
+      users(:employee).update!(is_active: false)
+
+      expect {
+        post admin_sign_in_path, params: { email: users(:employee).email, password: "Secret1*3*5*" }
+      }.not_to change(Session, :count)
+      expect(flash[:alert]).to eq("Your account has been disabled")
+    end
+
     it "rejects invalid credentials" do
       post admin_sign_in_path, params: { email: users(:admin).email, password: "wrongpassword" }
       expect(response).to redirect_to(admin_sign_in_path)

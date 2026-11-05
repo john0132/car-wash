@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Membership < ApplicationRecord
+  include Translatable
+
   HEX_COLOR_REGEXP = /\A#?[0-9a-fA-F]{6}\z/
 
   has_many :membership_translations, dependent: :destroy

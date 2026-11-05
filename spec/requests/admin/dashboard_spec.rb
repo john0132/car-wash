@@ -31,12 +31,13 @@ RSpec.describe "Admin dashboard", type: :request do
       end
     end
 
-    it "shares every permission with admins" do
-      Permission.create!(resource: "bookings", action: "read")
+    it "shares the permissions granted by the admin's roles" do
+      users(:admin).roles << Role.super_admin!
       sign_in users(:admin)
       get admin_root_path
 
-      expect_inertia.to have_props(admin: { permissions: [ "bookings.read" ] })
+      expect_inertia.to have_props(admin: { permissions: users(:admin).permission_names })
+      expect(users(:admin).permission_names).to include("customers.read", "admins.delete")
     end
 
     it "forces a full reload when a website client visits an admin page" do

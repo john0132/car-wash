@@ -11,4 +11,9 @@ class Language < ApplicationRecord
 
   validates :code, presence: true, uniqueness: true
   validates :name, presence: true
+
+  # { "en" => 1, "ar" => 2 }, loaded once per request (or job) via Current.
+  def self.ids_by_code
+    Current.language_ids_by_code ||= pluck(:code, :id).to_h
+  end
 end
