@@ -12,8 +12,19 @@ Rails.application.routes.draw do
     end
 
     resources :customers, only: %i[index show], concerns: :activatable
+    resources :memberships, except: :destroy, concerns: :activatable
+    resources :service_categories, concerns: :activatable
+    resources :services, concerns: :activatable
+    resources :payment_methods, except: %i[show destroy], concerns: :activatable
+    resources :payment_transactions, only: %i[index show]
     resources :administrators, concerns: :activatable
     resources :employees, concerns: :activatable
+    resources :cities, concerns: :activatable
+    resources :areas, concerns: :activatable
+    resources :pages, except: :show, concerns: :activatable
+    resources :blogs, except: :show, concerns: :activatable
+    resources :components, except: :show, concerns: :activatable
+    resources :direct_uploads, only: :create
 
     root "dashboard#index"
   end
@@ -44,6 +55,10 @@ Rails.application.routes.draw do
 
     root "home#index"
   end
+
+  # ActiveStorage's own direct-upload endpoint is open to anyone; send it through
+  # the staff-only controller instead. App routes match before the engine's.
+  post "/rails/active_storage/direct_uploads", to: "admin/direct_uploads#create"
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   get "up" => "rails/health#show", as: :rails_health_check

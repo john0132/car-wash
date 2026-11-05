@@ -13,3 +13,17 @@ export interface Pagination {
   pages: number
   total: number
 }
+
+/** Admin::ContentTranslations#languages_props, default language first. */
+export interface AdminLanguage {
+  id: number
+  code: string
+  name: string
+  default: boolean
+}
+
+/** An uploaded image: Admin::ContentTranslations#image_prop. */
+export interface ImageValue {
+  signed_id: string
+  url: string
+}

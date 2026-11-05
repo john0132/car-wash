@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe BookingItem, type: :model do
   let(:user) { User.create!(name: "Jane", email: "jane@example.com", password: "a-very-long-password") }
   let(:booking) { Booking.create!(user: user) }
-  let(:service) { Service.create!(service_category: ServiceCategory.create!, price: 100) }
+  let(:service) { create_service }
   let(:extra) { Extra.create!(price: 20) }
   let(:package) { Package.create!(name: "Pro", price: 200) }
 

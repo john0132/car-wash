@@ -16,19 +16,19 @@ RSpec.describe Media, type: :model do
   end
 
   it "is valid with required attributes" do
-    page = Page.create!(slug: "media-spec-page")
+    page = create_page(slug: "media-spec-page")
     expect(build_media(page)).to be_valid
   end
 
   it "requires byte_size to be greater than zero" do
-    page = Page.create!(slug: "media-spec-byte-size")
+    page = create_page(slug: "media-spec-byte-size")
     media = build_media(page)
     media.byte_size = 0
     expect(media).not_to be_valid
   end
 
   it "stores the short type code, not the full class name, in attachable_type" do
-    page = Page.create!(slug: "media-spec-type-code")
+    page = create_page(slug: "media-spec-type-code")
     media = build_media(page)
     media.save!
 
@@ -36,7 +36,7 @@ RSpec.describe Media, type: :model do
   end
 
   it "resolves attachable back to the owning record via the type map" do
-    page = Page.create!(slug: "media-spec-resolve")
+    page = create_page(slug: "media-spec-resolve")
     media = build_media(page)
     media.save!
 
@@ -44,7 +44,7 @@ RSpec.describe Media, type: :model do
   end
 
   it "is destroyed when its attachable owner is destroyed" do
-    page = Page.create!(slug: "media-spec-destroy")
+    page = create_page(slug: "media-spec-destroy")
     media = build_media(page)
     media.save!
 

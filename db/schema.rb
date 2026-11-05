@@ -10,10 +10,38 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_05_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_05_170008) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "addresses", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -58,7 +86,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_160000) do
     t.text "body"
     t.string "seo_title"
     t.text "seo_description"
-    t.string "seo_image_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["blog_id", "language_id"], name: "index_blog_translations_on_blog_and_language", unique: true
@@ -135,6 +162,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_160000) do
     t.index ["language_id"], name: "index_city_translations_on_language_id"
   end
 
+  create_table "component_translations", force: :cascade do |t|
+    t.bigint "component_id", null: false
+    t.bigint "language_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["component_id", "language_id"], name: "index_component_translations_on_component_and_language", unique: true
+    t.index ["component_id"], name: "index_component_translations_on_component_id"
+    t.index ["language_id"], name: "index_component_translations_on_language_id"
+  end
+
+  create_table "components", force: :cascade do |t|
+    t.string "key", null: false
+    t.boolean "is_active", default: true, null: false
+    t.jsonb "fields", default: [], null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_components_on_key", unique: true
+  end
+
   create_table "extra_translations", force: :cascade do |t|
     t.bigint "extra_id", null: false
     t.bigint "language_id", null: false
@@ -209,6 +257,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_160000) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "page_section_translations", force: :cascade do |t|
+    t.bigint "page_section_id", null: false
+    t.bigint "language_id", null: false
+    t.jsonb "content", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["language_id"], name: "index_page_section_translations_on_language_id"
+    t.index ["page_section_id", "language_id"], name: "index_page_section_translations_on_section_and_language", unique: true
+    t.index ["page_section_id"], name: "index_page_section_translations_on_page_section_id"
+  end
+
+  create_table "page_sections", force: :cascade do |t|
+    t.bigint "page_id", null: false
+    t.bigint "component_id", null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "is_active", default: true, null: false
+    t.jsonb "settings", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["component_id"], name: "index_page_sections_on_component_id"
+    t.index ["page_id", "position"], name: "index_page_sections_on_page_id_and_position"
+    t.index ["page_id"], name: "index_page_sections_on_page_id"
+  end
+
   create_table "page_translations", force: :cascade do |t|
     t.bigint "page_id", null: false
     t.bigint "language_id", null: false
@@ -217,7 +289,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_160000) do
     t.string "subtitle"
     t.string "seo_title"
     t.text "seo_description"
-    t.string "seo_image_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["language_id"], name: "index_page_translations_on_language_id"
@@ -376,6 +447,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_160000) do
     t.index ["package_id"], name: "index_users_on_package_id"
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "addresses", "areas"
   add_foreign_key "addresses", "users"
   add_foreign_key "area_translations", "areas"
@@ -391,10 +464,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_160000) do
   add_foreign_key "bookings", "users", column: "employee_id", on_delete: :nullify
   add_foreign_key "city_translations", "cities"
   add_foreign_key "city_translations", "languages"
+  add_foreign_key "component_translations", "components"
+  add_foreign_key "component_translations", "languages"
   add_foreign_key "extra_translations", "extras"
   add_foreign_key "extra_translations", "languages"
   add_foreign_key "membership_translations", "languages"
   add_foreign_key "membership_translations", "memberships"
+  add_foreign_key "page_section_translations", "languages"
+  add_foreign_key "page_section_translations", "page_sections"
+  add_foreign_key "page_sections", "components"
+  add_foreign_key "page_sections", "pages"
   add_foreign_key "page_translations", "languages"
   add_foreign_key "page_translations", "pages"
   add_foreign_key "payment_method_translations", "languages"

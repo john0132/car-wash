@@ -3,8 +3,8 @@
 require "rails_helper"
 
 RSpec.describe ServiceCategoryTranslation, type: :model do
-  let(:service_category) { ServiceCategory.create! }
-  let(:language) { Language.create!(code: "en", name: "English") }
+  let(:service_category) { create_service_category }
+  let(:language) { arabic }
 
   it "is valid with a service category, language, and name" do
     expect(ServiceCategoryTranslation.new(service_category: service_category, language: language, name: "Washing")).to be_valid

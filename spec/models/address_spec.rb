@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe Address, type: :model do
   let(:user) { User.create!(name: "Jane", email: "jane@example.com", password: "a-very-long-password") }
-  let(:area) { Area.create!(city: City.create!, rate: 10) }
+  let(:area) { create_area }
   let(:location) { RGeo::Geographic.spherical_factory(srid: 4326).point(31.2357, 30.0444) }
 
   it "is valid with a user, area, name, and location" do

@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 # Shared by the admin dashboard's customer, administrator and employee screens:
-# list filtering (`q`, `status`), page-number pagination, the enable/disable
+# list filtering (`q`, `status`), pagination (Admin::Pagination), the enable/disable
 # response, and the JSON shapes the pages in app/javascript/admin/features expect.
 module Admin::UserManagement
   extend ActiveSupport::Concern
 
-  PER_PAGE = 20
-
   included do
+    include Admin::Pagination
+
     after_action :verify_authorized
   end
 
@@ -24,16 +24,6 @@ module Admin::UserManagement
 
   def list_filters
     { q: params[:q].presence, status: params[:status].presence }
-  end
-
-  # Returns [records, pagination] for page `params[page_param]`. Pass `total`
-  # when it is already known, to skip the COUNT query.
-  def paginate(scope, total: nil, page_param: :page, per_page: PER_PAGE)
-    total ||= scope.count(:all)
-    pages = [ (total.to_f / per_page).ceil, 1 ].max
-    page = params[page_param].to_i.clamp(1, pages)
-
-    [ scope.limit(per_page).offset((page - 1) * per_page), { page: page, pages: pages, total: total } ]
   end
 
   # PATCH …/:id/activation with `is_active`. Authorize before calling.

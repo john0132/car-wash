@@ -6,6 +6,9 @@
 # Admins only get permissions through roles, so assign this role to the first production admin.
 super_admin = Role.super_admin!
 
+# Every environment: starter page components (hero, rich text, CTA, features).
+load Rails.root.join("db/seeds/components.rb")
+
 # Development-only staff account for signing in at /admin/sign_in.
 # Override with ADMIN_EMAIL / ADMIN_PASSWORD. Production admins must be created explicitly.
 if Rails.env.development?

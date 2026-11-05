@@ -4,8 +4,8 @@ require "rails_helper"
 
 RSpec.describe Booking, type: :model do
   let(:user) { User.create!(name: "Jane", email: "jane@example.com", password: "a-very-long-password") }
-  let(:service_category) { ServiceCategory.create! }
-  let(:service) { Service.create!(service_category: service_category, price: 100) }
+  let(:service_category) { create_service_category }
+  let(:service) { create_service(service_category: service_category) }
   let(:extra) { Extra.create!(price: 20) }
 
   it "is valid with a user" do

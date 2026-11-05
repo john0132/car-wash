@@ -52,13 +52,13 @@ class ApplicationPolicy
   private
 
   # DB-backed permission check against the Role/Permission tables, scoped to
-  # the resource this policy governs (e.g. "booking"). Admins bypass this
-  # entirely and customers never have roles, see User#permission?.
+  # the resource this policy governs (e.g. "cities", see Permission::CATALOG).
+  # Only admins hold roles, so employees and customers never pass, see User#permission?.
   def permit?(action)
     user.permission?(resource_name, action)
   end
 
   def resource_name
-    record.is_a?(Class) ? record.name.underscore : record.class.name.underscore
+    (record.is_a?(Class) ? record : record.class).model_name.plural
   end
 end

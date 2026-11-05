@@ -3,20 +3,30 @@
 require "rails_helper"
 
 RSpec.describe ServiceCategory, type: :model do
-  it "is valid with no attributes set" do
-    expect(ServiceCategory.new).to be_valid
-  end
-
   it "defaults is_active to true" do
-    expect(ServiceCategory.create!.is_active).to be(true)
+    expect(create_service_category.is_active).to be(true)
   end
 
-  it "destroys its services when destroyed" do
-    category = ServiceCategory.create!
-    service = Service.create!(service_category: category, price: 100)
+  it "requires a name in the default language" do
+    category = ServiceCategory.new
+    category.service_category_translations.build(language: arabic, name: "خارجي")
+    english
 
-    category.destroy
+    expect(category).not_to be_valid
+    expect(category.errors[:translations]).to eq([ "must include a name in English" ])
+  end
 
-    expect(Service.exists?(service.id)).to be(false)
+  it "can't be deleted while it has services" do
+    category = create_service_category
+    create_service(service_category: category)
+
+    expect(category.destroy).to be(false)
+    expect(ServiceCategory.exists?(category.id)).to be(true)
+  end
+
+  it "deletes its translations with it" do
+    category = create_service_category
+
+    expect { category.destroy }.to change(ServiceCategoryTranslation, :count).by(-1)
   end
 end

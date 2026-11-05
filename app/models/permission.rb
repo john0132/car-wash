@@ -4,8 +4,18 @@ class Permission < ApplicationRecord
   # Every "resource.action" the admin dashboard checks. Seeds sync this into the table.
   CATALOG = {
     "customers" => %w[read update],
+    "memberships" => %w[read create update],
+    "service_categories" => %w[read create update delete],
+    "services" => %w[read create update delete],
+    "payment_methods" => %w[read create update],
+    "payment_transactions" => %w[read],
     "admins" => %w[read create update delete],
-    "employees" => %w[read create update delete]
+    "employees" => %w[read create update delete],
+    "cities" => %w[read create update delete],
+    "areas" => %w[read create update delete],
+    "pages" => %w[read create update delete],
+    "blogs" => %w[read create update delete],
+    "components" => %w[read create update delete]
   }.freeze
 
   has_many :role_permissions, dependent: :destroy

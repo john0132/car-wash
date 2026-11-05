@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  include Activatable
+
   has_secure_password
 
   generates_token_for :email_verification, expires_in: 2.days do
@@ -31,15 +33,6 @@ class User < ApplicationRecord
   validates :wallet, :points, :lifetime_points, numericality: { greater_than_or_equal_to: 0 }
 
   normalizes :email, with: -> { _1.strip.downcase }
-
-  # "active" / "inactive" filter from the dashboard lists; anything else means all.
-  scope :with_status, ->(status) {
-    case status
-    when "active" then where(is_active: true)
-    when "inactive" then where(is_active: false)
-    else all
-    end
-  }
 
   # Adds `lifetime_value` and `bookings_count` columns, one subquery each, for customer lists.
   scope :with_customer_totals, -> {

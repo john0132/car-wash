@@ -1,0 +1,188 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe "Admin services", type: :request do
+  fixtures :users
+
+  let(:admin) { users(:admin) }
+  let(:category) { create_service_category("Exterior") }
+
+  before do
+    english
+    arabic
+    sign_in admin
+  end
+
+  def translations(en:, ar: "", **seo)
+    [ { language_id: english.id, name: en, **seo }, { language_id: arabic.id, name: ar } ]
+  end
+
+  def book(service)
+    user = User.create!(name: "Jane", email: "jane-#{SecureRandom.hex(3)}@example.com", password: "a-very-long-password")
+    Booking.create!(user: user).booking_items.create!(itemable: service, quantity: 1, price: service.price)
+  end
+
+  describe "GET /admin/services" do
+    it "lists services filtered by name, category and status" do
+      grant(admin, "services.read")
+      interior = create_service_category("Interior")
+      create_service("Exterior Wash", service_category: category, price: 150)
+      create_service("Interior Detailing", service_category: interior, price: 300, is_active: false)
+
+      get admin_services_path
+
+      expect_inertia.to render_component("admin/services/index")
+      expect(inertia.props[:services].pluck(:name)).to eq([ "Exterior Wash", "Interior Detailing" ])
+      expect(inertia.props[:services].first).to include(price: 150.0, sale_price: nil,
+                                                        service_category: { id: category.id, name: "Exterior" })
+      expect(inertia.props[:categories].pluck(:name)).to eq(%w[Exterior Interior])
+
+      get admin_services_path, params: { q: "detail" }
+      expect(inertia.props[:services].pluck(:name)).to eq([ "Interior Detailing" ])
+
+      get admin_services_path, params: { service_category_id: category.id }
+      expect(inertia.props[:services].pluck(:name)).to eq([ "Exterior Wash" ])
+      expect(inertia.props[:filters]).to include(service_category_id: category.id)
+
+      get admin_services_path, params: { status: "inactive" }
+      expect(inertia.props[:services].pluck(:name)).to eq([ "Interior Detailing" ])
+    end
+
+    it "is forbidden without services.read" do
+      get admin_services_path
+
+      expect(response).to redirect_to(admin_root_path)
+    end
+  end
+
+  describe "GET /admin/services/:id" do
+    it "shows the service with how many bookings it is on" do
+      grant(admin, "services.read")
+      service = create_service(service_category: category)
+      book(service)
+
+      get admin_service_path(service)
+
+      expect_inertia.to render_component("admin/services/show")
+      expect(inertia.props[:service]).to include(id: service.id, bookings_count: 1)
+    end
+  end
+
+  describe "GET /admin/services/new" do
+    it "preselects the category from the query" do
+      grant(admin, "services.create")
+
+      get new_admin_service_path(service_category_id: category.id)
+
+      expect_inertia.to render_component("admin/services/new")
+      expect(inertia.props[:service_category_id]).to eq(category.id)
+      expect(inertia.props[:translations].pluck(:code)).to eq(%w[en ar])
+    end
+  end
+
+  describe "POST /admin/services" do
+    before { grant(admin, "services.create") }
+
+    it "creates a service with prices, translations and SEO text" do
+      post admin_services_path, params: {
+        service: {
+          service_category_id: category.id, price: "400", sale_price: "350", is_active: true,
+          translations: translations(en: "Full Wash", ar: "غسيل كامل", seo_description: "Inside and out")
+        }
+      }
+
+      service = Service.last
+      expect(response).to redirect_to(admin_service_path(service))
+      expect(service).to have_attributes(service_category: category, price: 400, sale_price: 350)
+      expect(service.service_translations.map(&:name)).to contain_exactly("Full Wash", "غسيل كامل")
+      expect(service.translation(:en).seo_description).to eq("Inside and out")
+    end
+
+    it "treats a blank sale price as no sale" do
+      post admin_services_path, params: {
+        service: { service_category_id: category.id, price: "150", sale_price: "", translations: translations(en: "Wash") }
+      }
+
+      expect(Service.last.sale_price).to be_nil
+    end
+
+    it "rejects a sale price that isn't below the price" do
+      expect {
+        post admin_services_path, params: {
+          service: { service_category_id: category.id, price: "100", sale_price: "100", translations: translations(en: "Wash") }
+        }
+      }.not_to change(Service, :count)
+
+      expect(response).to redirect_to(new_admin_service_path(service_category_id: category.id))
+      expect(session[:inertia_errors]).to include(:sale_price)
+    end
+
+    it "requires a category and an English name" do
+      expect {
+        post admin_services_path, params: { service: { price: "100", translations: translations(en: "") } }
+      }.not_to change(Service, :count)
+
+      expect(session[:inertia_errors]).to include(:service_category, :translations)
+    end
+  end
+
+  describe "PATCH /admin/services/:id" do
+    it "updates prices, moves the service and clears the sale price" do
+      grant(admin, "services.update")
+      interior = create_service_category("Interior")
+      service = create_service(service_category: category, price: 200, sale_price: 150)
+
+      patch admin_service_path(service), params: {
+        service: { service_category_id: interior.id, price: "250", sale_price: "", translations: translations(en: "Deluxe") }
+      }
+
+      expect(response).to redirect_to(admin_service_path(service))
+      expect(service.reload).to have_attributes(service_category: interior, price: 250, sale_price: nil)
+      expect(service.translation(:en).name).to eq("Deluxe")
+    end
+
+    it "is forbidden without services.update" do
+      grant(admin, "services.read")
+      service = create_service(service_category: category, price: 200)
+
+      patch admin_service_path(service), params: { service: { price: "1" } }
+
+      expect(service.reload.price).to eq(200)
+    end
+  end
+
+  describe "PATCH /admin/services/:id/activation" do
+    it "disables the service" do
+      grant(admin, "services.update")
+      service = create_service(service_category: category)
+
+      patch activation_admin_service_path(service), params: { is_active: false }
+
+      expect(service.reload).not_to be_is_active
+    end
+  end
+
+  describe "DELETE /admin/services/:id" do
+    before { grant(admin, "services.delete") }
+
+    it "deletes a service that was never booked and returns to its category" do
+      service = create_service(service_category: category)
+
+      delete admin_service_path(service)
+
+      expect(response).to redirect_to(admin_service_category_path(category))
+      expect(Service.exists?(service.id)).to be(false)
+    end
+
+    it "refuses to delete a booked service" do
+      service = create_service(service_category: category)
+      book(service)
+
+      delete admin_service_path(service)
+
+      expect(Service.exists?(service.id)).to be(true)
+      expect(flash[:alert]).to match(/booking items/i)
+    end
+  end
+end

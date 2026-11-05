@@ -12,14 +12,21 @@ english = Language.find_or_create_by!(code: "en") { |l| l.name = "English" }
 arabic = Language.find_or_create_by!(code: "ar") { |l| l.name = "العربية" }
 
 # Finds a record by its English translation name, or creates it with `attrs`,
-# then makes sure both the English and Arabic translations exist.
+# then makes sure both the English and Arabic translations exist. New records
+# are saved together with their translations (City and Area require an English name).
 translated = lambda do |klass, en_name, ar_name, **attrs|
   association = :"#{klass.model_name.singular}_translations"
+  names = { english => en_name, arabic => ar_name }
   record = klass.joins(association).find_by(association => { name: en_name, language_id: english.id })
-  record ||= klass.create!(**attrs)
 
-  { english => en_name, arabic => ar_name }.each do |language, name|
-    record.public_send(association).find_or_create_by!(language: language) { |t| t.name = name }
+  if record
+    names.each do |language, name|
+      record.public_send(association).find_or_create_by!(language: language) { |t| t.name = name }
+    end
+  else
+    record = klass.new(**attrs)
+    names.each { |language, name| record.public_send(association).build(language: language, name: name) }
+    record.save!
   end
   record
 end
@@ -43,14 +50,25 @@ packages = [
 cairo = translated.(City, "Cairo", "القاهرة")
 giza = translated.(City, "Giza", "الجيزة")
 
-# [area, center latitude, center longitude]
+# A square geofence of ±`half` degrees around a center point.
+square = lambda do |lat, lng, half = 0.015|
+  corners = [ [ -half, -half ], [ half, -half ], [ half, half ], [ -half, half ], [ -half, -half ] ]
+  geo.polygon(geo.linear_ring(corners.map { |dlng, dlat| geo.point(lng + dlng, lat + dlat) }))
+end
+
+# [area, center latitude, center longitude]. Each area gets a square geofence
+# around its center, including areas seeded before geofences were required.
 areas = [
-  [ translated.(Area, "Maadi", "المعادي", city: cairo, rate: 1.0), 29.9602, 31.2569 ],
-  [ translated.(Area, "Zamalek", "الزمالك", city: cairo, rate: 1.2), 30.0609, 31.2194 ],
-  [ translated.(Area, "New Cairo", "القاهرة الجديدة", city: cairo, rate: 1.1), 30.0300, 31.4700 ],
-  [ translated.(Area, "Dokki", "الدقي", city: giza, rate: 1.0), 30.0385, 31.2123 ],
-  [ translated.(Area, "Sheikh Zayed", "الشيخ زايد", city: giza, rate: 1.3), 30.0444, 30.9833 ]
-]
+  [ "Maadi", "المعادي", cairo, 1.0, 29.9602, 31.2569 ],
+  [ "Zamalek", "الزمالك", cairo, 1.2, 30.0609, 31.2194 ],
+  [ "New Cairo", "القاهرة الجديدة", cairo, 1.1, 30.0300, 31.4700 ],
+  [ "Dokki", "الدقي", giza, 1.0, 30.0385, 31.2123 ],
+  [ "Sheikh Zayed", "الشيخ زايد", giza, 1.3, 30.0444, 30.9833 ]
+].map do |en_name, ar_name, city, rate, lat, lng|
+  record = translated.(Area, en_name, ar_name, city: city, rate: rate, geofence: square.(lat, lng))
+  record.update!(geofence: square.(lat, lng)) if record.geofence.nil?
+  [ record, lat, lng ]
+end
 
 payment_methods = [ [ "cash", "Cash", "نقدي" ], [ "card", "Card", "بطاقة" ], [ "wallet", "Wallet", "المحفظة" ] ].map do |code, en, ar|
   PaymentMethod.find_or_create_by!(code: code).tap do |method|
@@ -204,4 +222,40 @@ customers.each_with_index do |(name, last_name, tier, package, active), index|
     points: (lifetime_points * rng.rand(0.3..1.0)).to_i,
     wallet: wallet_topups.sum - spent_from_wallet
   )
+end
+
+# --- Content ----------------------------------------------------------------
+
+unless Page.exists?(slug: "about")
+  components = Component.where(key: %w[hero rich_text cta features]).index_by(&:key)
+  page = Page.new(slug: "about")
+  page.page_translations.build(language: english, name: "About", title: "About us",
+    subtitle: "Mobile car care since 2020", seo_description: "Who we are and how our mobile car wash works.")
+  page.page_translations.build(language: arabic, name: "من نحن", title: "من نحن", subtitle: "عناية متنقلة بالسيارات منذ 2020")
+
+  section = ->(key, position, settings, content) {
+    page.page_sections.build(component: components.fetch(key), position: position)
+      .assign_values(settings: settings, content_by_language: content)
+  }
+  section.("hero", 0, { "button_url" => "/sign_up", "alignment" => "center" },
+    english.id => { "heading" => "We come to you", "subheading" => "Book a wash and we'll be at your door.", "button_label" => "Book now" },
+    arabic.id => { "heading" => "نأتي إليك", "button_label" => "احجز الآن" })
+  section.("features", 1, { "items" => [ { "_id" => "fast" }, { "_id" => "eco" } ] },
+    english.id => { "heading" => "Why us", "items" => { "fast" => { "title" => "Fast", "text" => "Most washes take under an hour." },
+                                                         "eco" => { "title" => "Eco-friendly", "text" => "Waterless products." } } },
+    arabic.id => { "heading" => "لماذا نحن", "items" => { "fast" => { "title" => "سريع" }, "eco" => { "title" => "صديق للبيئة" } } })
+  section.("rich_text", 2, {},
+    english.id => { "body" => "<h2>Our story</h2><p>We started with one van and a simple idea: car care should come to you.</p>" })
+  section.("cta", 3, { "button_url" => "/sign_up", "variant" => "primary" },
+    english.id => { "heading" => "Ready for a spotless car?", "button_label" => "Create an account" })
+  page.save!
+end
+
+unless Blog.exists?(slug: "winter-car-care-tips")
+  blog = Blog.new(slug: "winter-car-care-tips")
+  blog.blog_translations.build(language: english, name: "Winter tips", title: "5 winter car care tips",
+    subtitle: "Keep your car clean when the weather isn't",
+    body: "<p>Cold weather is hard on paint.</p><ul><li>Wash every two weeks</li><li>Protect with wax</li></ul>",
+    seo_description: "Simple ways to protect your car in winter.")
+  blog.save!
 end
