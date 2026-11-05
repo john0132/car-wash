@@ -6,7 +6,9 @@ class Media < ApplicationRecord
   TYPE_MAP = {
     "Page" => "page",
     "Blog" => "blog",
-    "Package" => "package"
+    "Package" => "package",
+    "ServiceCategory" => "service_category",
+    "Service" => "service"
   }.freeze
 
   belongs_to :attachable, polymorphic: true
