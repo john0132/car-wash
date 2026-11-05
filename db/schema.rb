@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_05_140006) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_05_150010) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -74,6 +74,47 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_140006) do
     t.index ["slug"], name: "index_blogs_on_slug", unique: true
   end
 
+  create_table "booking_addresses", force: :cascade do |t|
+    t.bigint "booking_id", null: false
+    t.bigint "address_id"
+    t.string "name", null: false
+    t.string "area_name", null: false
+    t.string "city_name", null: false
+    t.geography "location", limit: {srid: 4326, type: "st_point", geographic: true}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_id"], name: "index_booking_addresses_on_address_id"
+    t.index ["booking_id"], name: "index_booking_addresses_on_booking_id", unique: true
+    t.index ["location"], name: "index_booking_addresses_on_location", using: :gist
+  end
+
+  create_table "booking_items", force: :cascade do |t|
+    t.bigint "booking_id", null: false
+    t.string "itemable_type", null: false
+    t.bigint "itemable_id", null: false
+    t.integer "quantity", default: 1, null: false
+    t.decimal "price", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["booking_id"], name: "index_booking_items_on_booking_id"
+    t.index ["itemable_type", "itemable_id"], name: "index_booking_items_on_itemable_type_and_itemable_id"
+  end
+
+  create_table "bookings", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "package_id"
+    t.decimal "subtotal", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "extras_total", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "discounts", precision: 10, scale: 2, default: "0.0", null: false
+    t.decimal "total_amount", precision: 10, scale: 2, default: "0.0", null: false
+    t.integer "status", default: 0, null: false
+    t.integer "payment_status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["package_id"], name: "index_bookings_on_package_id"
+    t.index ["user_id"], name: "index_bookings_on_user_id"
+  end
+
   create_table "cities", force: :cascade do |t|
     t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
@@ -89,6 +130,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_140006) do
     t.index ["city_id", "language_id"], name: "index_city_translations_on_city_and_language", unique: true
     t.index ["city_id"], name: "index_city_translations_on_city_id"
     t.index ["language_id"], name: "index_city_translations_on_language_id"
+  end
+
+  create_table "extra_translations", force: :cascade do |t|
+    t.bigint "extra_id", null: false
+    t.bigint "language_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["extra_id", "language_id"], name: "index_extra_translations_on_extra_and_language", unique: true
+    t.index ["extra_id"], name: "index_extra_translations_on_extra_id"
+    t.index ["language_id"], name: "index_extra_translations_on_language_id"
+  end
+
+  create_table "extras", force: :cascade do |t|
+    t.decimal "price", precision: 10, scale: 2, null: false
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "languages", force: :cascade do |t|
@@ -198,6 +257,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_140006) do
     t.string "reference"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "booking_id"
+    t.index ["booking_id"], name: "index_payment_transactions_on_booking_id"
     t.index ["payment_method_id"], name: "index_payment_transactions_on_payment_method_id"
     t.index ["reference"], name: "index_payment_transactions_on_reference", unique: true
     t.index ["user_id"], name: "index_payment_transactions_on_user_id"
@@ -319,14 +380,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_140006) do
   add_foreign_key "areas", "cities"
   add_foreign_key "blog_translations", "blogs"
   add_foreign_key "blog_translations", "languages"
+  add_foreign_key "booking_addresses", "addresses", on_delete: :nullify
+  add_foreign_key "booking_addresses", "bookings"
+  add_foreign_key "booking_items", "bookings"
+  add_foreign_key "bookings", "packages"
+  add_foreign_key "bookings", "users"
   add_foreign_key "city_translations", "cities"
   add_foreign_key "city_translations", "languages"
+  add_foreign_key "extra_translations", "extras"
+  add_foreign_key "extra_translations", "languages"
   add_foreign_key "membership_translations", "languages"
   add_foreign_key "membership_translations", "memberships"
   add_foreign_key "page_translations", "languages"
   add_foreign_key "page_translations", "pages"
   add_foreign_key "payment_method_translations", "languages"
   add_foreign_key "payment_method_translations", "payment_methods"
+  add_foreign_key "payment_transactions", "bookings"
   add_foreign_key "payment_transactions", "payment_methods"
   add_foreign_key "payment_transactions", "users"
   add_foreign_key "role_permissions", "permissions"

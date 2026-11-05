@@ -8,7 +8,8 @@ class Media < ApplicationRecord
     "Blog" => "blog",
     "Package" => "package",
     "ServiceCategory" => "service_category",
-    "Service" => "service"
+    "Service" => "service",
+    "Extra" => "extra"
   }.freeze
 
   belongs_to :attachable, polymorphic: true
