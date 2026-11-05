@@ -12,10 +12,14 @@ class User < ApplicationRecord
   end
 
   has_many :sessions, dependent: :destroy
+  has_many :payment_transactions, dependent: :restrict_with_error
+  belongs_to :membership, optional: true
+  belongs_to :subscription, optional: true
 
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, allow_nil: true, length: { minimum: 12 }
+  validates :wallet, :points, :lifetime_points, numericality: { greater_than_or_equal_to: 0 }
 
   normalizes :email, with: -> { _1.strip.downcase }
 
