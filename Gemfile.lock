@@ -56,6 +56,9 @@ GEM
       activemodel (= 8.1.4.1)
       activesupport (= 8.1.4.1)
       timeout (>= 0.4.0)
+    activerecord-postgis-adapter (11.1.1)
+      activerecord (~> 8.1.0)
+      rgeo-activerecord (~> 8.1.0)
     activestorage (8.1.4.1)
       actionpack (= 8.1.4.1)
       activejob (= 8.1.4.1)
@@ -286,6 +289,10 @@ GEM
     reline (0.7.0)
       io-console (~> 0.5)
     rexml (3.4.4)
+    rgeo (3.1.0)
+    rgeo-activerecord (8.1.0)
+      activerecord (>= 8.1, < 8.2)
+      rgeo (>= 3.0)
     rspec-core (3.13.6)
       rspec-support (~> 3.13.0)
     rspec-expectations (3.13.5)
@@ -405,6 +412,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  activerecord-postgis-adapter
   authentication-zero
   bcrypt (~> 3.1.7)
   bootsnap

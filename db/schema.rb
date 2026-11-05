@@ -10,9 +10,49 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_05_080056) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_05_090008) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "postgis"
+
+  create_table "area_translations", force: :cascade do |t|
+    t.bigint "area_id", null: false
+    t.bigint "language_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["area_id", "language_id"], name: "index_area_translations_on_area_and_language", unique: true
+    t.index ["area_id"], name: "index_area_translations_on_area_id"
+    t.index ["language_id"], name: "index_area_translations_on_language_id"
+  end
+
+  create_table "areas", force: :cascade do |t|
+    t.bigint "city_id", null: false
+    t.decimal "rate", precision: 10, scale: 2, null: false
+    t.boolean "is_active", default: true, null: false
+    t.geography "geofence", limit: {srid: 4326, type: "st_polygon", geographic: true}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["city_id"], name: "index_areas_on_city_id"
+    t.index ["geofence"], name: "index_areas_on_geofence", using: :gist
+  end
+
+  create_table "cities", force: :cascade do |t|
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "city_translations", force: :cascade do |t|
+    t.bigint "city_id", null: false
+    t.bigint "language_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["city_id", "language_id"], name: "index_city_translations_on_city_and_language", unique: true
+    t.index ["city_id"], name: "index_city_translations_on_city_id"
+    t.index ["language_id"], name: "index_city_translations_on_language_id"
+  end
 
   create_table "languages", force: :cascade do |t|
     t.string "code", null: false
@@ -114,6 +154,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_080056) do
     t.index ["subscription_id"], name: "index_users_on_subscription_id"
   end
 
+  add_foreign_key "area_translations", "areas"
+  add_foreign_key "area_translations", "languages"
+  add_foreign_key "areas", "cities"
+  add_foreign_key "city_translations", "cities"
+  add_foreign_key "city_translations", "languages"
   add_foreign_key "membership_translations", "languages"
   add_foreign_key "membership_translations", "memberships"
   add_foreign_key "payment_method_translations", "languages"

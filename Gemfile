@@ -6,6 +6,9 @@ gem "rails", "~> 8.1.4"
 gem "propshaft"
 # Use pg as the database for Active Record
 gem "pg", "~> 1.1"
+
+# PostGIS-backed geometry/geography columns for Active Record (used for Area#geofence)
+gem "activerecord-postgis-adapter"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
