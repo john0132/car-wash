@@ -14,7 +14,7 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :payment_transactions, dependent: :restrict_with_error
   belongs_to :membership, optional: true
-  belongs_to :subscription, optional: true
+  belongs_to :package, optional: true
 
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }

@@ -109,6 +109,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_100006) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "packages", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.boolean "is_active", default: true, null: false
+    t.decimal "price", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "page_translations", force: :cascade do |t|
     t.bigint "page_id", null: false
     t.bigint "language_id", null: false
@@ -174,17 +183,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_100006) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
-  create_table "subscriptions", force: :cascade do |t|
-    t.string "name", null: false
-    t.text "description"
-    t.boolean "is_active", default: true, null: false
-    t.integer "discount_type", null: false
-    t.decimal "discount_value", precision: 10, scale: 2, null: false
-    t.decimal "price", precision: 10, scale: 2, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "users", force: :cascade do |t|
     t.string "name", null: false
     t.string "email", null: false
@@ -197,10 +195,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_100006) do
     t.integer "points", default: 0, null: false
     t.integer "lifetime_points", default: 0, null: false
     t.bigint "membership_id"
-    t.bigint "subscription_id"
+    t.bigint "package_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["membership_id"], name: "index_users_on_membership_id"
-    t.index ["subscription_id"], name: "index_users_on_subscription_id"
+    t.index ["package_id"], name: "index_users_on_package_id"
   end
 
   add_foreign_key "area_translations", "areas"
@@ -220,5 +218,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_100006) do
   add_foreign_key "payment_transactions", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "users", "memberships"
-  add_foreign_key "users", "subscriptions"
+  add_foreign_key "users", "packages"
 end

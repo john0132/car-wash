@@ -7,6 +7,6 @@ class AddProfileAndWalletFieldsToUsers < ActiveRecord::Migration[8.1]
     add_column :users, :points, :integer, null: false, default: 0
     add_column :users, :lifetime_points, :integer, null: false, default: 0
     add_reference :users, :membership, foreign_key: true
-    add_reference :users, :subscription, foreign_key: true
+    add_reference :users, :package, foreign_key: true
   end
 end
