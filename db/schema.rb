@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_05_090008) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_05_100006) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -35,6 +35,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_090008) do
     t.datetime "updated_at", null: false
     t.index ["city_id"], name: "index_areas_on_city_id"
     t.index ["geofence"], name: "index_areas_on_geofence", using: :gist
+  end
+
+  create_table "blog_translations", force: :cascade do |t|
+    t.bigint "blog_id", null: false
+    t.bigint "language_id", null: false
+    t.string "name", null: false
+    t.string "title", null: false
+    t.string "subtitle"
+    t.text "body"
+    t.string "seo_title"
+    t.text "seo_description"
+    t.string "seo_image_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["blog_id", "language_id"], name: "index_blog_translations_on_blog_and_language", unique: true
+    t.index ["blog_id"], name: "index_blog_translations_on_blog_id"
+    t.index ["language_id"], name: "index_blog_translations_on_language_id"
+  end
+
+  create_table "blogs", force: :cascade do |t|
+    t.string "slug", null: false
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_blogs_on_slug", unique: true
   end
 
   create_table "cities", force: :cascade do |t|
@@ -82,6 +107,30 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_090008) do
     t.string "text_color", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "page_translations", force: :cascade do |t|
+    t.bigint "page_id", null: false
+    t.bigint "language_id", null: false
+    t.string "name", null: false
+    t.string "title", null: false
+    t.string "subtitle"
+    t.string "seo_title"
+    t.text "seo_description"
+    t.string "seo_image_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["language_id"], name: "index_page_translations_on_language_id"
+    t.index ["page_id", "language_id"], name: "index_page_translations_on_page_and_language", unique: true
+    t.index ["page_id"], name: "index_page_translations_on_page_id"
+  end
+
+  create_table "pages", force: :cascade do |t|
+    t.string "slug", null: false
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_pages_on_slug", unique: true
   end
 
   create_table "payment_method_translations", force: :cascade do |t|
@@ -157,10 +206,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_090008) do
   add_foreign_key "area_translations", "areas"
   add_foreign_key "area_translations", "languages"
   add_foreign_key "areas", "cities"
+  add_foreign_key "blog_translations", "blogs"
+  add_foreign_key "blog_translations", "languages"
   add_foreign_key "city_translations", "cities"
   add_foreign_key "city_translations", "languages"
   add_foreign_key "membership_translations", "languages"
   add_foreign_key "membership_translations", "memberships"
+  add_foreign_key "page_translations", "languages"
+  add_foreign_key "page_translations", "pages"
   add_foreign_key "payment_method_translations", "languages"
   add_foreign_key "payment_method_translations", "payment_methods"
   add_foreign_key "payment_transactions", "payment_methods"
