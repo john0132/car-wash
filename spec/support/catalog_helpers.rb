@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Builders for ServiceCategory/Service, which require a default-language (English) name.
+# Builders for ServiceCategory/Service/Extra, which require a default-language (English) name.
 # Uses LocationHelpers#english.
 module CatalogHelpers
   def create_service_category(name = "Exterior", **attrs)
@@ -18,6 +18,13 @@ module CatalogHelpers
 
   def create_service(...)
     build_service(...).tap(&:save!)
+  end
+
+  def create_extra(name = "Air Freshener", price: 20, **attrs)
+    Extra.new(price: price, **attrs).tap do |extra|
+      extra.extra_translations.build(language: english, name: name)
+      extra.save!
+    end
   end
 end
 

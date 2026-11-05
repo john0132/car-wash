@@ -5,7 +5,7 @@ import { PaymentStatusBadge } from "@/admin/features/bookings/components/payment
 import type { BookingRow } from "@/admin/features/bookings/types"
 import { useCan } from "@/admin/hooks/use-can"
 import { formatDateTime, formatMoney } from "@/admin/lib/format"
-import { adminCustomers, adminEmployees } from "@/routes"
+import { adminBookings, adminCustomers, adminEmployees } from "@/routes"
 import {
   Table,
   TableBody,
@@ -16,8 +16,10 @@ import {
 } from "@/shared/components/ui/table"
 
 /**
- * Bookings list. `party` picks the counterpart column: a customer's page shows
- * who carried the booking out, an employee's page shows who booked it.
+ * Bookings list. `party` picks the counterpart column(s): a customer's page
+ * shows who carried the booking out, an employee's page shows who booked it,
+ * and "both" (the main bookings list) shows both. The booking id links to its
+ * show page when the viewer can read bookings.
  */
 export function BookingsTable({
   bookings,
@@ -25,10 +27,11 @@ export function BookingsTable({
   emptyMessage = "No bookings yet.",
 }: {
   bookings: BookingRow[]
-  party: "customer" | "employee"
+  party: "customer" | "employee" | "both"
   emptyMessage?: string
 }) {
   const can = useCan()
+  const canReadBookings = can("bookings", "read")
 
   if (bookings.length === 0) {
     return (
@@ -44,9 +47,8 @@ export function BookingsTable({
         <TableRow>
           <TableHead>Booking</TableHead>
           <TableHead>Scheduled</TableHead>
-          <TableHead>
-            {party === "customer" ? "Customer" : "Employee"}
-          </TableHead>
+          {party !== "employee" && <TableHead>Customer</TableHead>}
+          {party !== "customer" && <TableHead>Employee</TableHead>}
           <TableHead>Address</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Payment</TableHead>
@@ -58,13 +60,22 @@ export function BookingsTable({
         {bookings.map((booking) => (
           <TableRow key={booking.id}>
             <TableCell className="font-medium tabular-nums">
-              #{booking.id}
+              {canReadBookings ? (
+                <Link
+                  href={adminBookings.show(booking.id).url}
+                  className="hover:underline"
+                >
+                  #{booking.id}
+                </Link>
+              ) : (
+                `#${booking.id}`
+              )}
             </TableCell>
             <TableCell className="tabular-nums">
               {formatDateTime(booking.scheduled_at)}
             </TableCell>
-            <TableCell>
-              {party === "customer" ? (
+            {party !== "employee" && (
+              <TableCell>
                 <PartyLink
                   party={booking.customer}
                   href={
@@ -74,7 +85,10 @@ export function BookingsTable({
                   }
                   fallback="—"
                 />
-              ) : (
+              </TableCell>
+            )}
+            {party !== "customer" && (
+              <TableCell>
                 <PartyLink
                   party={booking.employee}
                   href={
@@ -84,8 +98,8 @@ export function BookingsTable({
                   }
                   fallback="Unassigned"
                 />
-              )}
-            </TableCell>
+              </TableCell>
+            )}
             <TableCell className="text-muted-foreground max-w-56 truncate">
               {booking.address ?? "—"}
             </TableCell>

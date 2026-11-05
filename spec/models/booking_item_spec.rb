@@ -6,7 +6,7 @@ RSpec.describe BookingItem, type: :model do
   let(:user) { User.create!(name: "Jane", email: "jane@example.com", password: "a-very-long-password") }
   let(:booking) { Booking.create!(user: user) }
   let(:service) { create_service }
-  let(:extra) { Extra.create!(price: 20) }
+  let(:extra) { create_extra }
   let(:package) { Package.create!(name: "Pro", price: 200) }
 
   it "is valid with a booking, itemable, quantity, and price" do

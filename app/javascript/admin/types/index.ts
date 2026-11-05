@@ -4,6 +4,8 @@ export interface AdminSharedProps {
   admin: {
     /** "resource.action" keys, e.g. "bookings.read". UI visibility only — Rails enforces access. */
     permissions: string[]
+    /** Holds the Super Admin role. UI visibility only — Rails enforces access. */
+    is_super_admin: boolean
   }
 }
 

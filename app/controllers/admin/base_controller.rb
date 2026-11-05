@@ -16,7 +16,12 @@ class Admin::BaseController < InertiaController
 
   # Used by the frontend to hide UI the user cannot use. Never a security boundary:
   # every admin action must still be authorized on the server (Pundit).
-  inertia_share admin: -> { { permissions: Current.user&.permission_names || [] } }
+  inertia_share admin: -> {
+    {
+      permissions: Current.user&.permission_names || [],
+      is_super_admin: Current.user&.super_admin? || false
+    }
+  }
 
   private
 

@@ -18,6 +18,20 @@ class Booking < ApplicationRecord
   scope :upcoming, -> { where(scheduled_at: Time.current..) }
   scope :newest_first, -> { order(Arel.sql("bookings.scheduled_at DESC NULLS LAST, bookings.id DESC")) }
 
+  scope :with_status, ->(status) { statuses.key?(status.to_s) ? where(status: status) : all }
+  scope :with_payment_status, ->(status) { payment_statuses.key?(status.to_s) ? where(payment_status: status) : all }
+
+  # Matches the booking id or the customer's name/email.
+  scope :search, ->(query) {
+    next all if query.blank?
+
+    term = "%#{sanitize_sql_like(query.strip)}%"
+    joins(:user).where(
+      "CAST(bookings.id AS TEXT) ILIKE :term OR users.name ILIKE :term OR " \
+      "users.last_name ILIKE :term OR users.email ILIKE :term", term: term
+    )
+  }
+
   validates :subtotal, :extras_total, :discounts, :total_amount,
     numericality: { greater_than_or_equal_to: 0 }
 

@@ -2,12 +2,13 @@
 
 class Service < ApplicationRecord
   include Activatable
-  include Attachable
+  include PolymorphicTypeCode
   include Translatable
 
   belongs_to :service_category
   has_many :service_translations, dependent: :destroy, autosave: true
   has_many :booking_items, as: :itemable, dependent: :restrict_with_error
+  has_many_attached :images
 
   requires_default_translation
 

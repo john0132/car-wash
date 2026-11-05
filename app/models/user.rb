@@ -87,6 +87,11 @@ class User < ApplicationRecord
     admin? || employee?
   end
 
+  # Holds the Super Admin role, so it may manage roles without restriction (see RolePolicy).
+  def super_admin?
+    admin? && roles.any?(&:super_admin?)
+  end
+
   # "resource.action" keys granted through the user's roles, e.g. ["customers.read"].
   # Only admins hold roles; employees and customers have no dashboard permissions.
   #

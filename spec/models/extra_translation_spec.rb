@@ -3,8 +3,8 @@
 require "rails_helper"
 
 RSpec.describe ExtraTranslation, type: :model do
-  let(:extra) { Extra.create!(price: 20) }
-  let(:language) { Language.create!(code: "en", name: "English") }
+  let(:extra) { create_extra }
+  let(:language) { arabic }
 
   it "is valid with an extra, language, and name" do
     expect(ExtraTranslation.new(extra: extra, language: language, name: "Wax")).to be_valid

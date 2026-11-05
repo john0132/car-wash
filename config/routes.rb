@@ -12,13 +12,16 @@ Rails.application.routes.draw do
     end
 
     resources :customers, only: %i[index show], concerns: :activatable
+    resources :bookings, only: %i[index show edit update]
     resources :memberships, except: :destroy, concerns: :activatable
     resources :service_categories, concerns: :activatable
     resources :services, concerns: :activatable
+    resources :extras, concerns: :activatable
     resources :payment_methods, except: %i[show destroy], concerns: :activatable
     resources :payment_transactions, only: %i[index show]
     resources :administrators, concerns: :activatable
     resources :employees, concerns: :activatable
+    resources :roles
     resources :cities, concerns: :activatable
     resources :areas, concerns: :activatable
     resources :pages, except: :show, concerns: :activatable

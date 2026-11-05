@@ -3,11 +3,14 @@ import {
   Blocks,
   BookOpen,
   Building2,
+  CalendarCheck,
   CreditCard,
   Crown,
   FileText,
   FolderTree,
+  Gift,
   HardHat,
+  KeyRound,
   LayoutGrid,
   Map,
   Newspaper,
@@ -25,15 +28,18 @@ import {
   adminAdministrators,
   adminAreas,
   adminBlogs,
+  adminBookings,
   adminCities,
   adminComponents,
   adminCustomers,
   adminDashboard,
   adminEmployees,
+  adminExtras,
   adminMemberships,
   adminPages,
   adminPaymentMethods,
   adminPaymentTransactions,
+  adminRoles,
   adminServiceCategories,
   adminServices,
 } from "@/routes"
@@ -58,13 +64,22 @@ const mainNavItems: NavItem[] = [
 ]
 
 // Each link shows only when the user holds its "<resource>.read" permission.
-const peopleNavItems: (NavItem & { resource: string })[] = [
+const operationsNavItems: (NavItem & { resource: string })[] = [
+  {
+    title: "Bookings",
+    href: adminBookings.index().url,
+    icon: CalendarCheck,
+    resource: "bookings",
+  },
   {
     title: "Customers",
     href: adminCustomers.index().url,
     icon: Users,
     resource: "customers",
   },
+]
+
+const administrationNavItems: (NavItem & { resource: string })[] = [
   {
     title: "Employees",
     href: adminEmployees.index().url,
@@ -76,6 +91,12 @@ const peopleNavItems: (NavItem & { resource: string })[] = [
     href: adminAdministrators.index().url,
     icon: ShieldCheck,
     resource: "admins",
+  },
+  {
+    title: "Roles",
+    href: adminRoles.index().url,
+    icon: KeyRound,
+    resource: "roles",
   },
 ]
 
@@ -97,6 +118,12 @@ const catalogNavItems: (NavItem & { resource: string })[] = [
     href: adminMemberships.index().url,
     icon: Crown,
     resource: "memberships",
+  },
+  {
+    title: "Extras",
+    href: adminExtras.index().url,
+    icon: Gift,
+    resource: "extras",
   },
 ]
 
@@ -162,7 +189,11 @@ const footerNavItems: NavItem[] = [
 export function AppSidebar() {
   const { url } = usePage()
   const can = useCan()
-  const peopleItems = peopleNavItems.filter((item) =>
+  const operationsItems = operationsNavItems.filter((item) =>
+    can(item.resource, "read"),
+  )
+
+  const administrationItems = administrationNavItems.filter((item) =>
     can(item.resource, "read"),
   )
 
@@ -203,9 +234,10 @@ export function AppSidebar() {
             // /admin prefixes every admin URL, so the dashboard matches exactly.
             isActive: url.split("?")[0] === item.href,
           }))}
+          label="Overview"
         />
-        {peopleItems.length > 0 && (
-          <NavMain items={peopleItems} label="People" />
+        {operationsItems.length > 0 && (
+          <NavMain items={operationsItems} label="Operations" />
         )}
         {catalogItems.length > 0 && (
           <NavMain items={catalogItems} label="Catalog" />
@@ -218,6 +250,9 @@ export function AppSidebar() {
         )}
         {paymentItems.length > 0 && (
           <NavMain items={paymentItems} label="Payments" />
+        )}
+        {administrationItems.length > 0 && (
+          <NavMain items={administrationItems} label="Administration" />
         )}
       </SidebarContent>
 

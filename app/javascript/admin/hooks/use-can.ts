@@ -14,3 +14,12 @@ export function useCan() {
   return (resource: string, action: string) =>
     admin.permissions.includes(`${resource}.${action}`)
 }
+
+/**
+ * True when the signed-in administrator holds the Super Admin role.
+ * Use it only to hide or show UI — authorization is always enforced in Rails.
+ */
+export function useIsSuperAdmin() {
+  const { admin } = usePage<AdminSharedProps>().props
+  return admin.is_super_admin
+}

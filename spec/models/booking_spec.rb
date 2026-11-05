@@ -6,7 +6,7 @@ RSpec.describe Booking, type: :model do
   let(:user) { User.create!(name: "Jane", email: "jane@example.com", password: "a-very-long-password") }
   let(:service_category) { create_service_category }
   let(:service) { create_service(service_category: service_category) }
-  let(:extra) { Extra.create!(price: 20) }
+  let(:extra) { create_extra }
 
   it "is valid with a user" do
     expect(Booking.new(user: user)).to be_valid

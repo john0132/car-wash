@@ -58,6 +58,18 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "#super_admin?" do
+    let(:admin) { User.create!(name: "Jane", email: "jane@example.com", password: "a-very-long-password", role: "admin") }
+
+    it "is true only for an admin holding the Super Admin role" do
+      expect(admin.super_admin?).to be(false)
+
+      admin.roles << Role.super_admin!
+
+      expect(admin.super_admin?).to be(true)
+    end
+  end
+
   describe "deactivation" do
     it "signs the user out everywhere" do
       user = User.create!(name: "Jane", email: "jane@example.com", password: "a-very-long-password")

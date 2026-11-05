@@ -20,10 +20,13 @@ export function BookingStatusFilter({
   url,
   counts,
   value,
+  params = {},
 }: {
   url: string
   counts: BookingStatusCounts
   value: BookingStatus | null
+  /** Other filters (e.g. q, payment_status) to keep when the status changes. */
+  params?: Record<string, string | null | undefined>
 }) {
   const total = BOOKING_STATUSES.reduce(
     (sum, status) => sum + counts[status],
@@ -40,7 +43,10 @@ export function BookingStatusFilter({
       onValueChange={(next) =>
         router.get(
           url,
-          { booking_status: next && next !== "all" ? next : undefined },
+          {
+            ...params,
+            booking_status: next && next !== "all" ? next : undefined,
+          },
           { preserveScroll: true, preserveState: true, replace: true },
         )
       }

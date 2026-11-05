@@ -2,7 +2,6 @@
 
 # A blog post. Its text (title, rich text body, SEO) lives in blog_translations.
 class Blog < ApplicationRecord
-  include Attachable
   include Activatable
   include Translatable
 

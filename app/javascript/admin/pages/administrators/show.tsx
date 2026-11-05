@@ -9,7 +9,7 @@ import { DeleteUserDialog } from "@/admin/features/users/components/delete-user-
 import type { ManagedUser } from "@/admin/features/users/types"
 import { useCan } from "@/admin/hooks/use-can"
 import AdminLayout from "@/admin/layouts/admin-layout"
-import { adminAdministrators } from "@/routes"
+import { adminAdministrators, adminRoles } from "@/routes"
 import { Badge } from "@/shared/components/ui/badge"
 import { Button } from "@/shared/components/ui/button"
 import {
@@ -133,7 +133,16 @@ export default function AdministratorShow({
                   >
                     <div className="flex items-center gap-2">
                       <ShieldCheck className="text-muted-foreground size-4" />
-                      <span className="font-medium">{role.name}</span>
+                      {can("roles", "read") ? (
+                        <Link
+                          href={adminRoles.show(role.id)}
+                          className="font-medium hover:underline"
+                        >
+                          {role.name}
+                        </Link>
+                      ) : (
+                        <span className="font-medium">{role.name}</span>
+                      )}
                       <span className="text-muted-foreground text-sm">
                         {role.description}
                       </span>

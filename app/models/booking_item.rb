@@ -8,6 +8,6 @@ class BookingItem < ApplicationRecord
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   def self.polymorphic_class_for(name)
-    Media.polymorphic_class_for(name)
+    PolymorphicTypeCode.class_for(name) || super
   end
 end

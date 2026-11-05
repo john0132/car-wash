@@ -27,6 +27,15 @@ const tone: Record<BookingStatus, string> = {
   cancelled: "text-muted-foreground",
 }
 
+/** Solid fill for each status, for chart bars — same hues as `tone` above. */
+export const bookingStatusFill: Record<BookingStatus, string> = {
+  pending: "bg-amber-500",
+  confirmed: "bg-sky-500",
+  in_progress: "bg-violet-500",
+  completed: "bg-emerald-500",
+  cancelled: "bg-muted-foreground/50",
+}
+
 /** Icon + label, so the status never relies on color alone. */
 export function BookingStatusBadge({ status }: { status: BookingStatus }) {
   const Icon = bookingStatusIcon[status]

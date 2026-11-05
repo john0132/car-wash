@@ -37,18 +37,20 @@ const presence = (value: QueryValue) =>
 
 /**
  * Search + status filter (plus optional extra selects), kept in the URL query
- * and applied by Rails.
+ * and applied by Rails. Pass `showStatus={false}` for records without a status.
  */
 export function ListFilters({
   url,
   filters,
   searchPlaceholder,
   selects = [],
+  showStatus = true,
 }: {
   url: string
-  filters: ListFilterValues
+  filters: Omit<ListFilterValues, "status"> & { status?: StatusFilter }
   searchPlaceholder: string
   selects?: SelectFilter[]
+  showStatus?: boolean
 }) {
   const [query, setQuery] = useState(filters.q ?? "")
 
@@ -107,21 +109,23 @@ export function ListFilters({
         </Select>
       ))}
 
-      <Select
-        value={filters.status ?? ALL}
-        onValueChange={(value) =>
-          apply({ status: value === ALL ? null : value })
-        }
-      >
-        <SelectTrigger className="w-36" aria-label="Filter by status">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL}>All statuses</SelectItem>
-          <SelectItem value="active">Active</SelectItem>
-          <SelectItem value="inactive">Disabled</SelectItem>
-        </SelectContent>
-      </Select>
+      {showStatus && (
+        <Select
+          value={filters.status ?? ALL}
+          onValueChange={(value) =>
+            apply({ status: value === ALL ? null : value })
+          }
+        >
+          <SelectTrigger className="w-36" aria-label="Filter by status">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={ALL}>All statuses</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Disabled</SelectItem>
+          </SelectContent>
+        </Select>
+      )}
     </div>
   )
 }

@@ -3,7 +3,6 @@
 # A website page built from ordered PageSections, each an instance of a
 # staff-defined Component. Page-level text (name, title, SEO) lives in page_translations.
 class Page < ApplicationRecord
-  include Attachable
   include Activatable
   include Translatable
 
