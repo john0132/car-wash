@@ -18,9 +18,28 @@ RSpec.describe "Admin sessions", type: :request do
       get admin_sign_in_path
       expect(response).to redirect_to(admin_root_path)
     end
+
+    it "shows the form to signed-in customers so they can switch to a staff account" do
+      sign_in users(:one)
+      get admin_sign_in_path
+
+      expect(response).to have_http_status(:success)
+      expect_inertia.to render_component("admin/sessions/new")
+    end
   end
 
   describe "POST /admin/sign_in" do
+    it "replaces a signed-in customer's session with the staff session" do
+      sign_in users(:one)
+
+      expect {
+        post admin_sign_in_path, params: { email: users(:admin).email, password: "Secret1*3*5*" }
+      }.not_to change(Session, :count)
+
+      expect(response).to redirect_to(admin_root_path)
+      expect(users(:one).sessions.reload).to be_empty
+    end
+
     it "signs staff in" do
       post admin_sign_in_path, params: { email: users(:employee).email, password: "Secret1*3*5*" }
 

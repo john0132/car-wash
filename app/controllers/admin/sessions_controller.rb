@@ -2,7 +2,10 @@
 
 class Admin::SessionsController < Admin::BaseController
   skip_before_action :authenticate, :require_staff, only: %i[new create]
-  before_action :require_no_authentication, only: %i[new create]
+  before_action :require_no_staff_session, only: %i[new create]
+
+  rate_limit to: 10, within: 3.minutes, only: :create,
+             with: -> { redirect_to admin_sign_in_path, alert: "Too many attempts. Try again later." }
 
   def new
   end
@@ -11,6 +14,7 @@ class Admin::SessionsController < Admin::BaseController
     user = User.authenticate_by(email: params[:email], password: params[:password])
 
     if user && AdminPolicy.new(user, :admin).access?
+      Current.session&.destroy # replace a signed-in customer session instead of orphaning it
       start_new_session_for(user)
       redirect_to admin_root_path, notice: "Signed in successfully"
     else
@@ -22,5 +26,15 @@ class Admin::SessionsController < Admin::BaseController
     Current.session.destroy!
     Current.session = nil
     redirect_to admin_sign_in_path, notice: "Signed out successfully", inertia: { clear_history: true }
+  end
+
+  private
+
+  # Only staff are bounced to the dashboard. A signed-in customer still gets the
+  # form, so they can switch to a staff account without signing out of the website first.
+  def require_no_staff_session
+    return unless perform_authentication && policy(:admin).access?
+
+    redirect_to admin_root_path, notice: "You are already signed in"
   end
 end
