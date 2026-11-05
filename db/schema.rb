@@ -10,10 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_05_100006) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_05_110002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
+
+  create_table "addresses", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "area_id", null: false
+    t.string "name", null: false
+    t.geography "location", limit: {srid: 4326, type: "st_point", geographic: true}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["area_id"], name: "index_addresses_on_area_id"
+    t.index ["location"], name: "index_addresses_on_location", using: :gist
+    t.index ["user_id"], name: "index_addresses_on_user_id"
+  end
 
   create_table "area_translations", force: :cascade do |t|
     t.bigint "area_id", null: false
@@ -196,11 +208,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_100006) do
     t.integer "lifetime_points", default: 0, null: false
     t.bigint "membership_id"
     t.bigint "package_id"
+    t.string "role", default: "customer", null: false
+    t.boolean "is_active", default: true, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["membership_id"], name: "index_users_on_membership_id"
     t.index ["package_id"], name: "index_users_on_package_id"
   end
 
+  add_foreign_key "addresses", "areas"
+  add_foreign_key "addresses", "users"
   add_foreign_key "area_translations", "areas"
   add_foreign_key "area_translations", "languages"
   add_foreign_key "areas", "cities"
