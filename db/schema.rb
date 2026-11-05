@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_05_120006) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_05_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -97,6 +97,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_120006) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["code"], name: "index_languages_on_code", unique: true
+  end
+
+  create_table "media", force: :cascade do |t|
+    t.string "attachable_type", null: false
+    t.bigint "attachable_id", null: false
+    t.string "collection_name", default: "default", null: false
+    t.integer "position", default: 0, null: false
+    t.string "name", null: false
+    t.string "file_name", null: false
+    t.string "extension", null: false
+    t.string "content_type", null: false
+    t.bigint "byte_size", null: false
+    t.string "url", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["attachable_type", "attachable_id", "collection_name", "position"], name: "index_media_on_attachable_collection_position"
+    t.index ["attachable_type", "attachable_id", "collection_name"], name: "index_media_on_attachable_and_collection"
   end
 
   create_table "membership_translations", force: :cascade do |t|

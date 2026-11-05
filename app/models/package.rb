@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Package < ApplicationRecord
+  include Attachable
+
   has_many :users, dependent: :nullify
 
   validates :name, presence: true

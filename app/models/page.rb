@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Page < ApplicationRecord
+  include Attachable
+
   SLUG_REGEXP = /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/
 
   has_many :page_translations, dependent: :destroy
