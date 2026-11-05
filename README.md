@@ -54,12 +54,13 @@ npm run format:fix       # Prettier
 bin/rails db:migrate     # run migrations
 ```
 
-## Server-side rendering (optional)
+## Server-side rendering
 
-SSR is set up but turned off. To enable it, set `config.ssr_enabled = true` in
-`config/initializers/inertia_rails.rb`. For production images, also build with the
-`SSR_ENABLED=true` build arg (via `builder.args` in `config/deploy.yml`, or
-`docker build --build-arg SSR_ENABLED=true -t car-wash .`).
+SSR is enabled by default (`config.ssr_enabled = true` in
+`config/initializers/inertia_rails.rb`, and `SSR_ENABLED=true` in the
+`Dockerfile`/`config/deploy.yml` build args). To disable it, set
+`config.ssr_enabled = false` and build production images without the
+`SSR_ENABLED=true` build arg (or with `SSR_ENABLED=false`).
 
 ## Credits
 
