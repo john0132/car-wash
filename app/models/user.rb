@@ -16,6 +16,8 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :payment_transactions, dependent: :restrict_with_error
   has_many :addresses, dependent: :destroy
+  has_many :user_roles, dependent: :destroy
+  has_many :roles, through: :user_roles
   belongs_to :membership, optional: true
   belongs_to :package, optional: true
 
@@ -33,5 +35,12 @@ class User < ApplicationRecord
 
   after_update if: :password_digest_previously_changed? do
     sessions.where.not(id: Current.session).delete_all
+  end
+
+  def permission?(resource, action)
+    return true if admin?
+    return false unless employee?
+
+    roles.joins(:permissions).exists?(permissions: { resource: resource, action: action })
   end
 end
