@@ -1,19 +1,22 @@
 import { Head, Link } from "@inertiajs/react"
 
-import { root } from "@/routes"
+import { root, serviceCategory } from "@/routes"
+import { Pagination } from "@/website/components/pagination"
 import { SiteFooter } from "@/website/components/site-footer"
 import { SiteHeader } from "@/website/components/site-header"
-import { CatalogPagination } from "@/website/features/category-detail/components/catalog-pagination"
 import { ServiceFilters } from "@/website/features/category-detail/components/service-filters"
 import type {
   CategoryDetail,
   CategoryFacets,
   CategoryFilters,
   CategoryService,
-  PaginationData,
 } from "@/website/features/category-detail/types"
-import { hasActiveFilters } from "@/website/features/category-detail/utils"
+import {
+  filterQuery,
+  hasActiveFilters,
+} from "@/website/features/category-detail/utils"
 import { ServiceCard } from "@/website/features/service-detail/components/service-card"
+import type { PaginationData } from "@/website/lib/pagination"
 
 // Filter/search/page visits only reload services, pagination and filters, so the category and
 // facets are kept from the first load (and are optional in the type for that reason).
@@ -39,7 +42,7 @@ export default function ServiceCategoryShow({
 
   return (
     <>
-      <Head title={category?.seo_title ?? `${name} — Auto Atelier`}>
+      <Head title={category?.seo_title ?? name}>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -96,9 +99,9 @@ export default function ServiceCategoryShow({
 
           {services.length > 0 ? (
             <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {services.map((service) => (
+              {services.map((service, index) => (
                 <li key={service.id}>
-                  <ServiceCard service={service} />
+                  <ServiceCard service={service} priority={index < 3} />
                 </li>
               ))}
             </ul>
@@ -117,10 +120,14 @@ export default function ServiceCategoryShow({
             </div>
           )}
 
-          <CatalogPagination
-            slug={category?.slug ?? ""}
-            filters={filters}
+          <Pagination
             pagination={pagination}
+            only={["services", "pagination", "filters"]}
+            hrefFor={(n) =>
+              serviceCategory(category?.slug ?? "", {
+                query: filterQuery(filters, n),
+              }).url
+            }
           />
         </main>
         <SiteFooter />

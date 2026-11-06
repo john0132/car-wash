@@ -97,7 +97,7 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
                 Save changes
               </Button>
               {recentlySuccessful && (
-                <p className="text-sm text-[#2B3A32]/65" role="status">
+                <p className="text-sm text-[#5B6B5E]" role="status">
                   Saved
                 </p>
               )}

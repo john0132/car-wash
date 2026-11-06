@@ -6,11 +6,17 @@ import { formatDate } from "@/website/features/blogs/utils"
 import { ImageOrMark } from "@/website/features/home-catalog/components/image-or-mark"
 
 /** Image-topped card linking to a blog; the whole card is the link. */
-export function BlogCard({ blog }: { blog: BlogCardData }) {
+export function BlogCard({
+  blog,
+  priority = false,
+}: {
+  blog: BlogCardData
+  priority?: boolean
+}) {
   return (
     <li className="group relative overflow-hidden rounded-3xl border border-[#2B3A32]/10 bg-white transition-shadow duration-300 hover:shadow-[0_24px_48px_-24px_rgba(43,58,50,0.3)]">
       <div className="aspect-[16/10] overflow-hidden">
-        <ImageOrMark image={blog.cover_image} />
+        <ImageOrMark image={blog.cover_image} priority={priority} />
       </div>
       <div className="p-6">
         <time

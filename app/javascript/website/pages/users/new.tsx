@@ -11,7 +11,6 @@ import {
 } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
-import { SocialLoginButtons } from "@/website/features/auth/components/social-login-buttons"
 import AuthLayout from "@/website/layouts/auth-layout"
 
 export default function Register() {
@@ -30,23 +29,37 @@ export default function Register() {
         {({ processing, errors }) => (
           <>
             <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="name">Name</FieldLabel>
-                <Input
-                  id="name"
-                  type="text"
-                  name="name"
-                  required
-                  autoFocus
-                  tabIndex={1}
-                  autoComplete="name"
-                  disabled={processing}
-                  placeholder="Full name"
-                />
-                <FieldError
-                  errors={errors.name?.map((message) => ({ message }))}
-                />
-              </Field>
+              <div className="grid gap-6 sm:grid-cols-2">
+                <Field>
+                  <FieldLabel htmlFor="name">First name</FieldLabel>
+                  <Input
+                    id="name"
+                    type="text"
+                    name="name"
+                    required
+                    autoFocus
+                    autoComplete="given-name"
+                    disabled={processing}
+                  />
+                  <FieldError
+                    errors={errors.name?.map((message) => ({ message }))}
+                  />
+                </Field>
+
+                <Field>
+                  <FieldLabel htmlFor="last_name">Last name</FieldLabel>
+                  <Input
+                    id="last_name"
+                    type="text"
+                    name="last_name"
+                    autoComplete="family-name"
+                    disabled={processing}
+                  />
+                  <FieldError
+                    errors={errors.last_name?.map((message) => ({ message }))}
+                  />
+                </Field>
+              </div>
 
               <Field>
                 <FieldLabel htmlFor="email">Email address</FieldLabel>
@@ -55,7 +68,6 @@ export default function Register() {
                   type="email"
                   name="email"
                   required
-                  tabIndex={2}
                   autoComplete="email"
                   placeholder="email@example.com"
                 />
@@ -71,7 +83,6 @@ export default function Register() {
                   type="password"
                   name="password"
                   required
-                  tabIndex={3}
                   autoComplete="new-password"
                   placeholder="Password"
                 />
@@ -89,7 +100,6 @@ export default function Register() {
                   type="password"
                   name="password_confirmation"
                   required
-                  tabIndex={4}
                   autoComplete="new-password"
                   placeholder="Confirm password"
                 />
@@ -103,20 +113,15 @@ export default function Register() {
               <Button
                 type="submit"
                 className="mt-2 h-11 w-full rounded-full bg-[#2B3A32] text-[#F6F1E7] hover:bg-[#1F2B25]"
-                tabIndex={5}
               >
                 {processing && <Spinner />}
                 Create account
               </Button>
             </FieldGroup>
 
-            <SocialLoginButtons verb="Sign up" />
-
             <div className="text-muted-foreground text-center text-sm">
               Already have an account?{" "}
-              <TextLink href={websiteSessions.new()} tabIndex={6}>
-                Log in
-              </TextLink>
+              <TextLink href={websiteSessions.new()}>Log in</TextLink>
             </div>
           </>
         )}

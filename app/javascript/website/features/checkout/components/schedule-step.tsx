@@ -1,5 +1,6 @@
 import { useState } from "react"
 
+import { OptionCard } from "@/website/features/checkout/components/option-card"
 import { StepCard } from "@/website/features/checkout/components/step-card"
 import type { SlotDay } from "@/website/features/checkout/types"
 
@@ -64,20 +65,15 @@ export function ScheduleStep({
             className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4"
           >
             {day.slots.map((slot) => (
-              <button
+              <OptionCard
                 key={slot.value}
-                type="button"
-                role="radio"
-                aria-checked={slot.value === value}
-                onClick={() => onChange(slot.value)}
-                className={`rounded-xl border py-2.5 text-sm tabular-nums transition-colors focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:outline-none ${
-                  slot.value === value
-                    ? "border-[#2B3A32] bg-white font-medium"
-                    : "border-[#2B3A32]/15 bg-white/60 hover:bg-white"
-                }`}
+                name="scheduled_at"
+                checked={slot.value === value}
+                onSelect={() => onChange(slot.value)}
+                className="justify-center rounded-xl p-0 py-2.5 text-sm tabular-nums"
               >
                 {slot.label}
-              </button>
+              </OptionCard>
             ))}
           </div>
         </>

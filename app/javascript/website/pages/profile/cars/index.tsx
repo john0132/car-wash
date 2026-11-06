@@ -35,7 +35,7 @@ export default function CarsIndex({ cars }: Props) {
       {cars.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[#2B3A32]/25 px-6 py-14 text-center">
           <p className="font-medium">No cars yet</p>
-          <p className="mt-1 text-sm text-[#2B3A32]/65">
+          <p className="mt-1 text-sm text-[#5B6B5E]">
             Add your car to make booking quicker.
           </p>
         </div>

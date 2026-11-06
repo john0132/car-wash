@@ -11,7 +11,7 @@ interface Props {
 export default function FaqsIndex({ faqs }: Props) {
   return (
     <>
-      <Head title="FAQ — Auto Atelier">
+      <Head title="FAQ">
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"

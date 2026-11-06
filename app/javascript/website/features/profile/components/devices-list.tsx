@@ -37,7 +37,7 @@ export function DevicesList({ sessions }: { sessions: DeviceSession[] }) {
                       </span>
                     )}
                   </p>
-                  <p className="text-sm text-[#2B3A32]/65">
+                  <p className="text-sm text-[#5B6B5E]">
                     {session.ip_address} · Signed in{" "}
                     {formatDate(session.created_at)}
                   </p>

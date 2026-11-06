@@ -6,10 +6,13 @@ import {
   type PageModule,
   createPageResolver,
   inertiaAppOptions,
+  titleFor,
 } from "@/shared/lib/inertia"
 
 void createInertiaApp({
   ...inertiaAppOptions,
+  // Pages pass only their own part ("Our services"); the brand is appended.
+  title: titleFor("Auto Atelier", "—"),
   // SSR entry (see vite.config.ts). Only website pages are bundled into this entrypoint.
   resolve: createPageResolver(
     "website",

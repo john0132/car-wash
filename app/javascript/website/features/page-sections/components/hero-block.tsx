@@ -67,6 +67,7 @@ export function HeroBlock({ data }: { data: HeroData }) {
                 <img
                   src={data.image.url}
                   alt=""
+                  fetchPriority="high"
                   className="h-full w-full object-cover"
                 />
               )}

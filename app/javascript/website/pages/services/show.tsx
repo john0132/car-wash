@@ -44,7 +44,7 @@ function ServicePage({ service, related, extras }: Props) {
 
   return (
     <>
-      <Head title={service.seo_title ?? `${name} — Auto Atelier`}>
+      <Head title={service.seo_title ?? name}>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -69,8 +69,8 @@ function ServicePage({ service, related, extras }: Props) {
       >
         <SiteHeader />
         <main>
-          <article className="mx-auto grid max-w-6xl gap-12 px-6 pt-10 pb-24 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20 lg:pt-16">
-            <div className="lg:py-6">
+          <article className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-6 pt-10 pb-24 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20 lg:pt-16">
+            <div className="min-w-0 lg:py-6">
               <nav aria-label="Breadcrumb" className="text-sm text-[#5B6B5E]">
                 <ol className="flex flex-wrap items-center gap-2">
                   <li>
@@ -114,10 +114,10 @@ function ServicePage({ service, related, extras }: Props) {
               )}
             </div>
 
-            <div>
+            <div className="min-w-0">
               <div className="group aspect-[4/5] overflow-hidden rounded-t-full border border-[#A97C50]/30 bg-[#EFE7D6] p-2.5">
                 <div className="h-full w-full overflow-hidden rounded-t-full">
-                  <ImageOrMark image={service.image} />
+                  <ImageOrMark image={service.image} priority />
                 </div>
               </div>
               <BookingPanel

@@ -40,9 +40,11 @@ export function BrandMark({ className, tone = "pine" }: BrandMarkProps) {
 interface LogoProps {
   className?: string
   tone?: "pine" | "ivory"
+  /** Drops the wordmark on the narrowest phones, where the header is tight. */
+  compact?: boolean
 }
 
-export function Logo({ className, tone = "pine" }: LogoProps) {
+export function Logo({ className, tone = "pine", compact }: LogoProps) {
   const textColor = tone === "pine" ? "#2B3A32" : "#F6F1E7"
 
   return (
@@ -50,7 +52,7 @@ export function Logo({ className, tone = "pine" }: LogoProps) {
       <BrandMark tone={tone} className="h-7 w-7" />
       <span
         style={{ fontFamily: "'Italiana', serif", color: textColor }}
-        className="text-sm tracking-[0.2em] uppercase"
+        className={`text-sm tracking-[0.2em] uppercase ${compact ? "max-[360px]:sr-only" : ""}`}
       >
         Auto Atelier
       </span>

@@ -40,7 +40,7 @@ export default function AddressesIndex({ addresses, areas }: Props) {
       {addresses.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[#2B3A32]/25 px-6 py-14 text-center">
           <p className="font-medium">No addresses yet</p>
-          <p className="mt-1 text-sm text-[#2B3A32]/65">
+          <p className="mt-1 text-sm text-[#5B6B5E]">
             Add one to book a visit at your door.
           </p>
         </div>

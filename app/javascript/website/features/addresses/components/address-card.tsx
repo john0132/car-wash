@@ -3,6 +3,7 @@ import { MapPin } from "lucide-react"
 
 import { websiteProfileAddresses } from "@/routes"
 import { Button } from "@/shared/components/ui/button"
+import { ConfirmRemove } from "@/website/components/confirm-remove"
 import { AddressDialog } from "@/website/features/addresses/components/address-dialog"
 import type {
   AreaOption,
@@ -17,7 +18,6 @@ export function AddressCard({
   areas: AreaOption[]
 }) {
   const remove = () => {
-    if (!window.confirm(`Remove "${address.name}"?`)) return
     router.delete(websiteProfileAddresses.destroy(address.id), {
       preserveScroll: true,
     })
@@ -35,7 +35,7 @@ export function AddressCard({
         />
         <div>
           <p className="text-lg font-medium">{address.name}</p>
-          <p className="text-sm text-[#2B3A32]/65">
+          <p className="text-sm text-[#5B6B5E]">
             {[address.area, address.city].filter(Boolean).join(", ")}
           </p>
         </div>
@@ -50,14 +50,20 @@ export function AddressCard({
             </Button>
           }
         />
-        <Button
-          type="button"
-          variant="outline"
-          onClick={remove}
-          className={`${outline} text-[#B3261E] hover:text-[#B3261E]`}
-        >
-          Remove
-        </Button>
+        <ConfirmRemove
+          title={`Remove "${address.name}"?`}
+          description="This address will be removed from your account."
+          onConfirm={remove}
+          trigger={
+            <Button
+              type="button"
+              variant="outline"
+              className={`${outline} text-[#B3261E] hover:text-[#B3261E]`}
+            >
+              Remove
+            </Button>
+          }
+        />
       </div>
     </li>
   )

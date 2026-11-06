@@ -53,6 +53,7 @@ export default function ResetPassword({ sid, email }: ResetPasswordProps) {
                 type="password"
                 name="password"
                 autoComplete="new-password"
+                required
                 autoFocus
                 placeholder="Password"
               />
@@ -70,6 +71,7 @@ export default function ResetPassword({ sid, email }: ResetPasswordProps) {
                 type="password"
                 name="password_confirmation"
                 autoComplete="new-password"
+                required
                 placeholder="Confirm password"
               />
               <FieldError

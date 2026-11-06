@@ -68,19 +68,21 @@ export function ServiceFilters({
       setMaxPrice(filters.max_price?.toString() ?? "")
   }
 
-  const visit = (next: CategoryFilters) =>
+  // Debounced typing replaces the history entry (no one Back-clicks through
+  // every keystroke); discrete choices push one, so Back undoes them.
+  const visit = (next: CategoryFilters, replace = false) =>
     router.get(serviceCategory(slug).url, filterQuery(next), {
       only: ["services", "pagination", "filters"],
       preserveState: true,
       preserveScroll: true,
-      replace: true,
+      replace,
     })
 
   const apply = (patch: Partial<CategoryFilters>, delay = 0) => {
     clearTimeout(timer.current)
     pending.current = { ...pending.current, ...patch }
     const run = () => {
-      visit({ ...latest.current, ...pending.current })
+      visit({ ...latest.current, ...pending.current }, delay > 0)
       pending.current = {}
     }
     if (delay) timer.current = setTimeout(run, delay)
@@ -195,7 +197,11 @@ export function ServiceFilters({
               aria-labelledby="duration-label"
               className={triggerClass}
             >
-              <SelectValue />
+              <SelectValue>
+                {filters.max_duration
+                  ? `Up to ${formatDuration(filters.max_duration)}`
+                  : "Any length"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value={ANY}>Any length</SelectItem>
@@ -220,7 +226,7 @@ export function ServiceFilters({
               aria-labelledby="sort-label"
               className={triggerClass}
             >
-              <SelectValue />
+              <SelectValue>{SORT_LABELS[filters.sort]}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               {(Object.keys(SORT_LABELS) as SortOption[]).map((option) => (

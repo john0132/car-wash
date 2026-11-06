@@ -34,7 +34,7 @@ export default function AuthLayout({
             >
               {title}
             </h1>
-            <p className="text-sm text-[#2B3A32]/65">{description}</p>
+            <p className="text-sm text-[#5B6B5E]">{description}</p>
           </div>
           {children}
         </div>

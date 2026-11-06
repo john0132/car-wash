@@ -5,16 +5,21 @@ import type { HomeImage } from "@/website/features/home-catalog/types"
 export function ImageOrMark({
   image,
   className = "",
+  priority = false,
 }: {
   image: HomeImage | null
   className?: string
+  /** Above-the-fold image (the likely LCP): fetched eagerly with high priority. */
+  priority?: boolean
 }) {
   if (image) {
     return (
       <img
         src={image.url}
         alt=""
-        loading="lazy"
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : undefined}
+        decoding="async"
         className={`h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 ${className}`}
       />
     )

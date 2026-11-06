@@ -4,7 +4,7 @@ import { formatMonthYear } from "@/website/features/profile/utils"
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-32 flex-1 rounded-2xl border border-[#2B3A32]/12 bg-white/55 px-5 py-3.5">
-      <div className="text-xs tracking-[0.16em] text-[#2B3A32]/65 uppercase">
+      <div className="text-xs tracking-[0.16em] text-[#5B6B5E] uppercase">
         {label}
       </div>
       <div

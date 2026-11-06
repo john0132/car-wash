@@ -81,7 +81,7 @@ export default function ProfileLayout({
               >
                 {name}
               </h1>
-              <p className="mt-1 truncate text-[15px] text-[#2B3A32]/65">
+              <p className="mt-1 truncate text-[15px] text-[#5B6B5E]">
                 {auth.user.email}
               </p>
             </div>

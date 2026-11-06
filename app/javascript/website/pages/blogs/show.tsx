@@ -19,7 +19,7 @@ export default function BlogShow({ blog, related }: Props) {
   return (
     <>
       <BlogHead
-        title={blog.seo_title ?? `${title} — Auto Atelier`}
+        title={blog.seo_title ?? title}
         description={blog.seo_description ?? blog.subtitle}
       />
 

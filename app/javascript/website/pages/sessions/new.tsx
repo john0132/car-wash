@@ -15,7 +15,6 @@ import {
 } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
-import { SocialLoginButtons } from "@/website/features/auth/components/social-login-buttons"
 import AuthLayout from "@/website/layouts/auth-layout"
 
 export default function Login() {
@@ -41,7 +40,6 @@ export default function Login() {
                   type="email"
                   required
                   autoFocus
-                  tabIndex={1}
                   autoComplete="email"
                   placeholder="email@example.com"
                 />
@@ -55,8 +53,7 @@ export default function Login() {
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                   <TextLink
                     href={websiteIdentityPasswordResets.new()}
-                    className="ml-auto text-sm"
-                    tabIndex={5}
+                    className="ms-auto text-sm"
                   >
                     Forgot password?
                   </TextLink>
@@ -66,7 +63,6 @@ export default function Login() {
                   type="password"
                   name="password"
                   required
-                  tabIndex={2}
                   autoComplete="current-password"
                   placeholder="Password"
                 />
@@ -78,7 +74,6 @@ export default function Login() {
               <Button
                 type="submit"
                 className="mt-4 h-11 w-full rounded-full bg-[#2B3A32] text-[#F6F1E7] hover:bg-[#1F2B25]"
-                tabIndex={4}
                 disabled={processing}
               >
                 {processing && <Spinner />}
@@ -86,13 +81,9 @@ export default function Login() {
               </Button>
             </FieldGroup>
 
-            <SocialLoginButtons verb="Sign in" />
-
             <div className="text-muted-foreground text-center text-sm">
               Don&apos;t have an account?{" "}
-              <TextLink href={websiteUsers.new()} tabIndex={5}>
-                Sign up
-              </TextLink>
+              <TextLink href={websiteUsers.new()}>Sign up</TextLink>
             </div>
           </>
         )}

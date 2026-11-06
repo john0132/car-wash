@@ -41,7 +41,7 @@ export function BookingPanel({
 
   return (
     <div className="relative z-10 mx-4 -mt-20 rounded-3xl border border-[#2B3A32]/10 bg-white p-6 shadow-[0_32px_64px_-32px_rgba(43,58,50,0.45)] sm:mx-10">
-      <div className="flex items-end justify-between gap-6">
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <div>
           <p className="text-sm text-[#5B6B5E]">
             {onSale ? "Special price" : "Price"}
@@ -53,9 +53,12 @@ export function BookingPanel({
             {formatMoney(onSale ? service.sale_price! : service.price)}
           </p>
           {onSale && (
-            <p className="mt-1 text-sm text-[#5B6B5E] tabular-nums">
-              <s>{formatMoney(service.price)}</s>
-              <span className="ml-2 font-medium text-[#8A6240]">
+            <p className="relative mt-1 text-sm text-[#5B6B5E] tabular-nums">
+              <s>
+                <span className="sr-only">Was </span>
+                {formatMoney(service.price)}
+              </s>
+              <span className="ms-2 font-medium text-[#8A6240]">
                 {savings}% off
               </span>
             </p>
@@ -63,7 +66,7 @@ export function BookingPanel({
         </div>
 
         {duration && (
-          <div className="flex items-center gap-2 border-l border-[#2B3A32]/15 pl-6">
+          <div className="flex items-center gap-2 sm:border-s sm:border-[#2B3A32]/15 sm:ps-6">
             <Clock className="size-5 text-[#8A6240]" aria-hidden />
             <div>
               <p className="text-sm text-[#5B6B5E]">Takes about</p>
@@ -100,7 +103,7 @@ export function BookingPanel({
                   )
                 }
                 aria-label={`Remove ${extra.name ?? "extra"}`}
-                className="rounded-full p-1 text-[#5B6B5E] hover:bg-white hover:text-[#2B3A32] focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:outline-none"
+                className="grid size-6 place-items-center rounded-full text-[#5B6B5E] hover:bg-white hover:text-[#2B3A32] focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:outline-none"
               >
                 <X className="size-3.5" aria-hidden />
               </button>

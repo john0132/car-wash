@@ -1,6 +1,5 @@
-import { Link } from "@inertiajs/react"
-
 import { blogs as blogsRoute } from "@/routes"
+import { Pagination } from "@/website/components/pagination"
 import { SiteFooter } from "@/website/components/site-footer"
 import { SiteHeader } from "@/website/components/site-header"
 import { BlogCard } from "@/website/features/blogs/components/blog-card"
@@ -20,7 +19,7 @@ export default function BlogsIndex({ blogs, page, pages }: Props) {
   return (
     <>
       <BlogHead
-        title="Blog — Auto Atelier"
+        title="Blog"
         description="Tips, stories and news from the Auto Atelier team."
       />
 
@@ -46,36 +45,21 @@ export default function BlogsIndex({ blogs, page, pages }: Props) {
             </p>
           ) : (
             <ul className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {blogs.map((blog) => (
-                <BlogCard key={blog.id} blog={blog} />
+              {blogs.map((blog, index) => (
+                <BlogCard key={blog.id} blog={blog} priority={index < 3} />
               ))}
             </ul>
           )}
 
-          {pages > 1 && (
-            <nav
-              aria-label="Pagination"
-              className="mt-12 flex items-center justify-center gap-6 text-sm"
-            >
-              {page > 1 ? (
-                <Link href={pageLink(page - 1)} className="font-medium">
-                  ← Newer
-                </Link>
-              ) : (
-                <span className="text-[#5B6B5E]/50">← Newer</span>
-              )}
-              <span className="text-[#5B6B5E]">
-                Page {page} of {pages}
-              </span>
-              {page < pages ? (
-                <Link href={pageLink(page + 1)} className="font-medium">
-                  Older →
-                </Link>
-              ) : (
-                <span className="text-[#5B6B5E]/50">Older →</span>
-              )}
-            </nav>
-          )}
+          <Pagination
+            pagination={{
+              page,
+              pages,
+              total: blogs.length,
+              per_page: blogs.length,
+            }}
+            hrefFor={(n) => pageLink(n).url}
+          />
         </main>
         <SiteFooter />
       </div>

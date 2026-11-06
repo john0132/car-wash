@@ -5,6 +5,10 @@
 class Admin::BaseController < InertiaController
   layout "admin"
 
+  # The dashboard is staff-only, so it can require current browsers. The public
+  # website must not: older iPhones are real customers.
+  allow_browser versions: :modern
+
   # The admin dashboard is not indexed and does not need SSR.
   # A distinct asset version makes any Inertia visit that crosses between the
   # admin and website bundles a version mismatch, so Inertia does a full page

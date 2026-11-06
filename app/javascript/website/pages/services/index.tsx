@@ -13,7 +13,7 @@ interface Props {
 export default function ServicesIndex({ categories }: Props) {
   return (
     <>
-      <Head title="Our services — Auto Atelier">
+      <Head title="Our services">
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -64,7 +64,7 @@ export default function ServicesIndex({ categories }: Props) {
             </div>
           )}
 
-          {categories.map((category) => (
+          {categories.map((category, categoryIndex) => (
             <section
               key={category.id}
               aria-labelledby={`category-${category.id}`}
@@ -82,13 +82,16 @@ export default function ServicesIndex({ categories }: Props) {
                   href={serviceCategory(category.slug)}
                   className="shrink-0 text-sm text-[#8A6240] underline-offset-4 hover:underline"
                 >
-                  Filter this category
+                  See all {category.name}
                 </Link>
               </div>
               <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {category.services.map((service) => (
+                {category.services.map((service, index) => (
                   <li key={service.id}>
-                    <ServiceCard service={service} />
+                    <ServiceCard
+                      service={service}
+                      priority={categoryIndex === 0 && index < 3}
+                    />
                   </li>
                 ))}
               </ul>

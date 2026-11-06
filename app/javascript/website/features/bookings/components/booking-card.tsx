@@ -18,7 +18,7 @@ export function BookingCard({ booking }: { booking: CustomerBooking }) {
         <div>
           <Link
             href={bookingRoute(booking.id)}
-            className="text-sm text-[#2B3A32]/65 underline-offset-4 hover:text-[#2B3A32] hover:underline"
+            className="text-sm text-[#5B6B5E] underline-offset-4 hover:text-[#2B3A32] hover:underline"
           >
             Booking #{booking.id}
           </Link>
@@ -42,7 +42,7 @@ export function BookingCard({ booking }: { booking: CustomerBooking }) {
             <li key={item.id}>
               {item.name ?? "Item"}
               {item.quantity > 1 && (
-                <span className="text-[#2B3A32]/65"> × {item.quantity}</span>
+                <span className="text-[#5B6B5E]"> × {item.quantity}</span>
               )}
             </li>
           ))}
@@ -50,14 +50,14 @@ export function BookingCard({ booking }: { booking: CustomerBooking }) {
       )}
 
       <div className="mt-4 flex flex-wrap items-end justify-between gap-3 border-t border-[#2B3A32]/10 pt-4">
-        <p className="text-sm text-[#2B3A32]/65">
+        <p className="text-sm text-[#5B6B5E]">
           {booking.address ?? "No address"}
         </p>
         <p className="text-right">
           <span className="block text-lg font-medium">
             {formatMoney(booking.total_amount)}
           </span>
-          <span className="text-sm text-[#2B3A32]/65">
+          <span className="text-sm text-[#5B6B5E]">
             {PAYMENT_STATUS[booking.payment_status]}
           </span>
         </p>

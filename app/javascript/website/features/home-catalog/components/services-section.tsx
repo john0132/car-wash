@@ -57,13 +57,15 @@ export function ServicesSection({ services }: { services: HomeService[] }) {
                       {service.name}
                     </Link>
                   </h3>
-                  <p className="flex shrink-0 items-baseline gap-2 text-sm tabular-nums">
+                  <p className="relative flex shrink-0 items-baseline gap-2 text-sm tabular-nums">
                     {service.sale_price !== null ? (
                       <>
                         <span className="font-medium text-[#2B3A32]">
+                          <span className="sr-only">Now </span>
                           {formatMoney(service.sale_price)}
                         </span>
                         <s className="text-xs text-[#5B6B5E]">
+                          <span className="sr-only">Was </span>
                           {formatMoney(service.price)}
                         </s>
                       </>

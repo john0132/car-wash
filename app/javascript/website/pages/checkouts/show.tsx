@@ -6,7 +6,7 @@ export default function CheckoutShow(props: CheckoutProps) {
   const name = props.summary.service.name ?? "your service"
 
   return (
-    <BookingLayout title={`Book ${name} — Auto Atelier`}>
+    <BookingLayout title={`Book ${name}`}>
       <header className="mb-8 lg:mb-10">
         <p className="text-sm tracking-[0.2em] text-[#8A6240] uppercase">
           Checkout

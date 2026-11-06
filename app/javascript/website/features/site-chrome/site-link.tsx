@@ -3,8 +3,9 @@ import { Link } from "@inertiajs/react"
 import type { SiteLink } from "@/website/features/site-chrome/types"
 
 /**
- * A header/footer link. Same-site paths go through Inertia; external links,
- * anchors (`/#services`), `mailto:` and `tel:` are plain anchors.
+ * A header/footer link. Same-site paths (including `/#services`, which Inertia
+ * scrolls to) go through Inertia; external links, bare `#anchors`, `mailto:`
+ * and `tel:` are plain anchors.
  */
 export function SiteLinkAnchor({
   link,
@@ -13,7 +14,7 @@ export function SiteLinkAnchor({
   link: SiteLink
   className?: string
 }) {
-  const plain = link.external || /^(mailto:|tel:)|#/.test(link.href)
+  const plain = link.external || /^(mailto:|tel:|#)/.test(link.href)
 
   if (!plain) {
     return (

@@ -3,12 +3,12 @@ import { Car } from "lucide-react"
 
 import { websiteProfileCars } from "@/routes"
 import { Button } from "@/shared/components/ui/button"
+import { ConfirmRemove } from "@/website/components/confirm-remove"
 import { CarDialog } from "@/website/features/cars/components/car-dialog"
 import type { CustomerCar } from "@/website/features/cars/types"
 
 export function CarCard({ car }: { car: CustomerCar }) {
   const remove = () => {
-    if (!window.confirm(`Remove ${car.make} ${car.model}?`)) return
     router.delete(websiteProfileCars.destroy(car.id), { preserveScroll: true })
   }
 
@@ -26,7 +26,7 @@ export function CarCard({ car }: { car: CustomerCar }) {
           <p className="text-lg font-medium">
             {car.make} {car.model}
           </p>
-          <p className="text-sm text-[#2B3A32]/65">
+          <p className="text-sm text-[#5B6B5E]">
             {car.color} · <span className="font-mono">{car.license_plate}</span>
           </p>
         </div>
@@ -40,14 +40,20 @@ export function CarCard({ car }: { car: CustomerCar }) {
             </Button>
           }
         />
-        <Button
-          type="button"
-          variant="outline"
-          onClick={remove}
-          className={`${outline} text-[#B3261E] hover:text-[#B3261E]`}
-        >
-          Remove
-        </Button>
+        <ConfirmRemove
+          title={`Remove ${car.make} ${car.model}?`}
+          description="This car will be removed from your account. Past bookings keep their details."
+          onConfirm={remove}
+          trigger={
+            <Button
+              type="button"
+              variant="outline"
+              className={`${outline} text-[#B3261E] hover:text-[#B3261E]`}
+            >
+              Remove
+            </Button>
+          }
+        />
       </div>
     </li>
   )

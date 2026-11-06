@@ -40,10 +40,3 @@ export interface CategoryFacets {
   on_sale_count: number
   durations: number[]
 }
-
-export interface PaginationData {
-  page: number
-  pages: number
-  total: number
-  per_page: number
-}

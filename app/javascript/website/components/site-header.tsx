@@ -1,7 +1,7 @@
 import { Link, usePage } from "@inertiajs/react"
 import { User } from "lucide-react"
 
-import { profile, services, signIn } from "@/routes"
+import { profile, root, services, signIn } from "@/routes"
 import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar"
 import { Button } from "@/shared/components/ui/button"
 import { useInitials } from "@/shared/hooks/use-initials"
@@ -16,10 +16,10 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-[#2B3A32]/10 bg-[#F6F1E7]/95 backdrop-blur-sm">
-      <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-6">
-        <a href="/" className="shrink-0">
-          <Logo />
-        </a>
+      <div className="mx-auto flex h-20 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
+        <Link href={root()} className="shrink-0">
+          <Logo compact />
+        </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
           {site.header.items.map((link) => (
@@ -27,7 +27,7 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {auth.user ? (
             <Link
               href={profile()}
@@ -55,9 +55,11 @@ export function SiteHeader() {
           )}
           <Button
             asChild
-            className="rounded-full bg-[#2B3A32] px-5 text-[#F6F1E7] hover:bg-[#1F2B25]"
+            className="rounded-full bg-[#2B3A32] px-4 text-[#F6F1E7] hover:bg-[#1F2B25] sm:px-5"
           >
-            <Link href={services()}>Book your visit</Link>
+            <Link href={services()} aria-label="Book your visit">
+              Book<span className="max-sm:hidden">&nbsp;your visit</span>
+            </Link>
           </Button>
         </div>
       </div>

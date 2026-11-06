@@ -24,7 +24,7 @@ export function SectionHeading({
       >
         {title}
       </h2>
-      <p className="mt-1 text-sm text-[#2B3A32]/65">{description}</p>
+      <p className="mt-1 text-sm text-[#5B6B5E]">{description}</p>
     </div>
   )
 }
