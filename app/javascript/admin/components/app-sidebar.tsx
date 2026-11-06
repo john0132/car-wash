@@ -14,6 +14,7 @@ import {
   KeyRound,
   LayoutGrid,
   Map,
+  MessageSquare,
   Newspaper,
   PanelBottom,
   PanelTop,
@@ -34,6 +35,7 @@ import {
   adminBookings,
   adminCities,
   adminComponents,
+  adminContactMessages,
   adminCustomers,
   adminDashboard,
   adminEmployees,
@@ -172,6 +174,12 @@ const contentNavItems: (NavItem & { resource: string })[] = [
     href: adminFaqs.index().url,
     icon: HelpCircle,
     resource: "faqs",
+  },
+  {
+    title: "Contact messages",
+    href: adminContactMessages.index().url,
+    icon: MessageSquare,
+    resource: "contact_messages",
   },
   {
     title: "Header",

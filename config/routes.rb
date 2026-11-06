@@ -28,6 +28,7 @@ Rails.application.routes.draw do
     resources :blogs, except: :show, concerns: :activatable
     resources :components, except: :show, concerns: :activatable
     resources :faqs, except: :show, concerns: :activatable
+    resources :contact_messages, only: %i[index show destroy]
     resource :header_navigation, only: %i[edit update], controller: "header_items"
     resource :footer, only: %i[edit update]
     resources :direct_uploads, only: :create
@@ -61,6 +62,7 @@ Rails.application.routes.draw do
     end
 
     resources :faqs, only: :index
+    resource :contact, only: %i[show create]
     resources :blogs, only: %i[index show], param: :slug
     resources :services, only: :show, param: :slug
     resources :service_categories, only: :show, param: :slug, path: "categories"

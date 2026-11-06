@@ -18,6 +18,9 @@ load Rails.root.join("db/seeds/site_chrome.rb")
 # Every environment: starter FAQs for the /faqs page.
 load Rails.root.join("db/seeds/faqs.rb")
 
+# Every environment: the contact us page and its header/footer links (after the pages and site chrome).
+load Rails.root.join("db/seeds/contact.rb")
+
 # Every environment: example blog posts.
 load Rails.root.join("db/seeds/blogs.rb")
 

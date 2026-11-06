@@ -30,7 +30,7 @@ RSpec.describe "Admin header navigation", type: :request do
       expect_inertia.to render_component("admin/header_items/edit")
       expect(inertia.props[:items].map { |i| i[:translations][english.id.to_s.to_sym][:label] }).to eq(%w[First Second])
       expect(inertia.props[:options][:pages].pluck(:slug)).to eq([ "about-us" ])
-      expect(inertia.props[:options][:routes]).to eq(%w[home sign_in sign_up faqs blogs])
+      expect(inertia.props[:options][:routes]).to eq(%w[home sign_in sign_up faqs blogs contact])
     end
 
     it "is forbidden without header_items.read" do

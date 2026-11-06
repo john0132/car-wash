@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_06_170000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_06_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -182,6 +182,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_06_170000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["key"], name: "index_components_on_key", unique: true
+  end
+
+  create_table "contact_messages", force: :cascade do |t|
+    t.string "first_name", null: false
+    t.string "last_name", null: false
+    t.string "email", null: false
+    t.string "phone"
+    t.text "message", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_contact_messages_on_created_at"
   end
 
   create_table "extra_translations", force: :cascade do |t|

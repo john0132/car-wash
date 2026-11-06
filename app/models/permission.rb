@@ -20,6 +20,7 @@ class Permission < ApplicationRecord
     "blogs" => %w[read create update delete],
     "components" => %w[read create update delete],
     "faqs" => %w[read create update delete],
+    "contact_messages" => %w[read delete],
     "header_items" => %w[read update],
     "footers" => %w[read update]
   }.freeze
