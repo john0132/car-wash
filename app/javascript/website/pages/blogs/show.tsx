@@ -1,9 +1,12 @@
+import { usePage } from "@inertiajs/react"
+
 import { blogs as blogsRoute } from "@/routes"
 import { Breadcrumbs } from "@/website/components/breadcrumbs"
 import { BlogCard } from "@/website/features/blogs/components/blog-card"
 import type { BlogCardData, BlogDetail } from "@/website/features/blogs/types"
 import SiteLayout from "@/website/layouts/site-layout"
 import { useI18n } from "@/website/lib/i18n"
+import { blogPostingLd } from "@/website/lib/structured-data"
 
 interface Props {
   blog: BlogDetail
@@ -12,6 +15,7 @@ interface Props {
 
 export default function BlogShow({ blog, related }: Props) {
   const { t, formatDate } = useI18n()
+  const { origin } = usePage<{ seo: { origin: string } }>().props.seo
 
   const title = blog.title ?? t("Blog")
 
@@ -19,6 +23,16 @@ export default function BlogShow({ blog, related }: Props) {
     <SiteLayout
       title={blog.seo_title ?? title}
       description={blog.seo_description ?? blog.subtitle}
+      image={blog.cover_image}
+      type="article"
+      jsonLd={[
+        blogPostingLd(origin, "Auto Atelier", {
+          title,
+          description: blog.seo_description ?? blog.subtitle,
+          image: blog.cover_image,
+          published_at: blog.published_at,
+        }),
+      ]}
       mainClassName=""
     >
       <article className="mx-auto max-w-3xl px-6 pt-10 pb-20 lg:pt-16">

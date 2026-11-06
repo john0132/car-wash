@@ -27,9 +27,10 @@ export default function Welcome({
     <MarketingLayout
       page={page}
       fallbackTitle={t("Auto Atelier — Hand-Finished Auto Care")}
-      emptyMessage={t(
-        'This page hasn’t been set up yet. Add a "home" page from the dashboard to show content here.',
+      fallbackDescription={t(
+        "Hand washing, interior detailing and ceramic protection, carried out the slow way.",
       )}
+      business
       afterHero={
         <>
           <ServiceCategoriesSection categories={categories} />

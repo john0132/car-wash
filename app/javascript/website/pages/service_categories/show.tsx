@@ -44,7 +44,14 @@ export default function ServiceCategoryShow({
   return (
     <SiteLayout
       title={category?.seo_title ?? name}
-      description={category?.seo_description}
+      description={
+        category?.seo_description ??
+        t("Book {name} services: hand-finished care, at your door or ours.", {
+          name,
+        })
+      }
+      image={category?.image}
+      canonicalQuery={["page"]}
       mainClassName="mx-auto min-h-[70vh] max-w-6xl px-6 pt-10 pb-24 lg:pt-16"
     >
       <Breadcrumbs items={[{ label: name }]} />

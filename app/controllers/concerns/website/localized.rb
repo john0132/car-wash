@@ -20,9 +20,14 @@ module Website::Localized
   # The language comes from the URL prefix (see LocalePrefix). Route helpers and
   # redirects keep the prefix through SCRIPT_NAME, so the visitor stays in their language.
   def switch_locale(&action)
+    with_request_locale(&action)
+  end
+
+  # Also needed by rescue_from handlers, which run after the around_action has unwound.
+  def with_request_locale(&block)
     requested = request.env[LocalePrefix::ENV_KEY].to_s
     locale = I18n.available_locales.map(&:to_s).include?(requested) ? requested : I18n.default_locale.to_s
-    I18n.with_locale(locale, &action)
+    I18n.with_locale(locale, &block)
   end
 
   def rtl_locale?

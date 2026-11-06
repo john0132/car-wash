@@ -110,8 +110,6 @@
   "Care for every corner": "عناية بكل ركن",
   "Most requested": "الأكثر طلبًا",
   "Treatments, finished by hand": "عناية تُنجز بالأيدي",
-  "Yes": "نعم",
-  "No": "لا",
   "Hand-Finished Auto Care": "عناية متقنة بالسيارات يدويًا",
   "Delete account": "حذف الحساب",
   "Permanently removes your account and data. This cannot be undone.": "يحذف حسابك وبياناتك نهائيًا. لا يمكن التراجع عن ذلك.",
@@ -279,5 +277,14 @@
   "Menu": "القائمة",
   "Open menu": "فتح القائمة",
   "Site navigation": "التنقل في الموقع",
-  "{name} submenu": "القائمة الفرعية لـ {name}"
+  "{name} submenu": "القائمة الفرعية لـ {name}",
+  "Book {name} services: hand-finished care, at your door or ours.": "احجز خدمات {name}: عناية متقنة بالأيدي، عند بابك أو عندنا.",
+  "Hand washing, interior detailing and ceramic protection, carried out the slow way.": "غسيل يدوي وتنظيف داخلي وحماية بالسيراميك، تُنجز بتأنٍّ وإتقان.",
+  "Page not found": "الصفحة غير موجودة",
+  "Something went wrong": "حدث خطأ ما",
+  "Error {status}": "خطأ {status}",
+  "The page you were looking for doesn't exist or may have moved.": "الصفحة التي تبحث عنها غير موجودة أو ربما تم نقلها.",
+  "We're sorry, something broke on our side. Please try again in a moment.": "نعتذر، حدث عطل من جانبنا. يرجى المحاولة مرة أخرى بعد قليل.",
+  "Back to the homepage": "العودة إلى الصفحة الرئيسية",
+  "Browse our services": "تصفّح خدماتنا"
 }

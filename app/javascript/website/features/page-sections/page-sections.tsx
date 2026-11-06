@@ -10,6 +10,7 @@ import { HeroBlock } from "@/website/features/page-sections/components/hero-bloc
 import type { RichTextData } from "@/website/features/page-sections/components/rich-text-block"
 import { RichTextBlock } from "@/website/features/page-sections/components/rich-text-block"
 import {
+  type PageProps,
   type PageSectionData,
   type SchemaField,
   hasRequiredFields,
@@ -27,16 +28,29 @@ interface PageSectionsProps {
 // "cta" each get a dedicated block; an unknown staff-defined key falls back
 // to a generic, schema-driven render (GenericBlock).
 //
-// The first two "features" sections get the `#services` / `#why-us` anchor
-// ids and the first "cta" gets `#membership`, matching SiteHeader's nav —
-// reordering or adding sections of the same kind on this page will drift
-// from that nav until it becomes data-driven too.
+// A section's anchor (`#services`) is its own `anchor` field when staff set one.
+// Without it, the first two "features" sections get `#services` / `#why-us` and the
+// first "cta" gets `#membership`, which the seeded header links point to.
 // Nth occurrence (1-based) of `sections[index]`'s component key among the
 // sections up to and including it. Pages are short, so the O(n²) scan here
 // is cheap and keeps this a pure, non-mutating function of `sections`.
+const anchorOf = (data: Record<string, unknown>) =>
+  typeof data.anchor === "string" && /^[a-z][\w-]*$/i.test(data.anchor)
+    ? data.anchor
+    : undefined
+
 function occurrence(sections: PageSectionData[], index: number) {
   const key = sections[index].component
   return sections.slice(0, index + 1).filter((s) => s.component === key).length
+}
+
+/** Whether the page will render a hero block (its `<h1>`), not the generic fallback. */
+export function hasHero(page: PageProps) {
+  return page.sections.some(
+    (section) =>
+      section.component === "hero" &&
+      hasRequiredFields(page.components.hero ?? [], section.data),
+  )
 }
 
 export function PageSections({
@@ -74,7 +88,9 @@ export function PageSections({
           <CtaBlock
             key={section.id}
             data={section.data as unknown as CtaData}
-            id={nth === 1 ? "membership" : undefined}
+            id={
+              anchorOf(section.data) ?? (nth === 1 ? "membership" : undefined)
+            }
           />
         )
       }
@@ -85,7 +101,10 @@ export function PageSections({
             key={section.id}
             data={section.data as unknown as FeaturesData}
             tone={nth === 1 ? "white" : "ivory"}
-            id={nth === 1 ? "services" : nth === 2 ? "why-us" : undefined}
+            id={
+              anchorOf(section.data) ??
+              (nth === 1 ? "services" : nth === 2 ? "why-us" : undefined)
+            }
           />
         )
       }

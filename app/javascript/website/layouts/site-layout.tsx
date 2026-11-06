@@ -4,11 +4,16 @@ import { SeoHead } from "@/website/components/seo-head"
 import { SiteFooter } from "@/website/components/site-footer"
 import { SiteHeader } from "@/website/components/site-header"
 import { useI18n } from "@/website/lib/i18n"
+import type { Image } from "@/website/lib/types"
 
 interface SiteLayoutProps {
   title: string
   description?: string | null
+  image?: Image | null
+  type?: "website" | "article"
   noindex?: boolean
+  canonicalQuery?: string[]
+  jsonLd?: Record<string, unknown>[]
   /** Classes for <main>; pass "" when sections manage their own width (CMS pages). */
   mainClassName?: string
   children: ReactNode
@@ -22,7 +27,11 @@ interface SiteLayoutProps {
 export default function SiteLayout({
   title,
   description,
+  image,
+  type,
   noindex,
+  canonicalQuery,
+  jsonLd,
   mainClassName = "mx-auto max-w-6xl px-6 pt-10 pb-24 lg:pt-16",
   children,
 }: SiteLayoutProps) {
@@ -30,7 +39,15 @@ export default function SiteLayout({
 
   return (
     <>
-      <SeoHead title={title} description={description} noindex={noindex} />
+      <SeoHead
+        title={title}
+        description={description}
+        image={image}
+        type={type}
+        noindex={noindex}
+        canonicalQuery={canonicalQuery}
+        jsonLd={jsonLd}
+      />
 
       <a
         href="#main"

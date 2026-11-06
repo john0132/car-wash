@@ -68,7 +68,7 @@ export default function ContactShow({ page, defaults }: Props) {
       <MarketingLayout
         page={page}
         fallbackTitle={t("Contact us")}
-        emptyMessage=""
+        business
         afterHero={
           <section className="mx-auto grid max-w-6xl gap-12 px-6 py-16 lg:grid-cols-5 lg:gap-16 lg:py-24">
             <div className="lg:col-span-2">

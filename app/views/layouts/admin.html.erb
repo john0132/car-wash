@@ -7,7 +7,7 @@
     <meta name="application-name" content="Car Wash">
     <meta name="robots" content="noindex, nofollow">
 
-    <script>
+    <script nonce="<%= content_security_policy_nonce %>">
       <%# Enable dark mode based on localStorage or system preference. Inline to avoid FOUC. %>
       document.documentElement.classList.toggle(
         "dark",

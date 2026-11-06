@@ -45,6 +45,8 @@ module CarWash
     config.i18n.fallbacks = [ :en ]
     config.i18n.load_path += Dir[Rails.root.join("config/locales/**/*.yml")]
     config.middleware.insert_before 0, LocalePrefix
+    # Failed requests render the branded page (Website::ErrorsController) instead of public/*.html.
+    config.exceptions_app = routes
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Don't generate system test files.

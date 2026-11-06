@@ -1,3 +1,5 @@
+import { usePage } from "@inertiajs/react"
+
 import { serviceCategory } from "@/routes"
 import { Breadcrumbs } from "@/website/components/breadcrumbs"
 import { ImageOrMark } from "@/website/components/image-or-mark"
@@ -15,6 +17,7 @@ import {
 import { useSessionState } from "@/website/hooks/use-session-state"
 import SiteLayout from "@/website/layouts/site-layout"
 import { useI18n } from "@/website/lib/i18n"
+import { serviceLd } from "@/website/lib/structured-data"
 import type { ServiceSummary } from "@/website/lib/types"
 
 interface Props {
@@ -33,6 +36,7 @@ const NO_EXTRAS: ExtraOption[] = []
 
 function ServicePage({ service, related, extras }: Props) {
   const { t } = useI18n()
+  const { origin } = usePage<{ seo: { origin: string } }>().props.seo
   // Kept for this tab, so a refresh or coming back keeps the picks.
   const [selectedExtras, setSelectedExtras] = useSessionState(
     selectedExtrasKey(service.slug),
@@ -46,6 +50,16 @@ function ServicePage({ service, related, extras }: Props) {
     <SiteLayout
       title={service.seo_title ?? name}
       description={service.seo_description ?? body[0]}
+      image={service.image}
+      jsonLd={[
+        serviceLd(origin, "Auto Atelier", {
+          name,
+          description: service.seo_description ?? body[0],
+          image: service.image,
+          price: service.price,
+          sale_price: service.sale_price,
+        }),
+      ]}
       mainClassName=""
     >
       <article className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-6 pt-10 pb-24 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20 lg:pt-16">

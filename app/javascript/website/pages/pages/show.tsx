@@ -13,7 +13,6 @@ export default function Show({ page }: Props) {
     <MarketingLayout
       page={page}
       fallbackTitle={page.title ?? t("Auto Atelier")}
-      emptyMessage=""
     />
   )
 }

@@ -21,6 +21,7 @@ export default function BlogsIndex({ blogs, page, pages }: Props) {
     <SiteLayout
       title={t("Blog")}
       description={t("Tips, stories and news from the Auto Atelier team.")}
+      canonicalQuery={["page"]}
       mainClassName="mx-auto max-w-6xl px-6 py-16 sm:py-24"
     >
       <h1 className="font-display text-center text-4xl sm:text-5xl">

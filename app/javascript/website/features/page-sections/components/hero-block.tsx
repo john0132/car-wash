@@ -10,6 +10,8 @@ export interface HeroData {
   button_url?: string
   image?: { url: string } | null
   alignment?: string
+  /** Small line above the heading; defaults to the brand tagline. */
+  eyebrow?: string
 }
 
 export function HeroBlock({ data }: { data: HeroData }) {
@@ -34,7 +36,7 @@ export function HeroBlock({ data }: { data: HeroData }) {
             dir="auto"
             className="text-bronze text-xs font-medium tracking-[0.3em] uppercase"
           >
-            {t("Hand-Finished Auto Care")}
+            {data.eyebrow?.trim() ? data.eyebrow : t("Hand-Finished Auto Care")}
           </p>
           <h1
             dir="auto"
