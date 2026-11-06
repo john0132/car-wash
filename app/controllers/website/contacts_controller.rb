@@ -7,10 +7,13 @@ class Website::ContactsController < Website::BaseController
   include Website::RendersPage
 
   SLUG = "contact"
-  SUCCESS_MESSAGE = "Thanks! Your message was sent and we'll get back to you soon."
 
   skip_before_action :authenticate
   before_action :perform_authentication
+
+  # Public, unauthenticated write endpoint: throttle per IP to limit spam.
+  rate_limit to: 5, within: 10.minutes, only: :create,
+             with: -> { redirect_to contact_path, inertia: { errors: { message: [ "Too many messages sent. Please try again later." ] } } }
 
   def show
     render inertia: {
@@ -20,10 +23,13 @@ class Website::ContactsController < Website::BaseController
   end
 
   def create
+    # Honeypot: real users never fill this hidden field; bots do. Pretend success.
+    return redirect_to(contact_path) if params[:website].present?
+
     message = ContactMessage.new(message_params)
 
     if message.save
-      redirect_to contact_path, notice: SUCCESS_MESSAGE
+      redirect_to contact_path
     else
       redirect_to contact_path, inertia: { errors: message.errors.to_hash }
     end

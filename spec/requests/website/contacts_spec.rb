@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe "Website contact us", type: :request do
   before { english }
 
-  let(:valid) { { contact_message: { first_name: "Sara", last_name: "Ali", email: "sara@example.com", phone: "0100", message: "Hi" } } }
+  let(:valid) { { contact_message: { first_name: "Sara", last_name: "Ali", email: "sara@example.com", phone: "0100123456", message: "Hello, I have a question" } } }
 
   it "renders the CMS contact page" do
     create_page(slug: "contact", name: "Contact", title: "Talk to us")
@@ -27,7 +27,25 @@ RSpec.describe "Website contact us", type: :request do
     expect { post contact_path, params: valid, as: :json }.to change(ContactMessage, :count).by(1)
 
     expect(response).to redirect_to(contact_path)
-    expect(ContactMessage.last).to have_attributes(first_name: "Sara", email: "sara@example.com", message: "Hi")
+    expect(ContactMessage.last).to have_attributes(first_name: "Sara", email: "sara@example.com", message: "Hello, I have a question")
+  end
+
+  it "requires a phone number and a meaningful message" do
+    valid[:contact_message].merge!(phone: "", message: "Hi")
+
+    expect { post contact_path, params: valid, as: :json }.not_to change(ContactMessage, :count)
+    expect(session[:inertia_errors]).to include(:phone, :message)
+  end
+
+  it "strips control characters" do
+    valid[:contact_message][:first_name] = "Sa\u0000ra"
+    post contact_path, params: valid, as: :json
+
+    expect(ContactMessage.last.first_name).to eq("Sara")
+  end
+
+  it "silently drops honeypot submissions" do
+    expect { post contact_path, params: valid.merge(website: "http://spam"), as: :json }.not_to change(ContactMessage, :count)
   end
 
   it "rejects an invalid submission" do

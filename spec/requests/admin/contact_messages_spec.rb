@@ -10,7 +10,7 @@ RSpec.describe "Admin contact messages", type: :request do
   before { sign_in admin }
 
   def create_message(first_name: "Sara", **attrs)
-    ContactMessage.create!({ first_name: first_name, last_name: "Ali", email: "sara@example.com", message: "Hello there" }.merge(attrs))
+    ContactMessage.create!({ first_name: first_name, last_name: "Ali", email: "sara@example.com", phone: "0100123456", message: "Hello there" }.merge(attrs))
   end
 
   it "lists messages newest first and searches them" do
