@@ -30,7 +30,7 @@ RSpec.describe "Website error pages", type: :request do
     # rendered text) keeps these specs independent of server-side rendering,
     # which needs the Vite dev server or a built SSR bundle.
     def inertia_page(html)
-      JSON.parse(html[%r{<script data-page="app" type="application/json">(.*?)</script>}m, 1])
+      JSON.parse(html[%r{<script data-page="app"[^>]*>(.*?)</script>}m, 1])
     end
 
     # The env the real middleware stack hands over (key generator, cookie settings…).
