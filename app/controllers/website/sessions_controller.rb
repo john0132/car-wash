@@ -10,6 +10,7 @@ class Website::SessionsController < Website::BaseController
 
   def create
     user = User.authenticate_by(email: params[:email], password: params[:password])
+    user = nil unless user&.customer? # staff sign in through the admin dashboard
 
     if user&.is_active?
       start_new_session_for(user)
@@ -24,7 +25,7 @@ class Website::SessionsController < Website::BaseController
   def destroy
     @session.destroy!
     Current.session = nil
-    redirect_to settings_sessions_path, notice: "That session has been logged out", inertia: { clear_history: true }
+    redirect_to profile_path, notice: "That session has been logged out", inertia: { clear_history: true }
   end
 
   private

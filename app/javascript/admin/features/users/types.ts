@@ -5,7 +5,6 @@ export interface ManagedUser {
   last_name: string | null
   full_name: string
   email: string
-  verified: boolean
   is_active: boolean
   created_at: string
 }

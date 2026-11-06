@@ -25,7 +25,7 @@ RSpec.describe "Sessions", type: :request do
         expect(response).to redirect_to(root_path)
         expect(cookies[:session_token]).to be_present
 
-        get settings_profile_path
+        get profile_path
         expect(response).to have_http_status(:success)
       end
     end
@@ -42,13 +42,33 @@ RSpec.describe "Sessions", type: :request do
       end
     end
 
+    context "with a staff account" do
+      it "refuses to sign in; staff use the admin dashboard" do
+        users(:one).update!(role: "admin")
+
+        expect {
+          post sign_in_path, params: { email: users(:one).email, password: "Secret1*3*5*" }
+        }.not_to change(Session, :count)
+        expect(response).to redirect_to(sign_in_path)
+        expect(flash[:alert]).to eq("That email or password is incorrect")
+      end
+
+      it "is treated as signed out on the website" do
+        users(:one).update!(role: "admin")
+        sign_in users(:one)
+
+        get profile_path
+        expect(response).to redirect_to(sign_in_path)
+      end
+    end
+
     context "with invalid credentials" do
       it "redirects back with an alert" do
         post sign_in_path, params: { email: users(:one).email, password: "wrongpassword" }
         expect(response).to redirect_to(sign_in_path)
         expect(flash[:alert]).to eq("That email or password is incorrect")
 
-        get settings_profile_path
+        get profile_path
         expect(response).to redirect_to(sign_in_path)
       end
     end
@@ -59,7 +79,7 @@ RSpec.describe "Sessions", type: :request do
       sign_in users(:one)
       session_record = users(:one).sessions.last
       delete session_path(session_record)
-      expect(response).to redirect_to(settings_sessions_path)
+      expect(response).to redirect_to(profile_path)
       expect(Session.exists?(session_record.id)).to be(false)
     end
   end

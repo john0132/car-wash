@@ -15,6 +15,7 @@ import {
 } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
+import { SocialLoginButtons } from "@/website/features/auth/components/social-login-buttons"
 import AuthLayout from "@/website/layouts/auth-layout"
 
 export default function Login() {
@@ -76,7 +77,7 @@ export default function Login() {
 
               <Button
                 type="submit"
-                className="mt-4 w-full"
+                className="mt-4 h-11 w-full rounded-full bg-[#2B3A32] text-[#F6F1E7] hover:bg-[#1F2B25]"
                 tabIndex={4}
                 disabled={processing}
               >
@@ -84,6 +85,8 @@ export default function Login() {
                 Log in
               </Button>
             </FieldGroup>
+
+            <SocialLoginButtons verb="Sign in" />
 
             <div className="text-muted-foreground text-center text-sm">
               Don&apos;t have an account?{" "}

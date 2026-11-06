@@ -13,12 +13,12 @@ class Website::Identity::PasswordResetsController < Website::BaseController
   end
 
   def create
-    if @user = User.find_by(email: params[:email], verified: true)
+    if @user = User.find_by(email: params[:email])
       send_password_reset_email
-      redirect_to sign_in_path, notice: "Check your email for reset instructions"
-    else
-      redirect_to new_identity_password_reset_path, alert: "You can't reset your password until you verify your email"
     end
+
+    # Same answer either way, so the form can't be used to probe which emails have accounts.
+    redirect_to sign_in_path, notice: "If that email has an account, check it for reset instructions"
   end
 
   def update

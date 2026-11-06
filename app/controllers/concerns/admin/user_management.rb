@@ -41,7 +41,7 @@ module Admin::UserManagement
   end
 
   def user_props(user)
-    user.as_json(only: %i[id name last_name email verified is_active created_at])
+    user.as_json(only: %i[id name last_name email is_active created_at])
       .merge(full_name: user.full_name)
   end
 

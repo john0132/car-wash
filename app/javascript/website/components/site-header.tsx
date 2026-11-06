@@ -1,7 +1,10 @@
 import { Link, usePage } from "@inertiajs/react"
+import { User } from "lucide-react"
 
-import { settingsProfile, signIn, signUp } from "@/routes"
+import { profile, signIn, signUp } from "@/routes"
+import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar"
 import { Button } from "@/shared/components/ui/button"
+import { useInitials } from "@/shared/hooks/use-initials"
 import { Logo } from "@/website/components/brand-mark"
 import { HeaderNavItem } from "@/website/components/header-nav-item"
 import type { SiteSharedProps } from "@/website/features/site-chrome/types"
@@ -9,6 +12,7 @@ import type { SiteSharedProps } from "@/website/features/site-chrome/types"
 export function SiteHeader() {
   const { props } = usePage<SiteSharedProps>()
   const { auth, site } = props
+  const getInitials = useInitials()
 
   return (
     <header className="sticky top-0 z-40 border-b border-[#2B3A32]/10 bg-[#F6F1E7]/95 backdrop-blur-sm">
@@ -25,20 +29,28 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-3">
           {auth.user ? (
-            <Button
-              asChild
-              variant="ghost"
-              className="text-[#2B3A32] hover:bg-[#2B3A32]/5 hover:text-[#2B3A32]"
+            <Link
+              href={profile()}
+              aria-label="My profile"
+              title={auth.user.name}
+              className="rounded-full focus-visible:ring-2 focus-visible:ring-[#2B3A32]/40 focus-visible:outline-none"
             >
-              <Link href={settingsProfile()}>Account</Link>
-            </Button>
+              <Avatar className="size-10 border border-[#2B3A32]/15">
+                <AvatarFallback className="bg-[#2B3A32] text-sm text-[#F6F1E7]">
+                  {getInitials(auth.user.name)}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
           ) : (
             <Button
               asChild
               variant="ghost"
-              className="hidden text-[#2B3A32] hover:bg-[#2B3A32]/5 hover:text-[#2B3A32] sm:inline-flex"
+              size="icon"
+              className="size-10 rounded-full text-[#2B3A32] hover:bg-[#2B3A32]/5 hover:text-[#2B3A32]"
             >
-              <Link href={signIn()}>Sign in</Link>
+              <Link href={signIn()} aria-label="Log in or register">
+                <User className="size-5" />
+              </Link>
             </Button>
           )}
           <Button

@@ -22,7 +22,6 @@ if Rails.env.development?
     user.name = "Admin"
     user.password = ENV.fetch("ADMIN_PASSWORD", "password123456")
     user.role = :admin
-    user.verified = true
   end
   admin.roles << super_admin unless admin.roles.include?(super_admin)
 

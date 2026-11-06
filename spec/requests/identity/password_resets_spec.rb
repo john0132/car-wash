@@ -13,7 +13,7 @@ RSpec.describe "Identity::PasswordResets", type: :request do
   end
 
   describe "POST /identity/password_reset" do
-    context "with a verified user" do
+    context "with an existing user" do
       it "sends a password reset email" do
         expect {
           post identity_password_reset_path, params: { email: users(:one).email }
@@ -22,25 +22,13 @@ RSpec.describe "Identity::PasswordResets", type: :request do
       end
     end
 
-    context "with an unverified user" do
-      it "does not send a password reset email" do
-        users(:one).update!(verified: false)
-
-        expect {
-          post identity_password_reset_path, params: { email: users(:one).email }
-        }.not_to have_enqueued_mail(UserMailer, :password_reset)
-        expect(response).to redirect_to(new_identity_password_reset_path)
-        expect(flash[:alert]).to eq("You can't reset your password until you verify your email")
-      end
-    end
-
     context "with a nonexistent email" do
       it "does not send a password reset email" do
         expect {
           post identity_password_reset_path, params: { email: "missing@example.com" }
         }.not_to have_enqueued_mail(UserMailer, :password_reset)
-        expect(response).to redirect_to(new_identity_password_reset_path)
-        expect(flash[:alert]).to eq("You can't reset your password until you verify your email")
+        expect(response).to redirect_to(sign_in_path)
+        expect(flash[:notice]).to eq("If that email has an account, check it for reset instructions")
       end
     end
   end

@@ -47,17 +47,11 @@ Rails.application.routes.draw do
     resource :users, only: [ :destroy ]
 
     namespace :identity do
-      resource :email_verification, only: [ :show, :create ]
       resource :password_reset,     only: [ :new, :edit, :create, :update ]
     end
 
-    namespace :settings do
-      resource :profile, only: [ :show, :update ]
-      resource :password, only: [ :show, :update ]
-      resource :email, only: [ :show, :update ]
-      resources :sessions, only: [ :index ]
-      inertia :appearance
-    end
+    resource :profile, only: %i[show update]
+    resource :password, only: :update
 
     resources :services, only: :show, param: :slug
     resources :service_categories, only: :show, param: :slug, path: "categories"

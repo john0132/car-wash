@@ -11,6 +11,7 @@ import {
 } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
+import { SocialLoginButtons } from "@/website/features/auth/components/social-login-buttons"
 import AuthLayout from "@/website/layouts/auth-layout"
 
 export default function Register() {
@@ -99,11 +100,17 @@ export default function Register() {
                 />
               </Field>
 
-              <Button type="submit" className="mt-2 w-full" tabIndex={5}>
+              <Button
+                type="submit"
+                className="mt-2 h-11 w-full rounded-full bg-[#2B3A32] text-[#F6F1E7] hover:bg-[#1F2B25]"
+                tabIndex={5}
+              >
                 {processing && <Spinner />}
                 Create account
               </Button>
             </FieldGroup>
+
+            <SocialLoginButtons verb="Sign up" />
 
             <div className="text-muted-foreground text-center text-sm">
               Already have an account?{" "}

@@ -1,9 +1,8 @@
 import { Link, router } from "@inertiajs/react"
-import { LogOut, Settings } from "lucide-react"
+import { LogOut } from "lucide-react"
 
-import { adminSignOut, settingsProfile } from "@/routes"
+import { adminSignOut } from "@/routes"
 import {
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -31,16 +30,6 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
           <UserInfo user={user} showEmail={true} />
         </div>
       </DropdownMenuLabel>
-      <DropdownMenuSeparator />
-      <DropdownMenuGroup>
-        <DropdownMenuItem asChild>
-          {/* Account settings live in the website app: a plain link forces a full page load. */}
-          <a className="block w-full" href={settingsProfile().url}>
-            <Settings className="mr-2" />
-            Account settings
-          </a>
-        </DropdownMenuItem>
-      </DropdownMenuGroup>
       <DropdownMenuSeparator />
       <DropdownMenuItem asChild>
         <Link

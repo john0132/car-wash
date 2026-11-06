@@ -213,7 +213,7 @@ end
   [ "layla.hr@example.com", "Layla", "Fathy", "HR Manager", false ]
 ].each do |email, name, last_name, role_name, active|
   admin = User.find_or_create_by!(email: email) do |u|
-    u.assign_attributes(name: name, last_name: last_name, password: demo_password, role: :admin, verified: true, is_active: active)
+    u.assign_attributes(name: name, last_name: last_name, password: demo_password, role: :admin, is_active: active)
   end
   admin.roles << roles[role_name] unless admin.roles.include?(roles[role_name])
 end
@@ -226,7 +226,7 @@ employees = [
   [ "hany.washer@example.com", "Hany", "Gamal", false ]
 ].map do |email, name, last_name, active|
   User.find_or_create_by!(email: email) do |u|
-    u.assign_attributes(name: name, last_name: last_name, password: demo_password, role: :employee, verified: true, is_active: active)
+    u.assign_attributes(name: name, last_name: last_name, password: demo_password, role: :employee, is_active: active)
   end
 end
 active_employees = employees.select(&:is_active?)
@@ -257,7 +257,7 @@ statuses_by_age = ->(days_ago) {
 customers.each_with_index do |(name, last_name, tier, package, active), index|
   email = "#{name.downcase}.#{last_name.downcase}@example.com"
   customer = User.find_or_create_by!(email: email) do |u|
-    u.assign_attributes(name: name, last_name: last_name, password: demo_password, role: :customer, verified: true,
+    u.assign_attributes(name: name, last_name: last_name, password: demo_password, role: :customer,
       is_active: active, membership: memberships[tier], package: package, created_at: (400 - index * 30).days.ago)
   end
   next if customer.bookings.any?

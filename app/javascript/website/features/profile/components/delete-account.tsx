@@ -1,8 +1,6 @@
 import { Form } from "@inertiajs/react"
-import { useRef } from "react"
 
 import { websiteUsers } from "@/routes"
-import HeadingSmall from "@/shared/components/heading-small"
 import { Button } from "@/shared/components/ui/button"
 import {
   Dialog,
@@ -15,67 +13,61 @@ import {
 } from "@/shared/components/ui/dialog"
 import { Field, FieldError, FieldLabel } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
+import {
+  ProfileCard,
+  SectionHeading,
+} from "@/website/features/profile/components/profile-card"
 
-export default function DeleteUser() {
-  const passwordInput = useRef<HTMLInputElement>(null)
-
+export function DeleteAccount() {
   return (
-    <div className="space-y-6">
-      <HeadingSmall
-        title="Delete account"
-        description="Delete your account and all of its resources"
-      />
-      <div className="space-y-4 rounded-lg border border-red-100 bg-red-50 p-4 dark:border-red-200/10 dark:bg-red-700/10">
-        <div className="relative space-y-0.5 text-red-600 dark:text-red-100">
-          <p className="font-medium">Warning</p>
-          <p className="text-sm">
-            Please proceed with caution, this cannot be undone.
-          </p>
+    <ProfileCard id="delete" tone="danger">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="min-w-72 flex-1">
+          <SectionHeading
+            title="Delete account"
+            description="Permanently removes your account and data. This cannot be undone."
+          />
         </div>
 
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="destructive">Delete account</Button>
+            <Button
+              variant="destructive"
+              className="h-11 rounded-full bg-[#B3261E] px-6 text-white hover:bg-[#8E1F19]"
+            >
+              Delete account
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogTitle>
               Are you sure you want to delete your account?
             </DialogTitle>
             <DialogDescription>
-              Once your account is deleted, all of its resources and data will
-              also be permanently deleted. Please enter your password to confirm
-              you would like to permanently delete your account.
+              Once your account is deleted, all of its data is permanently
+              removed. Enter your password to confirm.
             </DialogDescription>
             <Form
               action={websiteUsers.destroy()}
-              options={{
-                preserveScroll: true,
-              }}
-              onError={() => passwordInput.current?.focus()}
+              options={{ preserveScroll: true }}
               resetOnSuccess
               className="space-y-6"
             >
               {({ resetAndClearErrors, processing, errors }) => (
                 <>
                   <Field>
-                    <FieldLabel
-                      htmlFor="password_challenge"
-                      className="sr-only"
-                    >
+                    <FieldLabel htmlFor="delete_password" className="sr-only">
                       Password
                     </FieldLabel>
-
                     <Input
-                      id="password_challenge"
+                      id="delete_password"
                       type="password"
-                      name="password_challenge"
-                      ref={passwordInput}
+                      name="delete_password"
                       placeholder="Password"
                       autoComplete="current-password"
+                      autoFocus
                     />
-
                     <FieldError
-                      errors={errors.password_challenge?.map((message) => ({
+                      errors={errors.delete_password?.map((message) => ({
                         message,
                       }))}
                     />
@@ -84,15 +76,19 @@ export default function DeleteUser() {
                   <DialogFooter>
                     <DialogClose asChild>
                       <Button
+                        type="button"
                         variant="secondary"
                         onClick={() => resetAndClearErrors()}
                       >
                         Cancel
                       </Button>
                     </DialogClose>
-
-                    <Button variant="destructive" disabled={processing} asChild>
-                      <button type="submit">Delete account</button>
+                    <Button
+                      type="submit"
+                      variant="destructive"
+                      disabled={processing}
+                    >
+                      Delete account
                     </Button>
                   </DialogFooter>
                 </>
@@ -101,6 +97,6 @@ export default function DeleteUser() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+    </ProfileCard>
   )
 }

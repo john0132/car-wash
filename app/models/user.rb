@@ -5,10 +5,6 @@ class User < ApplicationRecord
 
   has_secure_password
 
-  generates_token_for :email_verification, expires_in: 2.days do
-    email
-  end
-
   generates_token_for :password_reset, expires_in: 20.minutes do
     password_salt.last(10)
   end
@@ -61,10 +57,6 @@ class User < ApplicationRecord
     term = "%#{sanitize_sql_like(query.strip)}%"
     where("users.name ILIKE :term OR users.last_name ILIKE :term OR users.email ILIKE :term", term: term)
   }
-
-  before_validation if: :email_changed?, on: :update do
-    self.verified = false
-  end
 
   after_update if: :password_digest_previously_changed? do
     sessions.where.not(id: Current.session).delete_all

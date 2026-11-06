@@ -13,7 +13,6 @@ class Website::UsersController < Website::BaseController
 
     if @user.save
       start_new_session_for(@user)
-      send_email_verification
       redirect_to after_authentication_path, notice: "Welcome! You have signed up successfully"
     else
       redirect_to sign_up_path, inertia: { errors: @user.errors }
@@ -22,12 +21,12 @@ class Website::UsersController < Website::BaseController
 
   def destroy
     user = Current.user
-    if user.authenticate(params[:password_challenge] || "")
+    if user.authenticate(params[:delete_password] || "")
       user.destroy!
       Current.session = nil
       redirect_to root_path, notice: "Your account has been deleted", inertia: { clear_history: true }
     else
-      redirect_to settings_profile_path, inertia: { errors: { password_challenge: "Password challenge is invalid" } }
+      redirect_to profile_path, inertia: { errors: { delete_password: [ "is invalid" ] } }
     end
   end
 
@@ -35,9 +34,5 @@ class Website::UsersController < Website::BaseController
 
   def user_params
     params.permit(:email, :name, :password, :password_confirmation)
-  end
-
-  def send_email_verification
-    UserMailer.with(user: @user).email_verification.deliver_later
   end
 end

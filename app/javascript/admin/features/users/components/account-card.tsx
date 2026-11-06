@@ -1,4 +1,3 @@
-import { BadgeCheck, BadgeX } from "lucide-react"
 import type { ReactNode } from "react"
 
 import { ActiveBadge } from "@/admin/features/users/components/active-badge"
@@ -29,17 +28,6 @@ export function AccountCard({
           <ActiveBadge active={user.is_active} />
         </div>
         <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
-          <Detail label="Email verified">
-            {user.verified ? (
-              <span className="inline-flex items-center gap-1">
-                <BadgeCheck className="size-4 text-emerald-600" /> Verified
-              </span>
-            ) : (
-              <span className="text-muted-foreground inline-flex items-center gap-1">
-                <BadgeX className="size-4" /> Not verified
-              </span>
-            )}
-          </Detail>
           <Detail label="Joined">{formatDate(user.created_at)}</Detail>
           {lastSeenAt !== undefined && (
             <Detail label="Last active">{formatDateTime(lastSeenAt)}</Detail>
