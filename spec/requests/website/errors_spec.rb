@@ -26,6 +26,13 @@ RSpec.describe "Website error pages", type: :request do
   # Rails calls `config.exceptions_app` from ShowExceptions, which sits above the
   # cookie and session middleware, so the page has to render without them.
   describe "exceptions_app" do
+    # The page payload Inertia embeds in the HTML. Asserting on it (not on the
+    # rendered text) keeps these specs independent of server-side rendering,
+    # which needs the Vite dev server or a built SSR bundle.
+    def inertia_page(html)
+      JSON.parse(html[%r{<script data-page="app" type="application/json">(.*?)</script>}m, 1])
+    end
+
     # The env the real middleware stack hands over (key generator, cookie settings…).
     def failed_request(path, original, **env)
       env = Rack::MockRequest.env_for(path, "action_dispatch.original_path" => original, **env)
@@ -38,14 +45,21 @@ RSpec.describe "Website error pages", type: :request do
       html = body.each.to_a.join
 
       expect(status).to eq(404)
-      expect(html).to include('<html lang="ar" dir="rtl">').and include("الصفحة غير موجودة")
+      page = inertia_page(html)
+
+      expect(html).to include('<html lang="ar" dir="rtl">')
+      expect(page["component"]).to eq("website/errors/show")
+      expect(page["props"]).to include("status" => 404, "locale" => include("code" => "ar", "dir" => "rtl"))
     end
 
     it "renders the branded page for a server error" do
       status, _headers, body = failed_request("/500", "/services")
 
       expect(status).to eq(500)
-      expect(body.each.to_a.join).to include("Something went wrong")
+      page = inertia_page(body.each.to_a.join)
+
+      expect(page["component"]).to eq("website/errors/show")
+      expect(page["props"]).to include("status" => 500)
     end
 
     it "leaves the dashboard with the plain static page" do

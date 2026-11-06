@@ -37,8 +37,13 @@ class DashboardStats
   # even when nothing was paid that day.
   def revenue_trend
     @revenue_trend ||= begin
+      # created_at is stored in UTC; bucket by the business time zone's calendar
+      # day so a booking made just after local midnight lands on the right day.
+      local_day = Arel.sql(Booking.sanitize_sql_array([
+        "DATE(bookings.created_at AT TIME ZONE 'UTC' AT TIME ZONE ?)", Time.zone.tzinfo.name
+      ]))
       totals = Booking.paid.where(created_at: (TREND_DAYS - 1).days.ago.beginning_of_day..)
-        .group(Arel.sql("DATE(bookings.created_at)")).sum(:total_amount)
+        .group(local_day).sum(:total_amount)
 
       (TREND_DAYS - 1).downto(0).map do |days_ago|
         date = days_ago.days.ago.to_date
