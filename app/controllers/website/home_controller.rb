@@ -10,7 +10,8 @@ class Website::HomeController < Website::BaseController
     render inertia: {
       page: find_page("home")&.render_props,
       home_services: home_services,
-      home_categories: home_categories
+      home_categories: home_categories,
+      home_blogs: home_blogs
     }
   end
 
@@ -50,6 +51,22 @@ class Website::HomeController < Website::BaseController
         image: blob_prop(category.image)
       }
     end
+  end
+
+  # Three random active blogs for the homepage teaser.
+  def home_blogs
+    Blog.where(is_active: true).order(Arel.sql("RANDOM()")).limit(3)
+      .includes(:blog_translations, cover_image_attachment: :blob)
+      .map do |blog|
+        {
+          id: blog.id,
+          slug: blog.slug,
+          title: blog.translated(:title),
+          subtitle: blog.translated(:subtitle),
+          cover_image: blob_prop(blog.cover_image),
+          published_at: blog.created_at.iso8601
+        }
+      end
   end
 
   def blob_prop(attachment)

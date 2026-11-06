@@ -326,31 +326,6 @@ end
 
 # --- Content ----------------------------------------------------------------
 
-unless Page.exists?(slug: "about")
-  components = Component.where(key: %w[hero rich_text cta features]).index_by(&:key)
-  page = Page.new(slug: "about")
-  page.page_translations.build(language: english, name: "About", title: "About us",
-    subtitle: "Mobile car care since 2020", seo_description: "Who we are and how our mobile car wash works.")
-  page.page_translations.build(language: arabic, name: "من نحن", title: "من نحن", subtitle: "عناية متنقلة بالسيارات منذ 2020")
-
-  section = ->(key, position, settings, content) {
-    page.page_sections.build(component: components.fetch(key), position: position)
-      .assign_values(settings: settings, content_by_language: content)
-  }
-  section.("hero", 0, { "button_url" => "/sign_up", "alignment" => "center" },
-    english.id => { "heading" => "We come to you", "subheading" => "Book a wash and we'll be at your door.", "button_label" => "Book now" },
-    arabic.id => { "heading" => "نأتي إليك", "button_label" => "احجز الآن" })
-  section.("features", 1, { "items" => [ { "_id" => "fast" }, { "_id" => "eco" } ] },
-    english.id => { "heading" => "Why us", "items" => { "fast" => { "title" => "Fast", "text" => "Most washes take under an hour." },
-                                                         "eco" => { "title" => "Eco-friendly", "text" => "Waterless products." } } },
-    arabic.id => { "heading" => "لماذا نحن", "items" => { "fast" => { "title" => "سريع" }, "eco" => { "title" => "صديق للبيئة" } } })
-  section.("rich_text", 2, {},
-    english.id => { "body" => "<h2>Our story</h2><p>We started with one van and a simple idea: car care should come to you.</p>" })
-  section.("cta", 3, { "button_url" => "/sign_up", "variant" => "primary" },
-    english.id => { "heading" => "Ready for a spotless car?", "button_label" => "Create an account" })
-  page.save!
-end
-
 unless Blog.exists?(slug: "winter-car-care-tips")
   blog = Blog.new(slug: "winter-car-care-tips")
   blog.blog_translations.build(language: english, name: "Winter tips", title: "5 winter car care tips",

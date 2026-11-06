@@ -1,3 +1,5 @@
+import { BlogsSection } from "@/website/features/blogs/components/blogs-section"
+import type { BlogCardData } from "@/website/features/blogs/types"
 import { ServiceCategoriesSection } from "@/website/features/home-catalog/components/service-categories-section"
 import { ServicesSection } from "@/website/features/home-catalog/components/services-section"
 import type {
@@ -11,12 +13,14 @@ interface Props {
   page: PageProps | null
   home_services: HomeService[]
   home_categories: HomeCategory[]
+  home_blogs: BlogCardData[]
 }
 
 export default function Welcome({
   page,
   home_services: services,
   home_categories: categories,
+  home_blogs: blogs,
 }: Props) {
   return (
     <MarketingLayout
@@ -29,6 +33,7 @@ export default function Welcome({
         <>
           <ServiceCategoriesSection categories={categories} />
           <ServicesSection services={services} />
+          <BlogsSection blogs={blogs} />
         </>
       }
     />

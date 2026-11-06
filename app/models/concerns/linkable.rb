@@ -18,7 +18,9 @@ module Linkable
   ROUTES = {
     "home" => :root_path,
     "sign_in" => :sign_in_path,
-    "sign_up" => :sign_up_path
+    "sign_up" => :sign_up_path,
+    "faqs" => :faqs_path,
+    "blogs" => :blogs_path
   }.freeze
 
   included do

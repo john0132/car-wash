@@ -60,6 +60,8 @@ Rails.application.routes.draw do
       resources :cars, only: :index
     end
 
+    resources :faqs, only: :index
+    resources :blogs, only: %i[index show], param: :slug
     resources :services, only: :show, param: :slug
     resources :service_categories, only: :show, param: :slug, path: "categories"
 
