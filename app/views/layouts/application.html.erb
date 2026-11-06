@@ -1,7 +1,7 @@
 <%# Public website layout: loads the SSR-enabled website.tsx Inertia entrypoint. %>
 <%# Also used by `inertia` routes (InertiaRails::StaticController inherits InertiaController). %>
 <!DOCTYPE html>
-<html>
+<html lang="<%= I18n.locale %>" dir="<%= respond_to?(:rtl_locale?) && rtl_locale? ? "rtl" : "ltr" %>">
   <head>
     <%= render "layouts/head" %>
     <meta name="application-name" content="Auto Atelier">

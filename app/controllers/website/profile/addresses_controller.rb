@@ -12,16 +12,16 @@ class Website::Profile::AddressesController < Website::BaseController
   end
 
   def create
-    save Current.user.addresses.new, notice: "Address added"
+    save Current.user.addresses.new, notice: t("website.flash.address_added")
   end
 
   def update
-    save @address, notice: "Address updated"
+    save @address, notice: t("website.flash.address_updated")
   end
 
   def destroy
     @address.destroy!
-    redirect_to profile_addresses_path, notice: "Address removed"
+    redirect_to profile_addresses_path, notice: t("website.flash.address_removed")
   end
 
   private

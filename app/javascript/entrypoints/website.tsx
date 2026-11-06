@@ -1,12 +1,12 @@
 import { createInertiaApp } from "@inertiajs/react"
 
-import PersistentLayout from "@/shared/layouts/persistent-layout"
 import {
   type PageModule,
   createPageResolver,
   inertiaAppOptions,
   titleFor,
 } from "@/shared/lib/inertia"
+import WebsiteShell from "@/website/layouts/website-shell"
 
 void createInertiaApp({
   ...inertiaAppOptions,
@@ -17,7 +17,7 @@ void createInertiaApp({
     "website",
     import.meta.glob<PageModule>("../website/pages/**/*.tsx"),
   ),
-  layout: () => PersistentLayout,
+  layout: () => WebsiteShell,
 }).catch((error) => {
   // This ensures this entrypoint is only loaded on Inertia pages
   // by checking for the presence of the root element (#app by default).

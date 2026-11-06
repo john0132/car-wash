@@ -14,18 +14,18 @@ class Website::SessionsController < Website::BaseController
 
     if user&.is_active?
       start_new_session_for(user)
-      redirect_to after_authentication_url, notice: "Signed in successfully"
+      redirect_to after_authentication_url, notice: t("website.flash.signed_in")
     elsif user
-      redirect_to sign_in_path, alert: "Your account has been disabled"
+      redirect_to sign_in_path, alert: t("website.flash.account_disabled")
     else
-      redirect_to sign_in_path, alert: "That email or password is incorrect"
+      redirect_to sign_in_path, alert: t("website.flash.bad_credentials")
     end
   end
 
   def destroy
     @session.destroy!
     Current.session = nil
-    redirect_to profile_path, notice: "That session has been logged out", inertia: { clear_history: true }
+    redirect_to profile_path, notice: t("website.flash.session_logged_out"), inertia: { clear_history: true }
   end
 
   private

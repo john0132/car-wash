@@ -13,7 +13,7 @@ class Website::UsersController < Website::BaseController
 
     if @user.save
       start_new_session_for(@user)
-      redirect_to after_authentication_url, notice: "Welcome! You have signed up successfully"
+      redirect_to after_authentication_url, notice: t("website.flash.signed_up")
     else
       redirect_to sign_up_path, inertia: { errors: @user.errors }
     end
@@ -24,9 +24,9 @@ class Website::UsersController < Website::BaseController
     if user.authenticate(params[:delete_password] || "")
       user.destroy!
       Current.session = nil
-      redirect_to root_path, notice: "Your account has been deleted", inertia: { clear_history: true }
+      redirect_to root_path, notice: t("website.flash.account_deleted"), inertia: { clear_history: true }
     else
-      redirect_to profile_path, inertia: { errors: { delete_password: [ "is invalid" ] } }
+      redirect_to profile_path, inertia: { errors: { delete_password: [ t("website.errors.delete_password_invalid") ] } }
     end
   end
 

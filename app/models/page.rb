@@ -17,6 +17,8 @@ class Page < ApplicationRecord
   requires_default_translation
 
   validates :slug, presence: true, uniqueness: true, format: { with: SLUG_REGEXP }
+  # "/ar" is the Arabic site (LocalePrefix), so no page may take a language code as its address.
+  validates :slug, exclusion: { in: ->(*) { I18n.available_locales.map(&:to_s) }, message: "is reserved for a language" }
 
   # The website's view of this page in `locale`: page text (each field falls
   # back to the default locale, then any language), the active sections (see PageSection#render_props) and the schema

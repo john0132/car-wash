@@ -9,16 +9,16 @@ class Website::Profile::CarsController < Website::BaseController
 
   # Returns to the page that added the car (checkout adds one inline), else the cars tab.
   def create
-    save Current.user.cars.new, notice: "Car added", back: true
+    save Current.user.cars.new, notice: t("website.flash.car_added"), back: true
   end
 
   def update
-    save @car, notice: "Car updated"
+    save @car, notice: t("website.flash.car_updated")
   end
 
   def destroy
     @car.destroy!
-    redirect_to profile_cars_path, notice: "Car removed"
+    redirect_to profile_cars_path, notice: t("website.flash.car_removed")
   end
 
   private

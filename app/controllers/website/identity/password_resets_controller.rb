@@ -18,12 +18,12 @@ class Website::Identity::PasswordResetsController < Website::BaseController
     end
 
     # Same answer either way, so the form can't be used to probe which emails have accounts.
-    redirect_to sign_in_path, notice: "If that email has an account, check it for reset instructions"
+    redirect_to sign_in_path, notice: t("website.flash.reset_requested")
   end
 
   def update
     if @user.update(user_params)
-      redirect_to sign_in_path, notice: "Your password was reset successfully. Please sign in"
+      redirect_to sign_in_path, notice: t("website.flash.reset_done")
     else
       redirect_to edit_identity_password_reset_path(sid: params[:sid]), inertia: { errors: @user.errors }
     end
@@ -34,7 +34,7 @@ class Website::Identity::PasswordResetsController < Website::BaseController
   def set_user
     @user = User.find_by_token_for!(:password_reset, params[:sid])
   rescue StandardError
-    redirect_to new_identity_password_reset_path, alert: "That password reset link is invalid"
+    redirect_to new_identity_password_reset_path, alert: t("website.flash.reset_invalid")
   end
 
   def user_params

@@ -18,6 +18,9 @@ require "action_cable/engine"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# Needed while the app boots, before autoloading is set up.
+require_relative "../app/middleware/locale_prefix"
+
 module CarWash
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
@@ -35,6 +38,13 @@ module CarWash
     #
     # Business hours (booking slots) are local time; the database still stores UTC.
     config.time_zone = "Cairo"
+
+    # English (default, unprefixed URLs) and Arabic (/ar/...). The dashboard stays English.
+    config.i18n.available_locales = %i[en ar]
+    config.i18n.default_locale = :en
+    config.i18n.fallbacks = [ :en ]
+    config.i18n.load_path += Dir[Rails.root.join("config/locales/**/*.yml")]
+    config.middleware.insert_before 0, LocalePrefix
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Don't generate system test files.

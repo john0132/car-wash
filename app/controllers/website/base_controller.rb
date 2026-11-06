@@ -3,6 +3,7 @@
 # Base for every public website controller. Renders with the `application`
 # layout, which loads the `website.tsx` Inertia entrypoint (SSR-enabled).
 class Website::BaseController < InertiaController
+  include Website::Localized
   include Website::PublicProps
 
   # Header and footer content staff edit in the dashboard (see SiteChrome).

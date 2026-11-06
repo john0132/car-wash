@@ -13,7 +13,7 @@ class Website::ProfilesController < Website::BaseController
 
   def update
     if @user.update(user_params)
-      redirect_to profile_path, notice: "Your profile has been updated"
+      redirect_to profile_path, notice: t("website.flash.profile_updated")
     else
       redirect_to profile_path, inertia: { errors: @user.errors.to_hash }
     end
