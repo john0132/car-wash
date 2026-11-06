@@ -1,8 +1,15 @@
 # frozen_string_literal: true
 
-# Example blog posts (English). Idempotent: a blog is only created when its slug is missing.
+# Example blog posts (English). Idempotent: a blog is only created when its slug is missing, and a missing cover image is attached.
 
 english = Language.find_or_create_by!(code: "en") { |l| l.name = "English" }
+
+# Cover illustrations live in db/seeds/images/blogs/<slug>.png. They are PNGs on purpose: Active Storage serves SVG
+# as a download (application/octet-stream), so browsers will not render it in an <img>.
+cover_for = lambda do |slug|
+  path = Rails.root.join("db/seeds/images/blogs/#{slug}.png")
+  { io: File.open(path), filename: "#{slug}.png", content_type: "image/png", identify: false }
+end
 
 [
   {
@@ -46,10 +53,15 @@ english = Language.find_or_create_by!(code: "en") { |l| l.name = "English" }
       "<li>Wax or seal the paint for extra protection.</li><li>Top up coolant and washer fluid.</li></ul>"
   }
 ].each_with_index do |attrs, index|
-  next if Blog.exists?(slug: attrs[:slug])
+  existing = Blog.find_by(slug: attrs[:slug])
+  if existing
+    existing.cover_image.attach(cover_for.(attrs[:slug])) unless existing.cover_image.attached?
+    next
+  end
 
   blog = Blog.new(slug: attrs[:slug], is_active: true, created_at: (index * 3).days.ago)
   blog.blog_translations.build(language: english, name: attrs[:title], title: attrs[:title],
                                subtitle: attrs[:subtitle], body: attrs[:body])
+  blog.cover_image.attach(cover_for.(attrs[:slug]))
   blog.save!
 end

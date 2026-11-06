@@ -326,13 +326,18 @@ end
 
 # --- Content ----------------------------------------------------------------
 
-unless Blog.exists?(slug: "winter-car-care-tips")
-  blog = Blog.new(slug: "winter-car-care-tips")
+winter_blog = Blog.find_or_initialize_by(slug: "winter-car-care-tips")
+if winter_blog.new_record?
+  blog = winter_blog
   blog.blog_translations.build(language: english, name: "Winter tips", title: "5 winter car care tips",
     subtitle: "Keep your car clean when the weather isn't",
     body: "<p>Cold weather is hard on paint.</p><ul><li>Wash every two weeks</li><li>Protect with wax</li></ul>",
     seo_description: "Simple ways to protect your car in winter.")
   blog.save!
+end
+unless winter_blog.cover_image.attached?
+  winter_blog.cover_image.attach(io: File.open(Rails.root.join("db/seeds/images/blogs/winter-car-care-tips.png")),
+                                 filename: "winter-car-care-tips.png", content_type: "image/png", identify: false)
 end
 
 # Header "Services" dropdown: categories, and each category's services.
