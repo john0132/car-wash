@@ -15,9 +15,7 @@ class Website::ProfilesController < Website::BaseController
     if @user.update(user_params)
       redirect_to profile_path, notice: "Your profile has been updated"
     else
-      errors = @user.errors.to_hash
-      errors[:email_password] = errors.delete(:password_challenge) if errors.key?(:password_challenge)
-      redirect_to profile_path, inertia: { errors: errors }
+      redirect_to profile_path, inertia: { errors: @user.errors.to_hash }
     end
   end
 
@@ -27,16 +25,7 @@ class Website::ProfilesController < Website::BaseController
     @user = Current.user
   end
 
-  # Changing the email address needs the current password; the name never does.
   def user_params
-    permitted = params.permit(:name, :last_name, :email, :email_password)
-    attrs = permitted.slice(:name, :last_name)
-    email = permitted[:email]
-
-    if email.present? && User.normalize_value_for(:email, email) != @user.email
-      attrs[:email] = email
-      attrs[:password_challenge] = permitted[:email_password].to_s
-    end
-    attrs
+    params.permit(:name, :last_name, :email)
   end
 end

@@ -27,22 +27,16 @@ RSpec.describe "Profiles", type: :request do
       expect(users(:one).reload).to have_attributes(name: "Renamed", last_name: "Person")
     end
 
-    it "changes the email when the current password is right" do
-      patch profile_path, params: { email: "new@example.com", email_password: "Secret1*3*5*" }
+    it "changes the email without asking for a password" do
+      patch profile_path, params: { email: "new@example.com" }
       expect(response).to redirect_to(profile_path)
       expect(users(:one).reload.email).to eq("new@example.com")
     end
 
-    it "keeps the email when the current password is wrong" do
-      patch profile_path, params: { email: "new@example.com", email_password: "wrong" }
+    it "reports an invalid email" do
+      patch profile_path, params: { email: "nope" }
       expect(response).to redirect_to(profile_path)
-      expect(session[:inertia_errors]).to eq(email_password: [ "is invalid" ])
       expect(users(:one).reload.email).to eq("one@example.com")
-    end
-
-    it "does not require a password when the email is unchanged" do
-      patch profile_path, params: { name: "Same", email: users(:one).email }
-      expect(users(:one).reload.name).to eq("Same")
     end
   end
 

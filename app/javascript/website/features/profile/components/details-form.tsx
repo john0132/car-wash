@@ -22,7 +22,6 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
       <Form
         action={websiteProfiles.update()}
         options={{ preserveScroll: true }}
-        resetOnSuccess={["email_password"]}
         className="flex flex-col gap-6"
       >
         {({ errors, processing, recentlySuccessful }) => (
@@ -71,24 +70,6 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
                 className={fieldClass}
               />
               <FieldError errors={toErrors(errors.email)} />
-            </Field>
-
-            <Field>
-              <FieldLabel htmlFor="email_password">
-                Current password{" "}
-                <span className="font-normal text-[#2B3A32]/65">
-                  (only needed to change your email)
-                </span>
-              </FieldLabel>
-              <Input
-                id="email_password"
-                name="email_password"
-                type="password"
-                autoComplete="current-password"
-                placeholder="Current password"
-                className={fieldClass}
-              />
-              <FieldError errors={toErrors(errors.email_password)} />
             </Field>
 
             <div className="flex items-center gap-4">

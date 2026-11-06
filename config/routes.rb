@@ -53,6 +53,13 @@ Rails.application.routes.draw do
     resource :profile, only: %i[show update]
     resource :password, only: :update
 
+    # Customer account area: each is a tab of the profile sidebar.
+    namespace :profile do
+      resources :bookings, only: :index
+      resources :addresses, only: %i[index create update destroy]
+      resources :cars, only: :index
+    end
+
     resources :services, only: :show, param: :slug
     resources :service_categories, only: :show, param: :slug, path: "categories"
 

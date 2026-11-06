@@ -1,14 +1,23 @@
 import { Form } from "@inertiajs/react"
+import { useState } from "react"
 
 import { websitePasswords } from "@/routes"
 import { Button } from "@/shared/components/ui/button"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from "@/shared/components/ui/dialog"
 import { Field, FieldError, FieldLabel } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
 import {
   ProfileCard,
   SectionHeading,
-  fieldClass,
   outlineButtonClass,
 } from "@/website/features/profile/components/profile-card"
 
@@ -30,58 +39,79 @@ const FIELDS = [
 ] as const
 
 export function PasswordForm() {
+  const [open, setOpen] = useState(false)
+
   return (
     <ProfileCard id="password">
-      <Form
-        action={websitePasswords.update()}
-        options={{ preserveScroll: true }}
-        resetOnSuccess
-        resetOnError={["password_challenge"]}
-        className="flex flex-col gap-6"
-      >
-        {({ errors, processing, recentlySuccessful }) => (
-          <>
-            <SectionHeading
-              title="Password"
-              description="Use at least 12 characters."
-            />
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="min-w-72 flex-1">
+          <SectionHeading
+            title="Password"
+            description="Keep your account safe with a strong password."
+          />
+        </div>
 
-            <div className="grid gap-5 md:grid-cols-3">
-              {FIELDS.map(({ name, label, autoComplete }) => (
-                <Field key={name}>
-                  <FieldLabel htmlFor={name}>{label}</FieldLabel>
-                  <Input
-                    id={name}
-                    name={name}
-                    type="password"
-                    autoComplete={autoComplete}
-                    required
-                    className={fieldClass}
-                  />
-                  <FieldError errors={toErrors(errors[name])} />
-                </Field>
-              ))}
-            </div>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              className={outlineButtonClass}
+            >
+              Change password
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogTitle>Change password</DialogTitle>
+            <DialogDescription>
+              Use at least 12 characters. You&apos;ll stay signed in on this
+              device only.
+            </DialogDescription>
+            <Form
+              action={websitePasswords.update()}
+              options={{ preserveScroll: true }}
+              onSuccess={() => setOpen(false)}
+              resetOnSuccess
+              resetOnError={["password_challenge"]}
+              className="space-y-5"
+            >
+              {({ errors, processing, resetAndClearErrors }) => (
+                <>
+                  {FIELDS.map(({ name, label, autoComplete }) => (
+                    <Field key={name}>
+                      <FieldLabel htmlFor={name}>{label}</FieldLabel>
+                      <Input
+                        id={name}
+                        name={name}
+                        type="password"
+                        autoComplete={autoComplete}
+                        required
+                      />
+                      <FieldError errors={toErrors(errors[name])} />
+                    </Field>
+                  ))}
 
-            <div className="flex items-center gap-4">
-              <Button
-                type="submit"
-                variant="outline"
-                disabled={processing}
-                className={outlineButtonClass}
-              >
-                {processing && <Spinner />}
-                Update password
-              </Button>
-              {recentlySuccessful && (
-                <p className="text-sm text-[#2B3A32]/65" role="status">
-                  Saved
-                </p>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        onClick={() => resetAndClearErrors()}
+                      >
+                        Cancel
+                      </Button>
+                    </DialogClose>
+                    <Button type="submit" disabled={processing}>
+                      {processing && <Spinner />}
+                      Update password
+                    </Button>
+                  </DialogFooter>
+                </>
               )}
-            </div>
-          </>
-        )}
-      </Form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      </div>
     </ProfileCard>
   )
 }
