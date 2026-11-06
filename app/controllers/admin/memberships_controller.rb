@@ -3,7 +3,10 @@
 # Customer loyalty tiers. Names and descriptions live in membership_translations
 # (one per Language); tiers are disabled rather than deleted because customers reference them.
 class Admin::MembershipsController < Admin::BaseController
+  include Admin::ContentTranslations
+
   RECENT_CUSTOMERS = 10
+  TRANSLATION_FIELDS = %i[name description].freeze
 
   after_action :verify_authorized
 
@@ -35,7 +38,7 @@ class Admin::MembershipsController < Admin::BaseController
         created_at: @membership.created_at,
         updated_at: @membership.updated_at
       ),
-      translations: translation_props(@membership),
+      translations: content_translations_props(@membership, fields: TRANSLATION_FIELDS),
       stats: {
         customers_count: customers.count,
         active_customers_count: customers.where(is_active: true).count,
@@ -62,7 +65,7 @@ class Admin::MembershipsController < Admin::BaseController
     if save(membership)
       redirect_to admin_membership_path(membership), notice: "#{display_name(membership)} was created"
     else
-      redirect_to new_admin_membership_path, inertia: { errors: errors_for(membership) }
+      redirect_to new_admin_membership_path, inertia: { errors: content_errors(membership) }
     end
   end
 
@@ -77,7 +80,7 @@ class Admin::MembershipsController < Admin::BaseController
     if save(@membership)
       redirect_to admin_membership_path(@membership), notice: "#{display_name(@membership)} was updated"
     else
-      redirect_to edit_admin_membership_path(@membership), inertia: { errors: errors_for(@membership) }
+      redirect_to edit_admin_membership_path(@membership), inertia: { errors: content_errors(@membership) }
     end
   end
 
@@ -102,53 +105,17 @@ class Admin::MembershipsController < Admin::BaseController
     params.expect(membership: %i[is_active egp_to_points points_to_egp background_color text_color])
   end
 
-  # { "<language_id>" => { name:, description: } }, limited to existing languages.
-  def translation_params
-    allowed = Language.ids.to_h { |id| [ id.to_s, %i[name description] ] }
-    params.fetch(:membership, {}).fetch(:translations, {}).permit(allowed).to_h
-  end
-
   def save(membership)
-    translations = translation_params
     membership.assign_attributes(membership_params)
     membership.background_color = hex(membership.background_color)
     membership.text_color = hex(membership.text_color)
-    @translation_error = nil
-
-    Membership.transaction do
-      unless membership.save
-        raise ActiveRecord::Rollback
-      end
-
-      translations.each do |language_id, attrs|
-        record = membership.membership_translations.find_or_initialize_by(language_id: language_id)
-        if attrs[:name].to_s.strip.blank?
-          record.destroy if record.persisted?
-        else
-          record.update!(name: attrs[:name].strip, description: attrs[:description].presence)
-        end
-      end
-
-      if membership.membership_translations.reload.empty?
-        @translation_error = "Enter a name in at least one language"
-        raise ActiveRecord::Rollback
-      end
-
-      return true
-    end
-
-    false
+    assign_content_translations(membership, submitted_translations(:membership), fields: TRANSLATION_FIELDS)
+    membership.save
   end
 
   def hex(color)
     color = color.to_s.strip
     color.empty? || color.start_with?("#") ? color : "##{color}"
-  end
-
-  def errors_for(membership)
-    errors = membership.errors.to_hash
-    errors[:translations] = [ @translation_error ] if @translation_error
-    errors
   end
 
   def display_name(membership)
@@ -169,17 +136,11 @@ class Admin::MembershipsController < Admin::BaseController
     }
   end
 
-  def translation_props(membership)
-    by_language = membership.membership_translations.index_by(&:language_id)
-
-    Language.order(:id).map do |language|
-      translation = by_language[language.id]
-      { language_id: language.id, code: language.code, language: language.name,
-        name: translation&.name, description: translation&.description }
-    end
-  end
-
   def form_props(membership)
-    { membership: membership_props(membership), translations: translation_props(membership) }
+    {
+      membership: membership_props(membership),
+      translations: content_translations_props(membership, fields: TRANSLATION_FIELDS),
+      languages: languages_props
+    }
   end
 end

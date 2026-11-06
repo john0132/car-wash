@@ -15,4 +15,5 @@ end
 
 RSpec.configure do |config|
   config.include AdminHelpers, type: :request
+  config.include AdminHelpers, type: :system
 end

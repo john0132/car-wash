@@ -1,24 +1,21 @@
-import { Link, useForm } from "@inertiajs/react"
-import { useState } from "react"
+import { useForm } from "@inertiajs/react"
 
 import { FormSection, asFieldErrors } from "@/admin/components/form-fields"
+import { FormLayout } from "@/admin/components/form-layout"
 import { LanguageSwitcher } from "@/admin/components/language-switcher"
+import { NoLanguages } from "@/admin/components/no-languages"
 import { LinkList } from "@/admin/features/navigation/components/link-list"
 import type {
   LinkOptions,
   LinkProps,
   LinkState,
 } from "@/admin/features/navigation/types"
-import {
-  linkPayload,
-  navigationErrorLanguageCodes,
-  toLinkState,
-} from "@/admin/features/navigation/utils"
+import { linkPayload, toLinkState } from "@/admin/features/navigation/utils"
+import { useLanguageTabs } from "@/admin/hooks/use-language-tabs"
+import { SUBMIT_OPTIONS, formErrors } from "@/admin/lib/forms"
 import type { AdminLanguage } from "@/admin/types"
 import { adminDashboard, adminHeaderItems } from "@/routes"
-import { Button } from "@/shared/components/ui/button"
 import { FieldError } from "@/shared/components/ui/field"
-import { Spinner } from "@/shared/components/ui/spinner"
 
 interface HeaderFormData {
   items: LinkState[]
@@ -40,60 +37,45 @@ export function HeaderForm({
   languages: AdminLanguage[]
   canUpdate: boolean
 }) {
-  const defaultLanguage = languages.find((l) => l.default) ?? languages[0]
-  const [code, setCode] = useState(defaultLanguage?.code ?? "")
-  const language = languages.find((l) => l.code === code) ?? defaultLanguage
-
   const form = useForm<HeaderFormData>({ items: items.map(toLinkState) })
   const { data, setData, processing } = form
-  const errors = form.errors as Record<string, string[] | undefined>
+  const errors = formErrors(form)
+  const tabs = useLanguageTabs(languages, errors)
+  const { language } = tabs
 
   form.transform((values) => ({
     header: { items: values.items.map(linkPayload) },
   }))
 
-  if (!language) {
-    return (
-      <p className="text-muted-foreground text-sm">
-        No languages are set up yet. Add a Language record first.
-      </p>
-    )
-  }
+  if (!language) return <NoLanguages />
 
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault()
-        form.submit(adminHeaderItems.update(), {
-          preserveScroll: true,
-          preserveState: "errors",
-        })
-      }}
-      className="max-w-3xl space-y-6"
-    >
-      <div className="bg-background/95 supports-backdrop-filter:bg-background/80 sticky top-0 z-10 -mx-4 flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3 backdrop-blur">
+    <FormLayout
+      onSubmit={() => form.submit(adminHeaderItems.update(), SUBMIT_OPTIONS)}
+      tabs={
         <LanguageSwitcher
           languages={languages}
           value={language.code}
-          onChange={setCode}
-          errorCodes={navigationErrorLanguageCodes(errors, languages)}
+          onChange={tabs.setCode}
+          errorCodes={tabs.errorCodes}
         />
-        <div className="ml-auto flex items-center gap-2">
-          <Button variant="ghost" asChild>
-            <Link href={adminDashboard.index()}>Cancel</Link>
-          </Button>
-          {canUpdate && (
-            <Button type="submit" disabled={processing}>
-              {processing && <Spinner />}
-              Save changes
-            </Button>
-          )}
-        </div>
-      </div>
-
+      }
+      cancelHref={adminDashboard.index().url}
+      submitLabel="Save changes"
+      processing={processing}
+      canSubmit={canUpdate}
+    >
       <FormSection
         title="Header links"
-        description="Shown in the website header, in this order. Add child links to make a dropdown; they can nest as deep as you like. Links to disabled pages, categories or services are hidden automatically."
+        description={
+          <>
+            Shown in the website header, in this order. Labels are edited in{" "}
+            <span lang={language.code}>{language.name}</span>; link targets and
+            visibility are shared by every language. Add child links to make a
+            dropdown; they can nest as deep as you like. Links to disabled
+            pages, categories or services are hidden automatically.
+          </>
+        }
       >
         <LinkList
           links={data.items}
@@ -108,6 +90,6 @@ export function HeaderForm({
         />
         <FieldError errors={asFieldErrors(errors.items)} />
       </FormSection>
-    </form>
+    </FormLayout>
   )
 }

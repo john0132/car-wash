@@ -3,6 +3,10 @@
 # Ways customers can pay. Names live in payment_method_translations (one per Language);
 # methods are disabled rather than deleted because transactions reference them.
 class Admin::PaymentMethodsController < Admin::BaseController
+  include Admin::ContentTranslations
+
+  TRANSLATION_FIELDS = %i[name].freeze
+
   after_action :verify_authorized
 
   before_action :set_payment_method, only: %i[edit update activation]
@@ -35,7 +39,7 @@ class Admin::PaymentMethodsController < Admin::BaseController
     if save(payment_method)
       redirect_to admin_payment_methods_path, notice: "#{display_name(payment_method)} was created"
     else
-      redirect_to new_admin_payment_method_path, inertia: { errors: errors_for(payment_method) }
+      redirect_to new_admin_payment_method_path, inertia: { errors: content_errors(payment_method) }
     end
   end
 
@@ -50,7 +54,7 @@ class Admin::PaymentMethodsController < Admin::BaseController
     if save(@payment_method)
       redirect_to admin_payment_methods_path, notice: "#{display_name(@payment_method)} was updated"
     else
-      redirect_to edit_admin_payment_method_path(@payment_method), inertia: { errors: errors_for(@payment_method) }
+      redirect_to edit_admin_payment_method_path(@payment_method), inertia: { errors: content_errors(@payment_method) }
     end
   end
 
@@ -75,47 +79,11 @@ class Admin::PaymentMethodsController < Admin::BaseController
     params.expect(payment_method: %i[code is_active])
   end
 
-  # { "<language_id>" => { name: } }, limited to existing languages.
-  def translation_params
-    raw = params.fetch(:payment_method, {}).fetch(:translations, {})
-    return {} unless raw.respond_to?(:key?)
-
-    Language.ids.filter_map { |id| [ id.to_s, raw.require(id.to_s).permit(:name) ] if raw.key?(id.to_s) }.to_h
-  end
-
   def save(payment_method)
-    translations = translation_params
     payment_method.assign_attributes(payment_method_params)
     payment_method.code = payment_method.code.to_s.strip.parameterize(separator: "_")
-    @translation_error = nil
-
-    PaymentMethod.transaction do
-      raise ActiveRecord::Rollback unless payment_method.save
-
-      translations.each do |language_id, attrs|
-        record = payment_method.payment_method_translations.find_or_initialize_by(language_id: language_id)
-        if attrs[:name].to_s.strip.blank?
-          record.destroy if record.persisted?
-        else
-          record.update!(name: attrs[:name].strip)
-        end
-      end
-
-      if payment_method.payment_method_translations.reload.empty?
-        @translation_error = "Enter a name in at least one language"
-        raise ActiveRecord::Rollback
-      end
-
-      return true
-    end
-
-    false
-  end
-
-  def errors_for(payment_method)
-    errors = payment_method.errors.to_hash
-    errors[:translations] = [ @translation_error ] if @translation_error
-    errors
+    assign_content_translations(payment_method, submitted_translations(:payment_method), fields: TRANSLATION_FIELDS)
+    payment_method.save
   end
 
   def display_name(payment_method)
@@ -133,16 +101,11 @@ class Admin::PaymentMethodsController < Admin::BaseController
     }
   end
 
-  def translation_props(payment_method)
-    by_language = payment_method.payment_method_translations.index_by(&:language_id)
-
-    Language.order(:id).map do |language|
-      { language_id: language.id, code: language.code, language: language.name,
-        name: by_language[language.id]&.name }
-    end
-  end
-
   def form_props(payment_method)
-    { payment_method: payment_method_props(payment_method), translations: translation_props(payment_method) }
+    {
+      payment_method: payment_method_props(payment_method),
+      translations: content_translations_props(payment_method, fields: TRANSLATION_FIELDS),
+      languages: languages_props
+    }
   end
 end

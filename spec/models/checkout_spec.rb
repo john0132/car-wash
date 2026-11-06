@@ -7,7 +7,7 @@ RSpec.describe Checkout, type: :model do
 
   let(:user) { users(:one) }
   let!(:area) { create_area("Maadi", city: create_city("Cairo")) }
-  let!(:cash) { PaymentMethod.create!(code: "cash") }
+  let!(:cash) { create_payment_method("cash") }
   let(:service) { create_service("Exterior Wash", price: 100, sale_price: 80) }
   let(:wax) { create_extra("Wax", price: 30) }
   let(:freshener) { create_extra("Air Freshener", price: 20) }

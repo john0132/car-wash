@@ -1,8 +1,12 @@
 import { Head, Link } from "@inertiajs/react"
-import { Pencil, Plus } from "lucide-react"
+import { Plus } from "lucide-react"
 
 import { ActivationSwitch } from "@/admin/components/activation-switch"
-import { ListFilters } from "@/admin/components/list-filters"
+import {
+  ListFilters,
+  PUBLISHED_LABELS,
+  hasFilters,
+} from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
 import { ResourceTable } from "@/admin/components/resource-table"
@@ -51,11 +55,14 @@ export default function PagesIndex({ pages, filters, pagination }: Props) {
           url={adminPages.index().url}
           filters={filters}
           searchPlaceholder="Search page name…"
+          statusLabels={PUBLISHED_LABELS}
         />
 
         <ResourceTable
           items={pages}
-          emptyMessage="No pages match these filters."
+          emptyMessage="No pages yet."
+          emptyFilteredMessage="No pages match these filters."
+          filtered={hasFilters(filters)}
           columns={
             <>
               <TableHead>Page</TableHead>
@@ -63,7 +70,6 @@ export default function PagesIndex({ pages, filters, pagination }: Props) {
               <TableHead className="text-right">Sections</TableHead>
               <TableHead>Updated</TableHead>
               <TableHead className="text-right">Published</TableHead>
-              <TableHead className="w-12" />
             </>
           }
           renderRow={(page) => {
@@ -107,18 +113,6 @@ export default function PagesIndex({ pages, filters, pagination }: Props) {
                     action={adminPages.activation(page.id)}
                     disabled={!canUpdate}
                   />
-                </TableCell>
-                <TableCell>
-                  {canUpdate && (
-                    <Button variant="ghost" size="icon" asChild>
-                      <Link
-                        href={adminPages.edit(page.id)}
-                        aria-label={`Edit ${name}`}
-                      >
-                        <Pencil />
-                      </Link>
-                    </Button>
-                  )}
                 </TableCell>
               </TableRow>
             )

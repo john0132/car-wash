@@ -35,9 +35,21 @@ export interface SelectFilter {
 const presence = (value: QueryValue) =>
   value === null || value === undefined || value === "" ? undefined : value
 
+/** Whether any filter (search, status, select) is set, for ResourceTable's `filtered`. */
+export const hasFilters = (filters: object) =>
+  Object.values(filters).some(
+    (value) => presence(value as QueryValue) !== undefined,
+  )
+
+/** Labels of the active/inactive status options. */
+export const PUBLISHED_LABELS = { active: "Published", inactive: "Draft" }
+const ACTIVE_LABELS = { active: "Active", inactive: "Disabled" }
+
 /**
  * Search + status filter (plus optional extra selects), kept in the URL query
- * and applied by Rails. Pass `showStatus={false}` for records without a status.
+ * and applied by Rails. Pass `showStatus={false}` for records without an
+ * active/inactive status (use a `selects` entry for other kinds of status), and
+ * `statusLabels={PUBLISHED_LABELS}` for website content.
  */
 export function ListFilters({
   url,
@@ -45,12 +57,14 @@ export function ListFilters({
   searchPlaceholder,
   selects = [],
   showStatus = true,
+  statusLabels = ACTIVE_LABELS,
 }: {
   url: string
-  filters: Omit<ListFilterValues, "status"> & { status?: StatusFilter }
+  filters: { q: string | null }
   searchPlaceholder: string
   selects?: SelectFilter[]
   showStatus?: boolean
+  statusLabels?: { active: string; inactive: string }
 }) {
   const [query, setQuery] = useState(filters.q ?? "")
 
@@ -111,7 +125,7 @@ export function ListFilters({
 
       {showStatus && (
         <Select
-          value={filters.status ?? ALL}
+          value={String(values.status ?? ALL)}
           onValueChange={(value) =>
             apply({ status: value === ALL ? null : value })
           }
@@ -121,8 +135,8 @@ export function ListFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value={ALL}>All statuses</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Disabled</SelectItem>
+            <SelectItem value="active">{statusLabels.active}</SelectItem>
+            <SelectItem value="inactive">{statusLabels.inactive}</SelectItem>
           </SelectContent>
         </Select>
       )}

@@ -1,35 +1,34 @@
-import { Link, useForm } from "@inertiajs/react"
+import { useForm } from "@inertiajs/react"
 import { useState } from "react"
 
 import {
-  ContentMetaFields,
   type ContentMetaValues,
+  ContentTextSection,
   contentMetaParams,
   contentMetaValues,
 } from "@/admin/components/content-meta-fields"
 import {
   FormSection,
+  SwitchField,
   TextField,
+  TranslatedSection,
   asFieldErrors,
   slugify,
 } from "@/admin/components/form-fields"
+import { FormLayout } from "@/admin/components/form-layout"
 import { ImageUploadField } from "@/admin/components/image-upload-field"
 import { LanguageSwitcher } from "@/admin/components/language-switcher"
+import { NoLanguages } from "@/admin/components/no-languages"
 import { RichTextEditor } from "@/admin/components/rich-text-editor"
+import { SeoSection } from "@/admin/components/seo-section"
 import type { BlogDetail, BlogTranslation } from "@/admin/features/blogs/types"
-import { errorLanguageCodes, textDirection } from "@/admin/lib/languages"
-import type { AdminLanguage, ImageValue } from "@/admin/types"
+import { useLanguageTabs } from "@/admin/hooks/use-language-tabs"
+import { SUBMIT_OPTIONS, formErrors } from "@/admin/lib/forms"
+import { emptyLanguageCodes, textDirection } from "@/admin/lib/languages"
+import { languagesOf, patchTranslation } from "@/admin/lib/translations"
+import type { ImageValue } from "@/admin/types"
 import type { RouteDefinition } from "@/routes/runtime"
-import { Button } from "@/shared/components/ui/button"
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from "@/shared/components/ui/field"
-import { Spinner } from "@/shared/components/ui/spinner"
-import { Switch } from "@/shared/components/ui/switch"
+import { Field, FieldError, FieldLabel } from "@/shared/components/ui/field"
 
 type BlogTranslationValues = ContentMetaValues & { body: string }
 
@@ -61,15 +60,7 @@ export function BlogForm({
   cancelHref: string
   submitLabel: string
 }) {
-  const languages: AdminLanguage[] = translations.map((t) => ({
-    id: t.language_id,
-    code: t.code,
-    name: t.language,
-    default: t.default,
-  }))
-  const defaultLanguage = languages.find((l) => l.default) ?? languages[0]
-  const [code, setCode] = useState(defaultLanguage?.code ?? "")
-  const language = languages.find((l) => l.code === code) ?? defaultLanguage
+  const languages = languagesOf(translations)
   const [slugTouched, setSlugTouched] = useState(Boolean(blog.slug))
 
   const form = useForm<BlogFormData>({
@@ -81,7 +72,9 @@ export function BlogForm({
     ),
   })
   const { data, setData, processing } = form
-  const errors = form.errors as Record<string, string[] | undefined>
+  const errors = formErrors(form)
+  const tabs = useLanguageTabs(languages, errors)
+  const { language } = tabs
 
   form.transform((values) => ({
     blog: {
@@ -97,28 +90,13 @@ export function BlogForm({
     },
   }))
 
-  if (!language) {
-    return (
-      <p className="text-muted-foreground text-sm">
-        No languages are set up yet. Add a Language record first.
-      </p>
-    )
-  }
+  if (!language) return <NoLanguages />
 
   const current = data.translations[language.id] ?? translationValues({})
-  const errorFor = (attribute: string) =>
-    errors[`translations.${language.id}.${attribute}`]
-
   const setTranslation = (patch: Partial<BlogTranslationValues>) =>
     setData((previous) => ({
-      ...previous,
-      translations: {
-        ...previous.translations,
-        [language.id]: {
-          ...(previous.translations[language.id] ?? translationValues({})),
-          ...patch,
-        },
-      },
+      ...patchTranslation(previous, language.id, patch, translationValues({})),
+      // The slug follows the default title until it's edited by hand.
       slug:
         !slugTouched && language.default && patch.title !== undefined
           ? slugify(patch.title)
@@ -126,84 +104,34 @@ export function BlogForm({
     }))
 
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault()
-        form.submit(action, { preserveScroll: true, preserveState: "errors" })
-      }}
-      className="max-w-4xl space-y-6"
-    >
-      <div className="bg-background/95 supports-backdrop-filter:bg-background/80 sticky top-0 z-10 -mx-4 flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3 backdrop-blur">
+    <FormLayout
+      onSubmit={() => form.submit(action, SUBMIT_OPTIONS)}
+      tabs={
         <LanguageSwitcher
           languages={languages}
           value={language.code}
-          onChange={setCode}
-          errorCodes={errorLanguageCodes(errors, languages)}
+          onChange={tabs.setCode}
+          errorCodes={tabs.errorCodes}
+          emptyCodes={emptyLanguageCodes(data.translations, languages)}
         />
-        <div className="ml-auto flex items-center gap-2">
-          <Button variant="ghost" asChild>
-            <Link href={cancelHref}>Cancel</Link>
-          </Button>
-          <Button type="submit" disabled={processing}>
-            {processing && <Spinner />}
-            {submitLabel}
-          </Button>
-        </div>
-      </div>
-
-      <FormSection title="Post">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <TextField
-            id="slug"
-            label="URL slug"
-            description="Lowercase letters, numbers and dashes."
-            value={data.slug}
-            onChange={(slug) => {
-              setSlugTouched(true)
-              setData("slug", slug)
-            }}
-            errors={errors.slug}
-            required
-          />
-          <Field orientation="horizontal" className="sm:pt-6">
-            <Switch
-              id="is_active"
-              checked={data.is_active}
-              onCheckedChange={(checked) => setData("is_active", checked)}
-            />
-            <FieldContent>
-              <FieldLabel htmlFor="is_active">Published</FieldLabel>
-              <FieldDescription>
-                Unpublished posts aren&apos;t shown on the website.
-              </FieldDescription>
-            </FieldContent>
-          </Field>
-        </div>
-        <Field data-invalid={errors.cover_image ? true : undefined}>
-          <FieldLabel htmlFor="cover_image">Cover image</FieldLabel>
-          <ImageUploadField
-            id="cover_image"
-            value={data.cover_image}
-            onChange={(image) => setData("cover_image", image)}
-            invalid={Boolean(errors.cover_image)}
-          />
-          <FieldDescription>Shared by every language.</FieldDescription>
-          <FieldError errors={asFieldErrors(errors.cover_image)} />
-        </Field>
-        <FieldError errors={asFieldErrors(errors.translations)} />
-      </FormSection>
-
-      <ContentMetaFields
-        key={`meta-${language.code}`}
+      }
+      cancelHref={cancelHref}
+      submitLabel={submitLabel}
+      processing={processing}
+      width="4xl"
+    >
+      <ContentTextSection
+        key={`text-${language.code}`}
         language={language}
         values={current}
         onChange={setTranslation}
-        errorFor={errorFor}
+        errorFor={tabs.errorFor}
+        baseError={tabs.baseError}
         nameDescription="A short label for dashboard lists."
       />
 
-      <FormSection title={`Body · ${language.name}`}>
-        <Field data-invalid={errorFor("body") ? true : undefined}>
+      <TranslatedSection title="Body" language={language} description={null}>
+        <Field data-invalid={tabs.errorFor("body") ? true : undefined}>
           <FieldLabel htmlFor={`body_${language.code}`} className="sr-only">
             Body
           </FieldLabel>
@@ -214,11 +142,52 @@ export function BlogForm({
             onChange={(body) => setTranslation({ body })}
             dir={textDirection(language.code)}
             lang={language.code}
-            invalid={Boolean(errorFor("body"))}
+            invalid={Boolean(tabs.errorFor("body"))}
           />
-          <FieldError errors={asFieldErrors(errorFor("body"))} />
+          <FieldError errors={asFieldErrors(tabs.errorFor("body"))} />
         </Field>
+      </TranslatedSection>
+
+      <FormSection title="Post" shared>
+        <TextField
+          id="slug"
+          label="URL slug"
+          description={`Lowercase letters, numbers and dashes.${slugTouched ? "" : " Follows the default language's title until you edit it."}`}
+          value={data.slug}
+          onChange={(slug) => {
+            setSlugTouched(true)
+            setData("slug", slug)
+          }}
+          errors={errors.slug}
+          required
+          className="sm:max-w-sm"
+        />
+        <Field data-invalid={errors.cover_image ? true : undefined}>
+          <FieldLabel htmlFor="cover_image">Cover image</FieldLabel>
+          <ImageUploadField
+            id="cover_image"
+            value={data.cover_image}
+            onChange={(image) => setData("cover_image", image)}
+            invalid={Boolean(errors.cover_image)}
+          />
+          <FieldError errors={asFieldErrors(errors.cover_image)} />
+        </Field>
+        <SwitchField
+          id="is_active"
+          label="Published"
+          description="Unpublished posts aren't shown on the website."
+          checked={data.is_active}
+          onChange={(checked) => setData("is_active", checked)}
+        />
       </FormSection>
-    </form>
+
+      <SeoSection
+        key={`seo-${language.code}`}
+        language={language}
+        values={current}
+        onChange={setTranslation}
+        errorFor={tabs.errorFor}
+      />
+    </FormLayout>
   )
 }

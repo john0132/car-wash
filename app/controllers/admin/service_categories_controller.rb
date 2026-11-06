@@ -6,9 +6,9 @@ class Admin::ServiceCategoriesController < Admin::BaseController
   include Admin::Activation
   include Admin::Images
   include Admin::Pagination
-  include Admin::Translations
+  include Admin::ContentTranslations
 
-  TRANSLATION_FIELDS = %i[seo_title seo_description].freeze
+  TRANSLATION_FIELDS = %i[name seo_title seo_description].freeze
 
   after_action :verify_authorized
 
@@ -57,7 +57,7 @@ class Admin::ServiceCategoriesController < Admin::BaseController
     if category.save
       redirect_to admin_service_category_path(category), notice: "#{translated_name(category)} was created"
     else
-      redirect_to new_admin_service_category_path, inertia: { errors: category.errors }
+      redirect_to new_admin_service_category_path, inertia: { errors: content_errors(category) }
     end
   end
 
@@ -75,7 +75,7 @@ class Admin::ServiceCategoriesController < Admin::BaseController
       redirect_to admin_service_category_path(@service_category),
         notice: "#{translated_name(@service_category.reload)} was updated"
     else
-      redirect_to edit_admin_service_category_path(@service_category), inertia: { errors: @service_category.errors }
+      redirect_to edit_admin_service_category_path(@service_category), inertia: { errors: content_errors(@service_category) }
     end
   end
 
@@ -104,8 +104,7 @@ class Admin::ServiceCategoriesController < Admin::BaseController
   end
 
   def category_params
-    @category_params ||= params.expect(service_category: [ :slug, :is_active, :display_in_home_page, :image,
-                                                           translations: [ [ :language_id, :name, *TRANSLATION_FIELDS ] ] ])
+    @category_params ||= params.fetch(:service_category, {}).permit(:slug, :is_active, :display_in_home_page, :image)
   end
 
   def assign_category(category)
@@ -113,7 +112,7 @@ class Admin::ServiceCategoriesController < Admin::BaseController
     category.is_active = category_params[:is_active] if category_params.key?(:is_active)
     category.display_in_home_page = category_params[:display_in_home_page] if category_params.key?(:display_in_home_page)
     assign_image(category, :image, category_params[:image]) if category_params.key?(:image)
-    assign_translations(category, category_params[:translations], fields: TRANSLATION_FIELDS)
+    assign_content_translations(category, submitted_translations(:service_category), fields: TRANSLATION_FIELDS)
   end
 
   def category_props(category)
@@ -124,7 +123,7 @@ class Admin::ServiceCategoriesController < Admin::BaseController
       is_active: category.is_active,
       display_in_home_page: category.display_in_home_page,
       image: image_prop(category.image),
-      translations: translations_props(category, fields: TRANSLATION_FIELDS),
+      translations: content_translations_props(category, fields: TRANSLATION_FIELDS),
       created_at: category.created_at
     }
   end
@@ -142,7 +141,8 @@ class Admin::ServiceCategoriesController < Admin::BaseController
   def form_props(category)
     {
       service_category: category.persisted? ? category_props(category) : nil,
-      translations: translations_props(category, fields: TRANSLATION_FIELDS)
+      translations: content_translations_props(category, fields: TRANSLATION_FIELDS),
+      languages: languages_props
     }
   end
 end

@@ -1,6 +1,7 @@
 import { cn } from "cn"
-import { ArrowDown, ArrowUp, Lock, Plus, Trash2 } from "lucide-react"
+import { Lock, Plus } from "lucide-react"
 
+import { ReorderButtons } from "@/admin/components/reorder-buttons"
 import {
   FIELD_TYPES,
   type FieldDraft,
@@ -9,6 +10,7 @@ import {
   TRANSLATABLE_TYPES,
 } from "@/admin/features/components/types"
 import { fieldKey, newDraft } from "@/admin/features/components/utils"
+import { moveItem } from "@/admin/lib/lists"
 import { Button } from "@/shared/components/ui/button"
 import { Checkbox } from "@/shared/components/ui/checkbox"
 import { Field, FieldLabel } from "@/shared/components/ui/field"
@@ -46,13 +48,6 @@ export function FieldListEditor({
 }) {
   const update = (uid: string, patch: Partial<FieldDraft>) =>
     onChange(fields.map((f) => (f.uid === uid ? { ...f, ...patch } : f)))
-
-  const move = (index: number, offset: number) => {
-    const next = [...fields]
-    const [field] = next.splice(index, 1)
-    next.splice(index + offset, 0, field)
-    onChange(next)
-  }
 
   const types = nested
     ? FIELD_TYPES.filter((t) => t.value !== "repeater")
@@ -152,41 +147,16 @@ export function FieldListEditor({
                   </SelectContent>
                 </Select>
               </Field>
-              <div className="flex items-end gap-0.5 pb-0.5">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="size-8"
-                  aria-label={`Move ${field.label || "field"} up`}
-                  disabled={index === 0}
-                  onClick={() => move(index, -1)}
-                >
-                  <ArrowUp />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="size-8"
-                  aria-label={`Move ${field.label || "field"} down`}
-                  disabled={index === fields.length - 1}
-                  onClick={() => move(index, 1)}
-                >
-                  <ArrowDown />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="size-8"
-                  aria-label={`Remove ${field.label || "field"}`}
-                  onClick={() =>
+              <div className="pb-0.5">
+                <ReorderButtons
+                  index={index}
+                  count={fields.length}
+                  noun={field.label || "field"}
+                  onMove={(offset) => onChange(moveItem(fields, index, offset))}
+                  onRemove={() =>
                     onChange(fields.filter((f) => f.uid !== field.uid))
                   }
-                >
-                  <Trash2 />
-                </Button>
+                />
               </div>
             </div>
 

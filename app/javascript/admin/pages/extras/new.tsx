@@ -1,16 +1,17 @@
 import { Head } from "@inertiajs/react"
 
 import { PageHeader } from "@/admin/components/page-header"
-import type { TranslationEntry } from "@/admin/components/translation-fields"
 import { ExtraForm } from "@/admin/features/extras/components/extra-form"
 import AdminLayout from "@/admin/layouts/admin-layout"
+import type { AdminLanguage, TranslationEntry } from "@/admin/types"
 import { adminExtras } from "@/routes"
 
 interface Props {
   translations: TranslationEntry[]
+  languages: AdminLanguage[]
 }
 
-export default function ExtraNew({ translations }: Props) {
+export default function ExtraNew({ translations, languages }: Props) {
   return (
     <AdminLayout
       breadcrumbs={[
@@ -26,6 +27,7 @@ export default function ExtraNew({ translations }: Props) {
           price={null}
           isActive
           translations={translations}
+          languages={languages}
           action={adminExtras.create()}
           cancelHref={adminExtras.index().url}
           submitLabel="Create extra"

@@ -1,8 +1,12 @@
 import { Head, Link } from "@inertiajs/react"
-import { Pencil, Plus } from "lucide-react"
+import { Plus } from "lucide-react"
 
 import { ActivationSwitch } from "@/admin/components/activation-switch"
-import { ListFilters } from "@/admin/components/list-filters"
+import {
+  ListFilters,
+  PUBLISHED_LABELS,
+  hasFilters,
+} from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
 import { ResourceTable } from "@/admin/components/resource-table"
@@ -48,17 +52,19 @@ export default function FaqsIndex({ faqs, filters, pagination }: Props) {
           url={adminFaqs.index().url}
           filters={filters}
           searchPlaceholder="Search question…"
+          statusLabels={PUBLISHED_LABELS}
         />
 
         <ResourceTable
           items={faqs}
-          emptyMessage="No FAQs match these filters."
+          emptyMessage="No FAQs yet."
+          emptyFilteredMessage="No FAQs match these filters."
+          filtered={hasFilters(filters)}
           columns={
             <>
               <TableHead>Question</TableHead>
               <TableHead className="text-right">Sort order</TableHead>
-              <TableHead className="text-right">Active</TableHead>
-              <TableHead className="w-12" />
+              <TableHead className="text-right">Published</TableHead>
             </>
           }
           renderRow={(faq) => (
@@ -85,18 +91,6 @@ export default function FaqsIndex({ faqs, filters, pagination }: Props) {
                   action={adminFaqs.activation(faq.id)}
                   disabled={!canUpdate}
                 />
-              </TableCell>
-              <TableCell>
-                {canUpdate && (
-                  <Button variant="ghost" size="icon" asChild>
-                    <Link
-                      href={adminFaqs.edit(faq.id)}
-                      aria-label={`Edit ${faq.question}`}
-                    >
-                      <Pencil />
-                    </Link>
-                  </Button>
-                )}
               </TableCell>
             </TableRow>
           )}

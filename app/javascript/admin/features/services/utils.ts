@@ -1,27 +1,3 @@
-import type { ServiceTranslationEntry } from "@/admin/features/services/types"
-
-/** The `translations` param Admin::ServicesController expects. */
-export const serviceTranslationParams = (
-  translations: ServiceTranslationEntry[],
-) =>
-  translations.map(
-    ({
-      language_id,
-      name,
-      title,
-      description,
-      seo_title,
-      seo_description,
-    }) => ({
-      language_id,
-      name,
-      title,
-      description,
-      seo_title,
-      seo_description,
-    }),
-  )
-
 /** 90 → "1 h 30 min", 45 → "45 min", null → null. */
 export const formatDuration = (minutes: number | null) => {
   if (!minutes) return null

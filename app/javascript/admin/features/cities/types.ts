@@ -1,5 +1,5 @@
 import type { ListFilterValues } from "@/admin/components/list-filters"
-import type { TranslationEntry } from "@/admin/components/translation-fields"
+import type { TranslationEntry } from "@/admin/types"
 
 /** Admin::CitiesController#city_props */
 export interface CityDetail {

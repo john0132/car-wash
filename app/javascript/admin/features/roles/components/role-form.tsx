@@ -1,16 +1,17 @@
-import { Link, useForm } from "@inertiajs/react"
+import { useForm } from "@inertiajs/react"
 
 import {
   FormSection,
   TextField,
   TextareaField,
 } from "@/admin/components/form-fields"
+import { FormLayout } from "@/admin/components/form-layout"
 import { PermissionMatrix } from "@/admin/features/roles/components/permission-matrix"
 import type { PermissionGroup } from "@/admin/features/roles/types"
 import { catalogKeys } from "@/admin/features/roles/utils"
+import { SUBMIT_OPTIONS, formErrors } from "@/admin/lib/forms"
 import type { RouteDefinition } from "@/routes/runtime"
 import { Button } from "@/shared/components/ui/button"
-import { Spinner } from "@/shared/components/ui/spinner"
 
 interface RoleFormData {
   name: string
@@ -42,19 +43,19 @@ export function RoleForm({
     permission_keys: permissionKeys,
   })
   const { data, setData, processing } = form
-  const errors = form.errors as Record<string, string[] | undefined>
+  const errors = formErrors(form)
   const total = catalogKeys(catalog).length
   const selected = data.permission_keys.length
 
   form.transform((values) => ({ role: values }))
 
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault()
-        form.submit(action, { preserveScroll: true })
-      }}
-      className="max-w-4xl space-y-6"
+    <FormLayout
+      onSubmit={() => form.submit(action, SUBMIT_OPTIONS)}
+      cancelHref={cancelHref}
+      submitLabel={submitLabel}
+      processing={processing}
+      width="4xl"
     >
       <FormSection title="Details">
         <TextField
@@ -109,16 +110,6 @@ export function RoleForm({
           onChange={(keys) => setData("permission_keys", keys)}
         />
       </FormSection>
-
-      <div className="flex items-center gap-2">
-        <Button type="submit" disabled={processing}>
-          {processing && <Spinner />}
-          {submitLabel}
-        </Button>
-        <Button variant="ghost" asChild>
-          <Link href={cancelHref}>Cancel</Link>
-        </Button>
-      </div>
-    </form>
+    </FormLayout>
   )
 }

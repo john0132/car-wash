@@ -7,14 +7,20 @@ import type {
   MembershipTranslation,
 } from "@/admin/features/memberships/types"
 import AdminLayout from "@/admin/layouts/admin-layout"
+import type { AdminLanguage } from "@/admin/types"
 import { adminMemberships } from "@/routes"
 
 interface Props {
   membership: MembershipDetail
   translations: MembershipTranslation[]
+  languages: AdminLanguage[]
 }
 
-export default function MembershipEdit({ membership, translations }: Props) {
+export default function MembershipEdit({
+  membership,
+  translations,
+  languages,
+}: Props) {
   const name = membership.name ?? `Membership #${membership.id}`
 
   return (
@@ -33,6 +39,7 @@ export default function MembershipEdit({ membership, translations }: Props) {
           key={membership.id}
           membership={membership}
           translations={translations}
+          languages={languages}
           action={adminMemberships.update(membership.id)}
           cancelHref={adminMemberships.show(membership.id).url}
           submitLabel="Save changes"

@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe PaymentTransaction, type: :model do
   let(:user) { User.create!(name: "Jane", email: "jane@example.com", password: "a-very-long-password") }
-  let(:payment_method) { PaymentMethod.create!(code: "credit_card") }
+  let(:payment_method) { create_payment_method("credit_card") }
 
   it "is valid with a user, payment_method, and amount" do
     expect(PaymentTransaction.new(user: user, payment_method: payment_method, amount: 10)).to be_valid

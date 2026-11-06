@@ -1,6 +1,7 @@
 import { Head, Link } from "@inertiajs/react"
 import { Crown, Pencil, Plus, Users } from "lucide-react"
 
+import { ActivationSwitch } from "@/admin/components/activation-switch"
 import { PageHeader } from "@/admin/components/page-header"
 import { ResourceTable } from "@/admin/components/resource-table"
 import { StatCard } from "@/admin/components/stat-card"
@@ -9,7 +10,6 @@ import type {
   MembershipRow,
   MembershipStats,
 } from "@/admin/features/memberships/types"
-import { ActivationSwitch } from "@/admin/features/users/components/activation-switch"
 import { useCan } from "@/admin/hooks/use-can"
 import AdminLayout from "@/admin/layouts/admin-layout"
 import { formatNumber } from "@/admin/lib/format"

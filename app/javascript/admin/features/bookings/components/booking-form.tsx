@@ -1,5 +1,11 @@
-import { Link, useForm } from "@inertiajs/react"
+import { useForm } from "@inertiajs/react"
 
+import {
+  FormSection,
+  SelectField,
+  TextField,
+} from "@/admin/components/form-fields"
+import { FormLayout } from "@/admin/components/form-layout"
 import {
   BOOKING_STATUSES,
   type BookingDetail,
@@ -7,19 +13,8 @@ import {
   PAYMENT_STATUSES,
 } from "@/admin/features/bookings/types"
 import { humanize } from "@/admin/lib/format"
+import { SUBMIT_OPTIONS, formErrors } from "@/admin/lib/forms"
 import type { RouteDefinition } from "@/routes/runtime"
-import { Button } from "@/shared/components/ui/button"
-import { Card, CardContent } from "@/shared/components/ui/card"
-import { Field, FieldError, FieldLabel } from "@/shared/components/ui/field"
-import { Input } from "@/shared/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select"
-import { Spinner } from "@/shared/components/ui/spinner"
 
 const UNASSIGNED = "unassigned"
 
@@ -59,8 +54,8 @@ export function BookingForm({
     employee_id: booking.employee ? String(booking.employee.id) : UNASSIGNED,
     scheduled_at: toLocalInput(booking.scheduled_at),
   })
-  const { data, setData, errors, processing } = form
-  const fieldErrors = errors as Record<string, string[] | undefined>
+  const { data, setData, processing } = form
+  const errors = formErrors(form)
 
   form.transform(({ employee_id, ...values }) => ({
     booking: {
@@ -70,117 +65,60 @@ export function BookingForm({
   }))
 
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault()
-        form.submit(action, { preserveScroll: true })
-      }}
-      className="max-w-2xl space-y-6"
+    <FormLayout
+      onSubmit={() => form.submit(action, SUBMIT_OPTIONS)}
+      cancelHref={cancelHref}
+      submitLabel="Save changes"
+      processing={processing}
     >
-      <Card>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field data-invalid={fieldErrors.status ? true : undefined}>
-              <FieldLabel htmlFor="status">Status</FieldLabel>
-              <Select
-                value={data.status}
-                onValueChange={(value) => setData("status", value)}
-              >
-                <SelectTrigger id="status" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {BOOKING_STATUSES.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {humanize(status)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FieldError
-                errors={fieldErrors.status?.map((message) => ({ message }))}
-              />
-            </Field>
-
-            <Field data-invalid={fieldErrors.payment_status ? true : undefined}>
-              <FieldLabel htmlFor="payment_status">Payment status</FieldLabel>
-              <Select
-                value={data.payment_status}
-                onValueChange={(value) => setData("payment_status", value)}
-              >
-                <SelectTrigger id="payment_status" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PAYMENT_STATUSES.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {humanize(status)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FieldError
-                errors={fieldErrors.payment_status?.map((message) => ({
-                  message,
-                }))}
-              />
-            </Field>
-
-            <Field data-invalid={fieldErrors.employee_id ? true : undefined}>
-              <FieldLabel htmlFor="employee_id">Assigned employee</FieldLabel>
-              <Select
-                value={data.employee_id}
-                onValueChange={(value) => setData("employee_id", value)}
-              >
-                <SelectTrigger id="employee_id" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={UNASSIGNED}>Unassigned</SelectItem>
-                  {employeeOptions.map((employee) => (
-                    <SelectItem key={employee.id} value={String(employee.id)}>
-                      {employee.full_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FieldError
-                errors={fieldErrors.employee_id?.map((message) => ({
-                  message,
-                }))}
-              />
-            </Field>
-
-            <Field data-invalid={fieldErrors.scheduled_at ? true : undefined}>
-              <FieldLabel htmlFor="scheduled_at">Scheduled for</FieldLabel>
-              <Input
-                id="scheduled_at"
-                type="datetime-local"
-                value={data.scheduled_at}
-                onChange={(event) =>
-                  setData("scheduled_at", event.target.value)
-                }
-                aria-invalid={fieldErrors.scheduled_at ? true : undefined}
-              />
-              <FieldError
-                errors={fieldErrors.scheduled_at?.map((message) => ({
-                  message,
-                }))}
-              />
-            </Field>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="flex items-center gap-2">
-        <Button type="submit" disabled={processing}>
-          {processing && <Spinner />}
-          Save changes
-        </Button>
-        <Button variant="ghost" asChild>
-          <Link href={cancelHref}>Cancel</Link>
-        </Button>
-      </div>
-    </form>
+      <FormSection title="Booking">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <SelectField
+            id="status"
+            label="Status"
+            value={data.status}
+            onChange={(value) => setData("status", value)}
+            options={BOOKING_STATUSES.map((status) => ({
+              value: status,
+              label: humanize(status),
+            }))}
+            errors={errors.status}
+          />
+          <SelectField
+            id="payment_status"
+            label="Payment status"
+            value={data.payment_status}
+            onChange={(value) => setData("payment_status", value)}
+            options={PAYMENT_STATUSES.map((status) => ({
+              value: status,
+              label: humanize(status),
+            }))}
+            errors={errors.payment_status}
+          />
+          <SelectField
+            id="employee_id"
+            label="Assigned employee"
+            value={data.employee_id}
+            onChange={(value) => setData("employee_id", value)}
+            options={[
+              { value: UNASSIGNED, label: "Unassigned" },
+              ...employeeOptions.map((employee) => ({
+                value: String(employee.id),
+                label: employee.full_name,
+              })),
+            ]}
+            errors={errors.employee_id}
+          />
+          <TextField
+            id="scheduled_at"
+            label="Scheduled for"
+            type="datetime-local"
+            value={data.scheduled_at}
+            onChange={(value) => setData("scheduled_at", value)}
+            errors={errors.scheduled_at}
+          />
+        </div>
+      </FormSection>
+    </FormLayout>
   )
 }

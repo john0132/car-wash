@@ -1,3 +1,4 @@
+import type { TranslationEntry } from "@/admin/types"
 export type TransactionStatus = "pending" | "completed" | "failed" | "refunded"
 
 export const TRANSACTION_STATUSES: TransactionStatus[] = [
@@ -25,19 +26,8 @@ export interface PaymentMethodDetail {
   is_active: boolean
 }
 
-export interface PaymentMethodTranslation {
-  language_id: number
-  code: string
-  language: string
-  name: string | null
-}
-
-/** Fields posted by PaymentMethodForm as `payment_method[...]`. */
-export interface PaymentMethodFormData {
-  code: string
-  is_active: boolean
-  translations: Record<number, { name: string }>
-}
+/** Admin::ContentTranslations#content_translations_props entry. */
+export type PaymentMethodTranslation = TranslationEntry
 
 /** Admin::PaymentTransactionsController#transaction_props */
 export interface TransactionRow {

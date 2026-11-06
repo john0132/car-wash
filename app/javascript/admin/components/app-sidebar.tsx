@@ -1,7 +1,6 @@
 import { Link, usePage } from "@inertiajs/react"
 import {
   Blocks,
-  BookOpen,
   Building2,
   CalendarCheck,
   Car,
@@ -25,7 +24,6 @@ import {
   Users,
 } from "lucide-react"
 
-import { NavFooter } from "@/admin/components/nav-footer"
 import { NavMain } from "@/admin/components/nav-main"
 import { NavUser } from "@/admin/components/nav-user"
 import { useCan } from "@/admin/hooks/use-can"
@@ -92,6 +90,12 @@ const operationsNavItems: (NavItem & { resource: string })[] = [
     href: adminCars.index().url,
     icon: Car,
     resource: "cars",
+  },
+  {
+    title: "Contact messages",
+    href: adminContactMessages.index().url,
+    icon: MessageSquare,
+    resource: "contact_messages",
   },
 ]
 
@@ -172,23 +176,15 @@ const contentNavItems: (NavItem & { resource: string })[] = [
     resource: "blogs",
   },
   {
-    title: "Components",
-    href: adminComponents.index().url,
-    icon: Blocks,
-    resource: "components",
-  },
-  {
     title: "FAQs",
     href: adminFaqs.index().url,
     icon: HelpCircle,
     resource: "faqs",
   },
-  {
-    title: "Contact messages",
-    href: adminContactMessages.index().url,
-    icon: MessageSquare,
-    resource: "contact_messages",
-  },
+]
+
+// The website's structure: shared header/footer and the building blocks pages use.
+const websiteNavItems: (NavItem & { resource: string })[] = [
   {
     title: "Header",
     href: adminHeaderItems.edit().url,
@@ -200,6 +196,12 @@ const contentNavItems: (NavItem & { resource: string })[] = [
     href: adminFooters.edit().url,
     icon: PanelBottom,
     resource: "footers",
+  },
+  {
+    title: "Components",
+    href: adminComponents.index().url,
+    icon: Blocks,
+    resource: "components",
   },
 ]
 
@@ -215,14 +217,6 @@ const paymentNavItems: (NavItem & { resource: string })[] = [
     href: adminPaymentMethods.index().url,
     icon: CreditCard,
     resource: "payment_methods",
-  },
-]
-
-const footerNavItems: NavItem[] = [
-  {
-    title: "Documentation",
-    href: "https://inertia-rails.dev",
-    icon: BookOpen,
   },
 ]
 
@@ -246,6 +240,10 @@ export function AppSidebar() {
   )
 
   const contentItems = contentNavItems.filter((item) =>
+    can(item.resource, "read"),
+  )
+
+  const websiteItems = websiteNavItems.filter((item) =>
     can(item.resource, "read"),
   )
 
@@ -288,6 +286,9 @@ export function AppSidebar() {
         {contentItems.length > 0 && (
           <NavMain items={contentItems} label="Content" />
         )}
+        {websiteItems.length > 0 && (
+          <NavMain items={websiteItems} label="Website" />
+        )}
         {paymentItems.length > 0 && (
           <NavMain items={paymentItems} label="Payments" />
         )}
@@ -297,7 +298,6 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
-        <NavFooter items={footerNavItems} className="mt-auto" />
         <NavUser />
       </SidebarFooter>
     </Sidebar>

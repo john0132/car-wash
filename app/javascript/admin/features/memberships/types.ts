@@ -1,3 +1,5 @@
+import type { TranslationEntry } from "@/admin/types"
+
 /** Admin::MembershipsController#membership_props */
 export interface MembershipDetail {
   id: number
@@ -14,13 +16,8 @@ export interface MembershipRow extends MembershipDetail {
   customers_count: number
 }
 
-export interface MembershipTranslation {
-  language_id: number
-  code: string
-  language: string
-  name: string | null
-  description: string | null
-}
+/** Admin::ContentTranslations#content_translations_props entry. */
+export type MembershipTranslation = TranslationEntry<"name" | "description">
 
 export interface MembershipStats {
   total: number
@@ -42,14 +39,4 @@ export interface MembershipCustomer {
   points: number
   lifetime_points: number
   is_active: boolean
-}
-
-/** Posted by MembershipForm as `membership[...]`. */
-export interface MembershipFormData {
-  is_active: boolean
-  egp_to_points: string
-  points_to_egp: string
-  background_color: string
-  text_color: string
-  translations: Record<string, { name: string; description: string }>
 }

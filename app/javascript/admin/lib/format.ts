@@ -49,3 +49,12 @@ export function humanize(value: string) {
   const text = value.replace(/_/g, " ")
   return text.charAt(0).toUpperCase() + text.slice(1)
 }
+
+/** "1 booking", "3 bookings", "2 customer addresses" (pass `plural` when it isn't `singular` + "s"). */
+export function pluralize(
+  count: number,
+  singular: string,
+  plural = `${singular}s`,
+) {
+  return `${formatNumber(count)} ${count === 1 ? singular : plural}`
+}

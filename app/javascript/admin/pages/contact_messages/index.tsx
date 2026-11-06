@@ -1,7 +1,6 @@
 import { Head, Link } from "@inertiajs/react"
-import { Eye } from "lucide-react"
 
-import { ListFilters } from "@/admin/components/list-filters"
+import { ListFilters, hasFilters } from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
 import { ResourceTable } from "@/admin/components/resource-table"
@@ -13,7 +12,6 @@ import AdminLayout from "@/admin/layouts/admin-layout"
 import { formatDateTime } from "@/admin/lib/format"
 import type { Pagination as PaginationData } from "@/admin/types"
 import { adminContactMessages } from "@/routes"
-import { Button } from "@/shared/components/ui/button"
 import { TableCell, TableHead, TableRow } from "@/shared/components/ui/table"
 
 interface Props {
@@ -48,18 +46,20 @@ export default function ContactMessagesIndex({
           url={adminContactMessages.index().url}
           filters={filters}
           searchPlaceholder="Search name, email, phone or message…"
+          showStatus={false}
         />
 
         <ResourceTable
           items={messages}
           emptyMessage="No messages yet."
+          emptyFilteredMessage="No messages match this search."
+          filtered={hasFilters(filters)}
           columns={
             <>
               <TableHead>From</TableHead>
               <TableHead>Phone</TableHead>
               <TableHead>Message</TableHead>
               <TableHead>Received</TableHead>
-              <TableHead className="w-12" />
             </>
           }
           renderRow={(message) => (
@@ -81,16 +81,6 @@ export default function ContactMessagesIndex({
               </TableCell>
               <TableCell className="whitespace-nowrap">
                 {formatDateTime(message.created_at)}
-              </TableCell>
-              <TableCell>
-                <Button variant="ghost" size="icon" asChild>
-                  <Link
-                    href={adminContactMessages.show(message.id)}
-                    aria-label={`View message from ${message.full_name}`}
-                  >
-                    <Eye />
-                  </Link>
-                </Button>
               </TableCell>
             </TableRow>
           )}

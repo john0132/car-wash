@@ -1,7 +1,7 @@
 import { Head, Link } from "@inertiajs/react"
 import { Lock, Plus } from "lucide-react"
 
-import { ListFilters } from "@/admin/components/list-filters"
+import { ListFilters, hasFilters } from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
 import { ResourceTable } from "@/admin/components/resource-table"
@@ -54,7 +54,9 @@ export default function RolesIndex({ roles, filters, pagination }: Props) {
 
         <ResourceTable
           items={roles}
-          emptyMessage="No roles match this search."
+          emptyMessage="No roles yet."
+          emptyFilteredMessage="No roles match this search."
+          filtered={hasFilters(filters)}
           columns={
             <>
               <TableHead>Role</TableHead>

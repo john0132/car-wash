@@ -4,7 +4,9 @@
 class Admin::CitiesController < Admin::BaseController
   include Admin::Activation
   include Admin::Pagination
-  include Admin::Translations
+  include Admin::ContentTranslations
+
+  TRANSLATION_FIELDS = %i[name].freeze
 
   after_action :verify_authorized
 
@@ -46,12 +48,12 @@ class Admin::CitiesController < Admin::BaseController
   def create
     city = City.new(is_active: city_params[:is_active])
     authorize city
-    assign_translations(city, city_params[:translations])
+    assign_content_translations(city, submitted_translations(:city), fields: TRANSLATION_FIELDS)
 
     if city.save
       redirect_to admin_city_path(city), notice: "#{translated_name(city)} was created"
     else
-      redirect_to new_admin_city_path, inertia: { errors: city.errors }
+      redirect_to new_admin_city_path, inertia: { errors: content_errors(city) }
     end
   end
 
@@ -64,12 +66,12 @@ class Admin::CitiesController < Admin::BaseController
   def update
     authorize @city
     @city.is_active = city_params[:is_active] if city_params.key?(:is_active)
-    assign_translations(@city, city_params[:translations])
+    assign_content_translations(@city, submitted_translations(:city), fields: TRANSLATION_FIELDS)
 
     if @city.save
       redirect_to admin_city_path(@city), notice: "#{translated_name(@city.reload)} was updated"
     else
-      redirect_to edit_admin_city_path(@city), inertia: { errors: @city.errors }
+      redirect_to edit_admin_city_path(@city), inertia: { errors: content_errors(@city) }
     end
   end
 
@@ -96,7 +98,7 @@ class Admin::CitiesController < Admin::BaseController
   end
 
   def city_params
-    @city_params ||= params.expect(city: [ :is_active, translations: [ [ :language_id, :name ] ] ])
+    @city_params ||= params.fetch(:city, {}).permit(:is_active)
   end
 
   def city_props(city)
@@ -104,7 +106,7 @@ class Admin::CitiesController < Admin::BaseController
       id: city.id,
       name: translated_name(city),
       is_active: city.is_active,
-      translations: translations_props(city),
+      translations: content_translations_props(city, fields: TRANSLATION_FIELDS),
       created_at: city.created_at
     }
   end
@@ -120,6 +122,10 @@ class Admin::CitiesController < Admin::BaseController
   end
 
   def form_props(city)
-    { city: city.persisted? ? city_props(city) : nil, translations: translations_props(city) }
+    {
+      city: city.persisted? ? city_props(city) : nil,
+      translations: content_translations_props(city, fields: TRANSLATION_FIELDS),
+      languages: languages_props
+    }
   end
 end

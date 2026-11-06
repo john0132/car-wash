@@ -6,12 +6,17 @@ import { ActiveBadge } from "@/admin/components/active-badge"
 import { ConfirmDeleteDialog } from "@/admin/components/confirm-delete-dialog"
 import { PageHeader } from "@/admin/components/page-header"
 import { StatCard } from "@/admin/components/stat-card"
-import { TranslationsCard } from "@/admin/features/services/components/translations-card"
+import { TranslationsCard } from "@/admin/components/translations-card"
 import type { ServiceDetail } from "@/admin/features/services/types"
 import { formatDuration } from "@/admin/features/services/utils"
 import { useCan } from "@/admin/hooks/use-can"
 import AdminLayout from "@/admin/layouts/admin-layout"
-import { formatDate, formatMoney, formatNumber } from "@/admin/lib/format"
+import {
+  formatDate,
+  formatMoney,
+  formatNumber,
+  pluralize,
+} from "@/admin/lib/format"
 import { adminServiceCategories, adminServices } from "@/routes"
 import { Button } from "@/shared/components/ui/button"
 
@@ -36,7 +41,10 @@ export default function ServiceShow({ service }: Props) {
         <PageHeader
           title={
             <span className="flex items-center gap-3">
-              {service.name} <ActiveBadge active={service.is_active} />
+              {service.name}
+              {!can("services", "update") && (
+                <ActiveBadge active={service.is_active} />
+              )}
             </span>
           }
           description={
@@ -63,6 +71,7 @@ export default function ServiceShow({ service }: Props) {
                     active={service.is_active}
                     name={service.name}
                     action={adminServices.activation(service.id)}
+                    label="Active"
                   />
                   <Button variant="outline" asChild>
                     <Link href={adminServices.edit(service.id)}>
@@ -76,7 +85,7 @@ export default function ServiceShow({ service }: Props) {
                   title={`Delete ${service.name}?`}
                   description={
                     service.bookings_count > 0
-                      ? `${service.name} is on ${service.bookings_count} booking(s), so it can't be deleted. Disable it instead.`
+                      ? `${service.name} is on ${pluralize(service.bookings_count, "booking")}, so it can't be deleted. Disable it instead.`
                       : "This permanently deletes the service and its translations."
                   }
                   action={adminServices.destroy(service.id)}
@@ -111,7 +120,16 @@ export default function ServiceShow({ service }: Props) {
           />
         </div>
 
-        <TranslationsCard translations={service.translations} />
+        <TranslationsCard
+          translations={service.translations}
+          columns={[
+            { key: "name", label: "Name" },
+            { key: "title", label: "Title" },
+            { key: "description", label: "Description", long: true },
+            { key: "seo_title", label: "SEO title" },
+            { key: "seo_description", label: "SEO description", long: true },
+          ]}
+        />
       </div>
     </AdminLayout>
   )

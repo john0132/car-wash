@@ -6,10 +6,16 @@ import { ActiveBadge } from "@/admin/components/active-badge"
 import { ConfirmDeleteDialog } from "@/admin/components/confirm-delete-dialog"
 import { PageHeader } from "@/admin/components/page-header"
 import { StatCard } from "@/admin/components/stat-card"
+import { TranslationsCard } from "@/admin/components/translations-card"
 import type { ExtraDetail } from "@/admin/features/extras/types"
 import { useCan } from "@/admin/hooks/use-can"
 import AdminLayout from "@/admin/layouts/admin-layout"
-import { formatDate, formatMoney, formatNumber } from "@/admin/lib/format"
+import {
+  formatDate,
+  formatMoney,
+  formatNumber,
+  pluralize,
+} from "@/admin/lib/format"
 import { adminExtras } from "@/routes"
 import { Button } from "@/shared/components/ui/button"
 
@@ -33,21 +39,13 @@ export default function ExtraShow({ extra }: Props) {
         <PageHeader
           title={
             <span className="flex items-center gap-3">
-              {extra.name} <ActiveBadge active={extra.is_active} />
+              {extra.name}
+              {!can("extras", "update") && (
+                <ActiveBadge active={extra.is_active} />
+              )}
             </span>
           }
-          description={
-            <>
-              {extra.translations
-                .filter((t) => !t.default && t.name)
-                .map((t) => (
-                  <span key={t.language_id} lang={t.code} className="mr-3">
-                    {t.language}: {t.name}
-                  </span>
-                ))}
-              Created {formatDate(extra.created_at)}
-            </>
-          }
+          description={`Created ${formatDate(extra.created_at)}`}
           actions={
             <>
               {can("extras", "update") && (
@@ -56,6 +54,7 @@ export default function ExtraShow({ extra }: Props) {
                     active={extra.is_active}
                     name={extra.name}
                     action={adminExtras.activation(extra.id)}
+                    label="Active"
                   />
                   <Button variant="outline" asChild>
                     <Link href={adminExtras.edit(extra.id)}>
@@ -69,7 +68,7 @@ export default function ExtraShow({ extra }: Props) {
                   title={`Delete ${extra.name}?`}
                   description={
                     extra.bookings_count > 0
-                      ? `${extra.name} is on ${extra.bookings_count} booking(s), so it can't be deleted. Disable it instead.`
+                      ? `${extra.name} is on ${pluralize(extra.bookings_count, "booking")}, so it can't be deleted. Disable it instead.`
                       : "This permanently deletes the extra and its translations."
                   }
                   action={adminExtras.destroy(extra.id)}
@@ -86,6 +85,11 @@ export default function ExtraShow({ extra }: Props) {
             value={formatNumber(extra.bookings_count)}
           />
         </div>
+
+        <TranslationsCard
+          translations={extra.translations}
+          columns={[{ key: "name", label: "Name" }]}
+        />
       </div>
     </AdminLayout>
   )

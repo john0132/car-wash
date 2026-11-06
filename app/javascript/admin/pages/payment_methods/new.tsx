@@ -7,16 +7,19 @@ import type {
   PaymentMethodTranslation,
 } from "@/admin/features/payments/types"
 import AdminLayout from "@/admin/layouts/admin-layout"
+import type { AdminLanguage } from "@/admin/types"
 import { adminPaymentMethods } from "@/routes"
 
 interface Props {
   payment_method: PaymentMethodDetail
   translations: PaymentMethodTranslation[]
+  languages: AdminLanguage[]
 }
 
 export default function PaymentMethodNew({
   payment_method,
   translations,
+  languages,
 }: Props) {
   return (
     <AdminLayout
@@ -32,6 +35,7 @@ export default function PaymentMethodNew({
         <PaymentMethodForm
           paymentMethod={payment_method}
           translations={translations}
+          languages={languages}
           action={adminPaymentMethods.create()}
           cancelHref={adminPaymentMethods.index().url}
           submitLabel="Create method"

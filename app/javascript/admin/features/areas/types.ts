@@ -1,5 +1,5 @@
 import type { ListFilterValues } from "@/admin/components/list-filters"
-import type { TranslationEntry } from "@/admin/components/translation-fields"
+import type { TranslationEntry } from "@/admin/types"
 
 /** GeoJSON Polygon geometry ([lng, lat] positions), as Area#geofence_geojson returns it. */
 export interface GeoJsonPolygon {

@@ -1,9 +1,9 @@
 import { Head } from "@inertiajs/react"
 
 import { ConfirmDeleteDialog } from "@/admin/components/confirm-delete-dialog"
+import { Detail } from "@/admin/components/detail"
 import { PageHeader } from "@/admin/components/page-header"
 import type { ContactMessageRow } from "@/admin/features/contact/types"
-import { Detail } from "@/admin/features/users/components/account-card"
 import { useCan } from "@/admin/hooks/use-can"
 import AdminLayout from "@/admin/layouts/admin-layout"
 import { formatDateTime } from "@/admin/lib/format"

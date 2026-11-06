@@ -5,9 +5,14 @@ require "rails_helper"
 RSpec.describe Translatable do
   let!(:english) { Language.create!(code: "en", name: "English") }
   let!(:arabic) { Language.create!(code: "ar", name: "Arabic") }
-  let(:membership) do
-    Membership.create!(egp_to_points: 1, points_to_egp: 0.1, background_color: "#C0C0C0", text_color: "#000000")
+  # Saved without validation: these examples need records whose translations are
+  # added (or missing) after the fact, which requires_default_translation forbids.
+  def bare_membership
+    Membership.new(egp_to_points: 1, points_to_egp: 0.1, background_color: "#C0C0C0", text_color: "#000000")
+      .tap { |membership| membership.save!(validate: false) }
   end
+
+  let(:membership) { bare_membership }
 
   it "picks the translation for the requested language" do
     membership.membership_translations.create!(language: english, name: "Gold")
@@ -21,7 +26,7 @@ RSpec.describe Translatable do
     membership.membership_translations.create!(language: english, name: "Gold")
     expect(membership.translation(:fr).name).to eq("Gold")
 
-    other = Membership.create!(egp_to_points: 1, points_to_egp: 0.1, background_color: "#C0C0C0", text_color: "#000000")
+    other = bare_membership
     other.membership_translations.create!(language: arabic, name: "فضي")
     expect(other.translation(:en).name).to eq("فضي")
   end

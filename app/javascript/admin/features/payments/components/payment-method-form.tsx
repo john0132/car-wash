@@ -1,36 +1,51 @@
-import { Link, useForm } from "@inertiajs/react"
-import type { ReactNode } from "react"
+import { useForm } from "@inertiajs/react"
 
-import { asFieldErrors } from "@/admin/components/form-fields"
+import {
+  FormSection,
+  SwitchField,
+  TextField,
+  TranslatedSection,
+} from "@/admin/components/form-fields"
+import { FormLayout } from "@/admin/components/form-layout"
+import { LanguageSwitcher } from "@/admin/components/language-switcher"
+import { NoLanguages } from "@/admin/components/no-languages"
 import type {
   PaymentMethodDetail,
-  PaymentMethodFormData,
   PaymentMethodTranslation,
 } from "@/admin/features/payments/types"
-import type { RouteDefinition } from "@/routes/runtime"
-import { Button } from "@/shared/components/ui/button"
-import { Card, CardContent } from "@/shared/components/ui/card"
+import { useLanguageTabs } from "@/admin/hooks/use-language-tabs"
+import { SUBMIT_OPTIONS, formErrors } from "@/admin/lib/forms"
+import { emptyLanguageCodes, textDirection } from "@/admin/lib/languages"
 import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from "@/shared/components/ui/field"
-import { Input } from "@/shared/components/ui/input"
-import { Spinner } from "@/shared/components/ui/spinner"
-import { Switch } from "@/shared/components/ui/switch"
+  blankValues,
+  patchTranslation,
+  translationValues,
+} from "@/admin/lib/translations"
+import type { AdminLanguage } from "@/admin/types"
+import type { RouteDefinition } from "@/routes/runtime"
 
-/** Create/edit form for a payment method. Posts `{ payment_method: {...} }`. */
+const FIELDS = ["name"] as const
+type PaymentMethodText = Record<(typeof FIELDS)[number], string>
+
+/** Fields posted by PaymentMethodForm as `payment_method[...]`. */
+interface PaymentMethodFormData {
+  code: string
+  is_active: boolean
+  translations: Record<number, PaymentMethodText>
+}
+
+/** Create/edit form for a payment method, one language at a time. Posts `{ payment_method: {...} }`. */
 export function PaymentMethodForm({
   paymentMethod,
   translations,
+  languages,
   action,
   cancelHref,
   submitLabel,
 }: {
   paymentMethod: PaymentMethodDetail
   translations: PaymentMethodTranslation[]
+  languages: AdminLanguage[]
   action: RouteDefinition<"post" | "patch">
   cancelHref: string
   submitLabel: string
@@ -38,114 +53,86 @@ export function PaymentMethodForm({
   const form = useForm<PaymentMethodFormData>({
     code: paymentMethod.code,
     is_active: paymentMethod.is_active,
-    translations: Object.fromEntries(
-      translations.map((t) => [t.language_id, { name: t.name ?? "" }]),
-    ),
+    translations: translationValues(translations, FIELDS),
   })
-  const { data, setData, errors, processing } = form
-  const fieldErrors = errors as Record<string, string[] | undefined>
+  const { data, setData, processing } = form
+  const errors = formErrors(form)
+  const tabs = useLanguageTabs(languages, errors)
+  const { language } = tabs
 
   form.transform((values) => ({ payment_method: values }))
 
+  if (!language) return <NoLanguages />
+
+  const current = data.translations[language.id] ?? blankValues(FIELDS)
+
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault()
-        form.submit(action, { preserveScroll: true })
-      }}
-      className="max-w-2xl space-y-6"
+    <FormLayout
+      onSubmit={() => form.submit(action, SUBMIT_OPTIONS)}
+      tabs={
+        <LanguageSwitcher
+          languages={languages}
+          value={language.code}
+          onChange={tabs.setCode}
+          errorCodes={tabs.errorCodes}
+          emptyCodes={emptyLanguageCodes(data.translations, languages)}
+        />
+      }
+      cancelHref={cancelHref}
+      submitLabel={submitLabel}
+      processing={processing}
     >
-      <Section
+      <TranslatedSection
         title="Name"
-        description="Shown to customers in their language. Fill in at least one language."
+        language={language}
+        description={
+          language.default
+            ? "Shown to customers. Required in the default language."
+            : undefined
+        }
+        baseError={tabs.baseError}
       >
-        {translations.map((t) => (
-          <Field key={t.language_id} dir={t.code === "ar" ? "rtl" : undefined}>
-            <FieldLabel htmlFor={`name_${t.language_id}`}>
-              {t.language}
-            </FieldLabel>
-            <Input
-              id={`name_${t.language_id}`}
-              value={data.translations[t.language_id]?.name ?? ""}
-              onChange={(event) =>
-                setData("translations", {
-                  ...data.translations,
-                  [t.language_id]: { name: event.target.value },
-                })
-              }
-            />
-          </Field>
-        ))}
-        <FieldError errors={asFieldErrors(fieldErrors.translations)} />
-      </Section>
+        <TextField
+          id={`name_${language.code}`}
+          label="Name"
+          value={current.name}
+          onChange={(name) =>
+            setData((previous) =>
+              patchTranslation(
+                previous,
+                language.id,
+                { name },
+                blankValues(FIELDS),
+              ),
+            )
+          }
+          errors={tabs.errorFor("name")}
+          required={language.default}
+          dir={textDirection(language.code)}
+          lang={language.code}
+        />
+      </TranslatedSection>
 
-      <Section title="Settings">
-        <Field data-invalid={errors.code ? true : undefined}>
-          <FieldLabel htmlFor="code">Code</FieldLabel>
-          <Input
-            id="code"
-            value={data.code}
-            onChange={(event) => setData("code", event.target.value)}
-            aria-invalid={errors.code ? true : undefined}
-            className="font-mono"
-            placeholder="cash"
-            required
-          />
-          <FieldDescription>
-            Stable identifier used by the system, e.g. cash, card or wallet.
-          </FieldDescription>
-          <FieldError errors={asFieldErrors(fieldErrors.code)} />
-        </Field>
-
-        <Field orientation="horizontal">
-          <Switch
-            id="is_active"
-            checked={data.is_active}
-            onCheckedChange={(checked) => setData("is_active", checked)}
-          />
-          <FieldContent>
-            <FieldLabel htmlFor="is_active">Active</FieldLabel>
-            <FieldDescription>
-              Disabled methods can&apos;t be chosen at checkout; past
-              transactions are kept.
-            </FieldDescription>
-          </FieldContent>
-        </Field>
-      </Section>
-
-      <div className="flex items-center gap-2">
-        <Button type="submit" disabled={processing}>
-          {processing && <Spinner />}
-          {submitLabel}
-        </Button>
-        <Button variant="ghost" asChild>
-          <Link href={cancelHref}>Cancel</Link>
-        </Button>
-      </div>
-    </form>
-  )
-}
-
-function Section({
-  title,
-  description,
-  children,
-}: {
-  title: string
-  description?: string
-  children: ReactNode
-}) {
-  return (
-    <Card>
-      <CardContent className="space-y-4">
-        <div className="space-y-1">
-          <h2 className="font-medium">{title}</h2>
-          {description && (
-            <p className="text-muted-foreground text-sm">{description}</p>
-          )}
-        </div>
-        {children}
-      </CardContent>
-    </Card>
+      <FormSection title="Settings" shared>
+        <TextField
+          id="code"
+          label="Code"
+          value={data.code}
+          onChange={(code) => setData("code", code)}
+          errors={errors.code}
+          description="Stable identifier used by the system, e.g. cash, card or wallet."
+          className="font-mono"
+          placeholder="cash"
+          required
+        />
+        <SwitchField
+          id="is_active"
+          label="Active"
+          description="Disabled methods can't be chosen at checkout; past transactions are kept."
+          checked={data.is_active}
+          onChange={(checked) => setData("is_active", checked)}
+        />
+      </FormSection>
+    </FormLayout>
   )
 }

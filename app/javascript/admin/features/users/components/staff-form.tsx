@@ -1,15 +1,19 @@
-import { Link, useForm } from "@inertiajs/react"
-import type { ReactNode } from "react"
+import { useForm } from "@inertiajs/react"
 
-import { asFieldErrors } from "@/admin/components/form-fields"
+import {
+  FormSection,
+  SwitchField,
+  TextField,
+  asFieldErrors,
+} from "@/admin/components/form-fields"
+import { FormLayout } from "@/admin/components/form-layout"
 import type {
   ManagedUser,
   RoleOption,
   StaffFormData,
 } from "@/admin/features/users/types"
+import { SUBMIT_OPTIONS, formErrors } from "@/admin/lib/forms"
 import type { RouteDefinition } from "@/routes/runtime"
-import { Button } from "@/shared/components/ui/button"
-import { Card, CardContent } from "@/shared/components/ui/card"
 import { Checkbox } from "@/shared/components/ui/checkbox"
 import {
   Field,
@@ -21,9 +25,6 @@ import {
   FieldLegend,
   FieldSet,
 } from "@/shared/components/ui/field"
-import { Input } from "@/shared/components/ui/input"
-import { Spinner } from "@/shared/components/ui/spinner"
-import { Switch } from "@/shared/components/ui/switch"
 
 /**
  * Create/edit form for staff accounts (administrators and employees).
@@ -56,7 +57,8 @@ export function StaffForm({
     is_active: user?.is_active ?? true,
     ...(roles ? { role_ids: roleIds ?? [] } : {}),
   })
-  const { data, setData, errors, processing } = form
+  const { data, setData, processing } = form
+  const errors = formErrors(form)
 
   form.transform((values) => ({ user: values }))
 
@@ -69,17 +71,18 @@ export function StaffForm({
     )
 
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault()
+    <FormLayout
+      onSubmit={() =>
         form.submit(action, {
-          preserveScroll: true,
+          ...SUBMIT_OPTIONS,
           onSuccess: () => form.reset("password", "password_confirmation"),
         })
-      }}
-      className="max-w-2xl space-y-6"
+      }
+      cancelHref={cancelHref}
+      submitLabel={submitLabel}
+      processing={processing}
     >
-      <Section title="Profile">
+      <FormSection title="Profile">
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField
             id="name"
@@ -109,9 +112,9 @@ export function StaffForm({
           autoComplete="off"
           required
         />
-      </Section>
+      </FormSection>
 
-      <Section
+      <FormSection
         title="Password"
         description={
           isNew
@@ -141,9 +144,9 @@ export function StaffForm({
             required={isNew}
           />
         </div>
-      </Section>
+      </FormSection>
 
-      <Section
+      <FormSection
         title="Access"
         description={
           canManageAccess
@@ -151,20 +154,14 @@ export function StaffForm({
             : "You can't disable your own account or change your own roles."
         }
       >
-        <Field orientation="horizontal">
-          <Switch
-            id="is_active"
-            checked={data.is_active}
-            disabled={!canManageAccess}
-            onCheckedChange={(checked) => setData("is_active", checked)}
-          />
-          <FieldContent>
-            <FieldLabel htmlFor="is_active">Active</FieldLabel>
-            <FieldDescription>
-              Disabled accounts are signed out and can&apos;t sign in.
-            </FieldDescription>
-          </FieldContent>
-        </Field>
+        <SwitchField
+          id="is_active"
+          label="Active"
+          description="Disabled accounts are signed out and can't sign in."
+          checked={data.is_active}
+          disabled={!canManageAccess}
+          onChange={(checked) => setData("is_active", checked)}
+        />
 
         {roles && (
           <FieldSet>
@@ -203,75 +200,7 @@ export function StaffForm({
             <FieldError errors={asFieldErrors(errors.role_ids)} />
           </FieldSet>
         )}
-      </Section>
-
-      <div className="flex items-center gap-2">
-        <Button type="submit" disabled={processing}>
-          {processing && <Spinner />}
-          {submitLabel}
-        </Button>
-        <Button variant="ghost" asChild>
-          <Link href={cancelHref}>Cancel</Link>
-        </Button>
-      </div>
-    </form>
-  )
-}
-
-function Section({
-  title,
-  description,
-  children,
-}: {
-  title: string
-  description?: string
-  children: ReactNode
-}) {
-  return (
-    <Card>
-      <CardContent className="space-y-4">
-        <div className="space-y-1">
-          <h2 className="font-medium">{title}</h2>
-          {description && (
-            <p className="text-muted-foreground text-sm">{description}</p>
-          )}
-        </div>
-        {children}
-      </CardContent>
-    </Card>
-  )
-}
-
-function TextField({
-  id,
-  label,
-  value,
-  onChange,
-  errors,
-  type = "text",
-  ...props
-}: {
-  id: string
-  label: string
-  value: string
-  onChange: (value: string) => void
-  errors?: string[]
-  type?: string
-  autoComplete?: string
-  required?: boolean
-}) {
-  return (
-    <Field data-invalid={errors ? true : undefined}>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
-      <Input
-        id={id}
-        type={type}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        aria-invalid={errors ? true : undefined}
-        {...props}
-      />
-      <FieldError errors={asFieldErrors(errors)} />
-    </Field>
+      </FormSection>
+    </FormLayout>
   )
 }

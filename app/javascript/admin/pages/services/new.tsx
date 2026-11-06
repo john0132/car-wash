@@ -5,18 +5,21 @@ import { ServiceForm } from "@/admin/features/services/components/service-form"
 import type { ServiceTranslationEntry } from "@/admin/features/services/types"
 import type { ServiceCategoryOption } from "@/admin/features/services/types"
 import AdminLayout from "@/admin/layouts/admin-layout"
+import type { AdminLanguage } from "@/admin/types"
 import { adminServiceCategories, adminServices } from "@/routes"
 
 interface Props {
   translations: ServiceTranslationEntry[]
   service_category_id: number | null
   categories: ServiceCategoryOption[]
+  languages: AdminLanguage[]
 }
 
 export default function ServiceNew({
   translations,
   service_category_id: serviceCategoryId,
   categories,
+  languages,
 }: Props) {
   return (
     <AdminLayout
@@ -33,6 +36,7 @@ export default function ServiceNew({
           service={null}
           serviceCategoryId={serviceCategoryId}
           translations={translations}
+          languages={languages}
           categories={categories}
           action={adminServices.create()}
           cancelHref={

@@ -29,3 +29,15 @@ export interface ImageValue {
   signed_id: string
   url: string
 }
+
+/**
+ * One language's entry from Admin::ContentTranslations#content_translations_props
+ * (default language first), with its text `fields`.
+ */
+export type TranslationEntry<F extends string = "name"> = {
+  language_id: number
+  code: string
+  language: string
+  /** The default locale's language; the form requires it. */
+  default: boolean
+} & Record<F, string>

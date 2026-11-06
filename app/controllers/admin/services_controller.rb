@@ -6,9 +6,9 @@ class Admin::ServicesController < Admin::BaseController
   include Admin::Activation
   include Admin::Images
   include Admin::Pagination
-  include Admin::Translations
+  include Admin::ContentTranslations
 
-  TRANSLATION_FIELDS = %i[title description seo_title seo_description].freeze
+  TRANSLATION_FIELDS = %i[name title description seo_title seo_description].freeze
 
   after_action :verify_authorized
 
@@ -54,7 +54,7 @@ class Admin::ServicesController < Admin::BaseController
       redirect_to admin_service_path(service), notice: "#{translated_name(service)} was created"
     else
       redirect_to new_admin_service_path(service_category_id: service.service_category_id),
-        inertia: { errors: service.errors }
+        inertia: { errors: content_errors(service) }
     end
   end
 
@@ -71,7 +71,7 @@ class Admin::ServicesController < Admin::BaseController
     if @service.save
       redirect_to admin_service_path(@service), notice: "#{translated_name(@service.reload)} was updated"
     else
-      redirect_to edit_admin_service_path(@service), inertia: { errors: @service.errors }
+      redirect_to edit_admin_service_path(@service), inertia: { errors: content_errors(@service) }
     end
   end
 
@@ -100,8 +100,7 @@ class Admin::ServicesController < Admin::BaseController
   end
 
   def service_params
-    @service_params ||= params.expect(service: [ :service_category_id, :slug, :price, :sale_price, :duration_minutes, :is_active, :display_in_home_page, :image,
-                                                 translations: [ [ :language_id, :name, *TRANSLATION_FIELDS ] ] ])
+    @service_params ||= params.fetch(:service, {}).permit(:service_category_id, :slug, :price, :sale_price, :duration_minutes, :is_active, :display_in_home_page, :image)
   end
 
   def assign_service(service)
@@ -110,7 +109,7 @@ class Admin::ServicesController < Admin::BaseController
     # A blank sale price means "no sale", not 0.
     service.sale_price = service_params[:sale_price].presence if service_params.key?(:sale_price)
     service.duration_minutes = service_params[:duration_minutes].presence if service_params.key?(:duration_minutes)
-    assign_translations(service, service_params[:translations], fields: TRANSLATION_FIELDS)
+    assign_content_translations(service, submitted_translations(:service), fields: TRANSLATION_FIELDS)
   end
 
   def category_filter
@@ -134,7 +133,7 @@ class Admin::ServicesController < Admin::BaseController
       is_active: service.is_active,
       display_in_home_page: service.display_in_home_page,
       image: image_prop(service.image),
-      translations: translations_props(service, fields: TRANSLATION_FIELDS),
+      translations: content_translations_props(service, fields: TRANSLATION_FIELDS),
       service_category: { id: service.service_category.id, name: translated_name(service.service_category) },
       created_at: service.created_at
     }
@@ -143,7 +142,8 @@ class Admin::ServicesController < Admin::BaseController
   def form_props(service)
     {
       service: service.persisted? ? service_props(service) : nil,
-      translations: translations_props(service, fields: TRANSLATION_FIELDS),
+      translations: content_translations_props(service, fields: TRANSLATION_FIELDS),
+      languages: languages_props,
       service_category_id: service.service_category_id,
       categories: category_options
     }

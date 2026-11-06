@@ -3,8 +3,9 @@
 require "rails_helper"
 
 RSpec.describe PaymentMethodTranslation, type: :model do
-  let(:payment_method) { PaymentMethod.create!(code: "credit_card") }
-  let(:language) { Language.create!(code: "en", name: "English") }
+  # Has its English name already, so these build the Arabic one.
+  let(:payment_method) { create_payment_method("credit_card") }
+  let(:language) { arabic }
 
   it "is valid with a payment_method, language, and name" do
     expect(PaymentMethodTranslation.new(payment_method: payment_method, language: language, name: "Credit Card")).to be_valid

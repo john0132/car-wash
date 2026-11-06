@@ -5,11 +5,13 @@ import { ActivationSwitch } from "@/admin/components/activation-switch"
 import { ActiveBadge } from "@/admin/components/active-badge"
 import { ConfirmDeleteDialog } from "@/admin/components/confirm-delete-dialog"
 import { PageHeader } from "@/admin/components/page-header"
+import { TranslationsCard } from "@/admin/components/translations-card"
 import { AreasMap } from "@/admin/features/areas/components/areas-map"
 import type { AreaSummary } from "@/admin/features/areas/types"
 import type { CityDetail } from "@/admin/features/cities/types"
 import { useCan } from "@/admin/hooks/use-can"
 import AdminLayout from "@/admin/layouts/admin-layout"
+import { pluralize } from "@/admin/lib/format"
 import { adminAreas, adminCities } from "@/routes"
 import { Badge } from "@/shared/components/ui/badge"
 import { Button } from "@/shared/components/ui/button"
@@ -51,16 +53,12 @@ export default function CityShow({ city, areas }: Props) {
         <PageHeader
           title={
             <span className="flex items-center gap-3">
-              {city.name} <ActiveBadge active={city.is_active} />
+              {city.name}
+              {!can("cities", "update") && (
+                <ActiveBadge active={city.is_active} />
+              )}
             </span>
           }
-          description={city.translations
-            .filter((t) => !t.default && t.name)
-            .map((t) => (
-              <span key={t.language_id} lang={t.code} className="mr-3">
-                {t.language}: {t.name}
-              </span>
-            ))}
           actions={
             <>
               {can("cities", "update") && (
@@ -69,6 +67,7 @@ export default function CityShow({ city, areas }: Props) {
                     active={city.is_active}
                     name={city.name}
                     action={adminCities.activation(city.id)}
+                    label="Active"
                   />
                   <Button variant="outline" asChild>
                     <Link href={adminCities.edit(city.id)}>
@@ -82,7 +81,7 @@ export default function CityShow({ city, areas }: Props) {
                   title={`Delete ${city.name}?`}
                   description={
                     areas.length > 0
-                      ? `${city.name} still has ${areas.length} area(s). Delete or move them first, or disable the city instead.`
+                      ? `${city.name} still has ${pluralize(areas.length, "area")}. Delete or move them first, or disable the city instead.`
                       : "This permanently deletes the city and its translations."
                   }
                   action={adminCities.destroy(city.id)}
@@ -99,7 +98,7 @@ export default function CityShow({ city, areas }: Props) {
               <CardDescription>
                 {areas.length === 0
                   ? "No areas in this city yet."
-                  : `${areas.length} area(s). Click a shape to open it.`}
+                  : `${pluralize(areas.length, "area")}. Click a shape to open it.`}
               </CardDescription>
             </div>
             {can("areas", "create") && (
@@ -163,6 +162,11 @@ export default function CityShow({ city, areas }: Props) {
             )}
           </CardContent>
         </Card>
+
+        <TranslationsCard
+          translations={city.translations}
+          columns={[{ key: "name", label: "Name" }]}
+        />
       </div>
     </AdminLayout>
   )

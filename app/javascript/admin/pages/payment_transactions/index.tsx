@@ -1,19 +1,25 @@
 import { Head, Link } from "@inertiajs/react"
 import { CircleAlert, Clock, HandCoins, Undo2 } from "lucide-react"
 
+import { ListFilters, hasFilters } from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
 import { ResourceTable } from "@/admin/components/resource-table"
 import { StatCard } from "@/admin/components/stat-card"
-import { TransactionFilters } from "@/admin/features/payments/components/transaction-filters"
 import { TransactionStatusBadge } from "@/admin/features/payments/components/transaction-status-badge"
-import type {
-  TransactionFilters as Filters,
-  TransactionRow,
-  TransactionStats,
+import {
+  TRANSACTION_STATUSES,
+  type TransactionFilters as Filters,
+  type TransactionRow,
+  type TransactionStats,
 } from "@/admin/features/payments/types"
 import AdminLayout from "@/admin/layouts/admin-layout"
-import { formatDateTime, formatMoney, formatNumber } from "@/admin/lib/format"
+import {
+  formatDateTime,
+  formatMoney,
+  formatNumber,
+  humanize,
+} from "@/admin/lib/format"
 import type { Pagination as PaginationData } from "@/admin/types"
 import { adminCustomers, adminPaymentTransactions } from "@/routes"
 import { TableCell, TableHead, TableRow } from "@/shared/components/ui/table"
@@ -42,11 +48,11 @@ export default function PaymentTransactionsIndex({
         },
       ]}
     >
-      <Head title="Payment transactions" />
+      <Head title="Transactions" />
 
       <div className="space-y-6 p-4">
         <PageHeader
-          title="Payment transactions"
+          title="Transactions"
           description="Every payment and wallet top-up. Totals follow the current filters."
         />
 
@@ -74,15 +80,38 @@ export default function PaymentTransactionsIndex({
           />
         </div>
 
-        <TransactionFilters
+        <ListFilters
           url={adminPaymentTransactions.index().url}
           filters={filters}
-          methods={payment_method_options}
+          searchPlaceholder="Search reference, customer or email…"
+          showStatus={false}
+          selects={[
+            {
+              param: "status",
+              label: "Filter by status",
+              allLabel: "All statuses",
+              options: TRANSACTION_STATUSES.map((status) => ({
+                value: status,
+                label: humanize(status),
+              })),
+            },
+            {
+              param: "payment_method_id",
+              label: "Filter by method",
+              allLabel: "All methods",
+              options: payment_method_options.map((method) => ({
+                value: String(method.id),
+                label: method.name,
+              })),
+            },
+          ]}
         />
 
         <ResourceTable
           items={transactions}
-          emptyMessage="No transactions match these filters."
+          emptyMessage="No transactions yet."
+          emptyFilteredMessage="No transactions match these filters."
+          filtered={hasFilters(filters)}
           columns={
             <>
               <TableHead>Date</TableHead>

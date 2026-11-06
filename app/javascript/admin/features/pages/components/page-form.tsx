@@ -1,19 +1,23 @@
-import { Link, useForm } from "@inertiajs/react"
+import { useForm } from "@inertiajs/react"
 import { useState } from "react"
 
 import {
-  ContentMetaFields,
   type ContentMetaValues,
+  ContentTextSection,
   contentMetaParams,
   contentMetaValues,
 } from "@/admin/components/content-meta-fields"
 import {
   FormSection,
+  SwitchField,
   TextField,
   asFieldErrors,
   slugify,
 } from "@/admin/components/form-fields"
+import { FormLayout } from "@/admin/components/form-layout"
 import { LanguageSwitcher } from "@/admin/components/language-switcher"
+import { NoLanguages } from "@/admin/components/no-languages"
+import { SeoSection } from "@/admin/components/seo-section"
 import type { ComponentOption } from "@/admin/features/components/types"
 import { SectionList } from "@/admin/features/pages/components/section-list"
 import type {
@@ -23,19 +27,13 @@ import type {
   SectionState,
 } from "@/admin/features/pages/types"
 import { sectionState } from "@/admin/features/pages/utils"
-import { errorLanguageCodes } from "@/admin/lib/languages"
+import { useLanguageTabs } from "@/admin/hooks/use-language-tabs"
+import { SUBMIT_OPTIONS, formErrors } from "@/admin/lib/forms"
+import { emptyLanguageCodes } from "@/admin/lib/languages"
+import { patchTranslation } from "@/admin/lib/translations"
 import type { AdminLanguage } from "@/admin/types"
 import type { RouteDefinition } from "@/routes/runtime"
-import { Button } from "@/shared/components/ui/button"
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from "@/shared/components/ui/field"
-import { Spinner } from "@/shared/components/ui/spinner"
-import { Switch } from "@/shared/components/ui/switch"
+import { FieldError } from "@/shared/components/ui/field"
 
 interface PageFormData {
   slug: string
@@ -67,9 +65,6 @@ export function PageForm({
   cancelHref: string
   submitLabel: string
 }) {
-  const defaultLanguage = languages.find((l) => l.default) ?? languages[0]
-  const [code, setCode] = useState(defaultLanguage?.code ?? "")
-  const language = languages.find((l) => l.code === code) ?? defaultLanguage
   const [slugTouched, setSlugTouched] = useState(Boolean(page.slug))
 
   const form = useForm<PageFormData>({
@@ -85,7 +80,9 @@ export function PageForm({
     sections.map(sectionState),
   )
   const { data, setData, processing } = form
-  const errors = form.errors as Record<string, string[] | undefined>
+  const errors = formErrors(form)
+  const tabs = useLanguageTabs(languages, errors)
+  const { language } = tabs
 
   form.transform((values) => ({
     page: {
@@ -109,100 +106,51 @@ export function PageForm({
     },
   }))
 
-  if (!language) {
-    return (
-      <p className="text-muted-foreground text-sm">
-        No languages are set up yet. Add a Language record first.
-      </p>
-    )
-  }
+  if (!language) return <NoLanguages />
 
-  const setTranslation = (patch: Partial<ContentMetaValues>) => {
-    const current = data.translations[language.id] ?? contentMetaValues({})
-    const next = { ...current, ...patch }
+  const current = data.translations[language.id] ?? contentMetaValues({})
+  const setTranslation = (patch: Partial<ContentMetaValues>) =>
     setData((previous) => ({
-      ...previous,
-      translations: { ...previous.translations, [language.id]: next },
+      ...patchTranslation(previous, language.id, patch, contentMetaValues({})),
+      // The slug follows the default title until it's edited by hand.
       slug:
         !slugTouched && language.default && patch.title !== undefined
           ? slugify(patch.title)
           : previous.slug,
     }))
-  }
 
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault()
-        // Keep unsaved edits when validation fails; reload fresh ids after a save.
-        form.submit(action, { preserveScroll: true, preserveState: "errors" })
-      }}
-      className="max-w-4xl space-y-6"
-    >
-      <div className="bg-background/95 supports-backdrop-filter:bg-background/80 sticky top-0 z-10 -mx-4 flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3 backdrop-blur">
+    <FormLayout
+      // Keeps unsaved edits when validation fails; reloads fresh ids after a save.
+      onSubmit={() => form.submit(action, SUBMIT_OPTIONS)}
+      tabs={
         <LanguageSwitcher
           languages={languages}
           value={language.code}
-          onChange={setCode}
-          errorCodes={errorLanguageCodes(errors, languages)}
+          onChange={tabs.setCode}
+          errorCodes={tabs.errorCodes}
+          emptyCodes={emptyLanguageCodes(data.translations, languages)}
         />
-        <div className="ml-auto flex items-center gap-2">
-          <Button variant="ghost" asChild>
-            <Link href={cancelHref}>Cancel</Link>
-          </Button>
-          <Button type="submit" disabled={processing}>
-            {processing && <Spinner />}
-            {submitLabel}
-          </Button>
-        </div>
-      </div>
-
-      <FormSection title="Page">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <TextField
-            id="slug"
-            label="URL slug"
-            description="Lowercase letters, numbers and dashes, e.g. about-us."
-            value={data.slug}
-            onChange={(slug) => {
-              setSlugTouched(true)
-              setData("slug", slug)
-            }}
-            errors={errors.slug}
-            required
-          />
-          <Field orientation="horizontal" className="sm:pt-6">
-            <Switch
-              id="is_active"
-              checked={data.is_active}
-              onCheckedChange={(checked) => setData("is_active", checked)}
-            />
-            <FieldContent>
-              <FieldLabel htmlFor="is_active">Published</FieldLabel>
-              <FieldDescription>
-                Unpublished pages aren&apos;t shown on the website.
-              </FieldDescription>
-            </FieldContent>
-          </Field>
-        </div>
-        <FieldError errors={asFieldErrors(errors.translations)} />
-      </FormSection>
-
-      <ContentMetaFields
-        key={language.code}
+      }
+      cancelHref={cancelHref}
+      submitLabel={submitLabel}
+      processing={processing}
+      width="4xl"
+    >
+      <ContentTextSection
+        key={`text-${language.code}`}
         language={language}
-        values={data.translations[language.id] ?? contentMetaValues({})}
+        values={current}
         onChange={setTranslation}
-        errorFor={(attribute) =>
-          errors[`translations.${language.id}.${attribute}`]
-        }
+        errorFor={tabs.errorFor}
+        baseError={tabs.baseError}
         nameDescription="Used in navigation and dashboard lists."
       />
 
       <section className="space-y-3" aria-labelledby="sections-heading">
         <div className="space-y-1">
-          <h2 id="sections-heading" className="font-medium">
-            Sections · {language.name}
+          <h2 id="sections-heading" className="font-semibold">
+            Sections · <span lang={language.code}>{language.name}</span>
           </h2>
           <p className="text-muted-foreground text-sm">
             The page is built from these components, top to bottom. Text is
@@ -220,6 +168,37 @@ export function PageForm({
           errors={errors}
         />
       </section>
-    </form>
+
+      <FormSection title="Page" shared>
+        <TextField
+          id="slug"
+          label="URL slug"
+          description={`Lowercase letters, numbers and dashes, e.g. about-us.${slugTouched ? "" : " Follows the default language's title until you edit it."}`}
+          value={data.slug}
+          onChange={(slug) => {
+            setSlugTouched(true)
+            setData("slug", slug)
+          }}
+          errors={errors.slug}
+          required
+          className="sm:max-w-sm"
+        />
+        <SwitchField
+          id="is_active"
+          label="Published"
+          description="Unpublished pages aren't shown on the website."
+          checked={data.is_active}
+          onChange={(checked) => setData("is_active", checked)}
+        />
+      </FormSection>
+
+      <SeoSection
+        key={`seo-${language.code}`}
+        language={language}
+        values={current}
+        onChange={setTranslation}
+        errorFor={tabs.errorFor}
+      />
+    </FormLayout>
   )
 }

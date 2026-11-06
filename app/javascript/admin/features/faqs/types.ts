@@ -1,4 +1,5 @@
 import type { ListFilterValues } from "@/admin/components/list-filters"
+import type { TranslationEntry } from "@/admin/types"
 
 /** Admin::FaqsController#faq_row */
 export interface FaqRow {
@@ -19,11 +20,5 @@ export interface FaqDetail {
 }
 
 /** Admin::ContentTranslations#content_translations_props for faqs. */
-export interface FaqTranslation {
-  language_id: number
-  code: string
-  language: string
-  default: boolean
-  question: string
-  answer: string
-}
+/** Admin::ContentTranslations#content_translations_props entry. */
+export type FaqTranslation = TranslationEntry<"question" | "answer">

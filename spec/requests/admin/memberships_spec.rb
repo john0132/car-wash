@@ -8,11 +8,7 @@ RSpec.describe "Admin memberships", type: :request do
   let(:admin) { users(:admin) }
   let!(:english) { Language.find_or_create_by!(code: "en") { _1.name = "English" } }
   let!(:arabic) { Language.find_or_create_by!(code: "ar") { _1.name = "Arabic" } }
-  let!(:gold) do
-    Membership.create!(egp_to_points: 1.5, points_to_egp: 0.15, background_color: "#D4AF37", text_color: "#1F2937").tap do |m|
-      m.membership_translations.create!(language: english, name: "Gold")
-    end
-  end
+  let!(:gold) { create_membership("Gold", egp_to_points: 1.5, points_to_egp: 0.15) }
 
   let(:valid_params) do
     {
@@ -75,13 +71,25 @@ RSpec.describe "Admin memberships", type: :request do
       expect(membership.membership_translations.map(&:name)).to eq([ "Platinum" ])
     end
 
-    it "rejects a tier without any name" do
+    it "requires an English name" do
       grant(admin, "memberships.create")
       sign_in admin
       valid_params[:membership][:translations][english.id.to_s][:name] = ""
+      valid_params[:membership][:translations][arabic.id.to_s][:name] = "بلاتيني"
 
       expect { post admin_memberships_path, params: valid_params }.not_to change(Membership, :count)
       expect(response).to redirect_to(new_admin_membership_path)
+      expect(session[:inertia_errors]).to include(translations: [ "must include a name in English" ])
+    end
+
+    it "keys a translation's own errors by language" do
+      grant(admin, "memberships.create")
+      sign_in admin
+      # A description without a name keeps the Arabic translation, which then needs a name.
+      valid_params[:membership][:translations][arabic.id.to_s][:description] = "أعلى فئة"
+
+      expect { post admin_memberships_path, params: valid_params }.not_to change(Membership, :count)
+      expect(session[:inertia_errors]).to include(:"translations.#{arabic.id}.name")
     end
 
     it "is forbidden without memberships.create" do

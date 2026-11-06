@@ -5,7 +5,9 @@
 class Admin::AreasController < Admin::BaseController
   include Admin::Activation
   include Admin::Pagination
-  include Admin::Translations
+  include Admin::ContentTranslations
+
+  TRANSLATION_FIELDS = %i[name].freeze
 
   after_action :verify_authorized
 
@@ -51,7 +53,7 @@ class Admin::AreasController < Admin::BaseController
     if area.save
       redirect_to admin_area_path(area), notice: "#{translated_name(area)} was created"
     else
-      redirect_to new_admin_area_path(city_id: area.city_id), inertia: { errors: area.errors }
+      redirect_to new_admin_area_path(city_id: area.city_id), inertia: { errors: content_errors(area) }
     end
   end
 
@@ -68,7 +70,7 @@ class Admin::AreasController < Admin::BaseController
     if @area.save
       redirect_to admin_area_path(@area), notice: "#{translated_name(@area.reload)} was updated"
     else
-      redirect_to edit_admin_area_path(@area), inertia: { errors: @area.errors }
+      redirect_to edit_admin_area_path(@area), inertia: { errors: content_errors(@area) }
     end
   end
 
@@ -95,14 +97,13 @@ class Admin::AreasController < Admin::BaseController
   end
 
   def area_params
-    @area_params ||= params.expect(area: [ :city_id, :rate, :is_active, :geofence,
-                                           translations: [ [ :language_id, :name ] ] ])
+    @area_params ||= params.fetch(:area, {}).permit(:city_id, :rate, :is_active, :geofence)
   end
 
   def assign_area(area)
     area.assign_attributes(area_params.slice(:city_id, :rate, :is_active))
     area.geofence_geojson = area_params[:geofence] if area_params.key?(:geofence)
-    assign_translations(area, area_params[:translations])
+    assign_content_translations(area, submitted_translations(:area), fields: TRANSLATION_FIELDS)
   end
 
   def city_filter
@@ -122,7 +123,7 @@ class Admin::AreasController < Admin::BaseController
       rate: area.rate.to_f,
       is_active: area.is_active,
       geofence: area.geofence_geojson,
-      translations: translations_props(area),
+      translations: content_translations_props(area, fields: TRANSLATION_FIELDS),
       city: { id: area.city.id, name: translated_name(area.city) },
       created_at: area.created_at
     }
@@ -141,7 +142,8 @@ class Admin::AreasController < Admin::BaseController
   def form_props(area)
     {
       area: area.persisted? ? area_props(area) : nil,
-      translations: translations_props(area),
+      translations: content_translations_props(area, fields: TRANSLATION_FIELDS),
+      languages: languages_props,
       city_id: area.city_id,
       cities: city_options,
       reference_areas: reference_areas(area)

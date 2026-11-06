@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Multi-field translations for the dashboard's content forms (pages, blogs,
-# components). The props are one entry per Language, default language first:
+# Translations for every multilingual dashboard form (cities, services, pages,
+# FAQs, memberships…). The props are one entry per Language, default language first:
 #
 #   { language_id:, code:, language:, default:, title: "…", seo_image: { signed_id:, url: } | nil, … }
 #
@@ -62,6 +62,17 @@ module Admin::ContentTranslations
       fields.each { |field| translation.public_send(:"#{field}=", values[field].to_s.strip.presence) }
       images.each { |image| assign_image(translation, image, values[image]) if values.key?(image) }
     end
+  end
+
+  # The posted `translations` hash of `params[key]` (`{}` when absent). Only the
+  # `fields` passed to #assign_content_translations are read from it.
+  def submitted_translations(key)
+    params.to_unsafe_h.dig(key, :translations) || {}
+  end
+
+  # "Cairo" in the current locale (with fallbacks), for lists, breadcrumbs and flashes.
+  def translated_name(record)
+    record.translation&.name || "##{record.id}"
   end
 
   # Errors of the record, with each translation's errors keyed by language as

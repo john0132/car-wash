@@ -82,3 +82,17 @@ Use the single `@/` alias (`@/shared/...`, `@/admin/...`, `@/website/...`).
 ## Conventions
 
 **Translatable fields live in a separate table, never as columns on the base model.** When a model has fields that need multi-language support, don't add those columns directly to the model's table. Instead create a `<Model>Translation` model/table (e.g. `ProductTranslation` for `Product`) holding the translatable columns plus a foreign key back to the base model and a standard `language_id` foreign key to a `Language` model. `Language` is a real model/table (id, code, name, etc.) — never a plain string or enum column. Use plain Rails conventions: `belongs_to :language`, column `language_id`.
+
+## Admin UI standards
+
+Build new admin screens from these pieces (all in `app/javascript/admin/`) instead of introducing new variants.
+
+**Forms.** Every create/edit form renders `<FormLayout>` (`components/form-layout.tsx`): sticky toolbar, Cancel (ghost) then Save (primary) on the right, language tabs on the left when multilingual. Build the body from `FormSection`, `TextField`, `TextareaField`, `SwitchField`, `SelectField` and `SlugField` in `components/form-fields.tsx`; mark required fields with `required` (red `*`). Width is `3xl` by default, `4xl` for long text, `full` only when a map or preview needs it. Submit with `SUBMIT_OPTIONS` and read errors with `formErrors(form)` (`lib/forms.ts`), never a cast.
+
+**Multilingual forms use language tabs, always.** `useLanguageTabs(languages, errors)` owns the current language, error dots, the base "must include a name in English" error (shown on the default tab) and auto-switching to the first tab with errors. Translated fields live in a `TranslatedSection` (title "… · Language"); everything shared by all languages goes in `FormSection shared`. Keep translations in form state as `Record<languageId, {...}>` (`lib/translations.ts`), set `dir`/`lang` on inputs with `textDirection`, and add `SeoSection` for SEO text. Backend: use `Admin::ContentTranslations` (`content_translations_props`, `assign_content_translations`, `content_errors`); the model calls `requires_default_translation`. A language is removed only when all its fields are blank.
+
+**Lists.** `PageHeader` → `ListFilters` (never a hand-rolled search form; `showStatus={false}` when the record has no active flag, `statusLabels={PUBLISHED_LABELS}` for website content) → `ResourceTable` (`filtered={hasFilters(filters)}`) → `Pagination`. The first column's name links to the record's main page, so there is no separate pencil column.
+
+**Record workflows.** Operational records (bookings, services, cities, customers…): list → show → edit, Delete on the show page. Website content (pages, blog, components, FAQs, payment methods): list → edit, Delete in the edit header. Detail pages show a *labeled* `ActivationSwitch` (`label="Active"`) and translations via `TranslationsCard`.
+
+**Wording and badges.** "Published/Draft" for website content, "Active/Disabled" for everything else. Status badges are outline + icon + tint (see `BookingStatusBadge`). Use `pluralize()` instead of "(s)", and `ReorderButtons`/`moveItem` for editable lists.

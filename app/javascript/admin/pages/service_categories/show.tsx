@@ -5,14 +5,15 @@ import { ActivationSwitch } from "@/admin/components/activation-switch"
 import { ActiveBadge } from "@/admin/components/active-badge"
 import { ConfirmDeleteDialog } from "@/admin/components/confirm-delete-dialog"
 import { PageHeader } from "@/admin/components/page-header"
+import { TranslationsCard } from "@/admin/components/translations-card"
 import { ServicePrice } from "@/admin/features/services/components/service-price"
-import { TranslationsCard } from "@/admin/features/services/components/translations-card"
 import type {
   ServiceCategoryDetail,
   ServiceSummary,
 } from "@/admin/features/services/types"
 import { useCan } from "@/admin/hooks/use-can"
 import AdminLayout from "@/admin/layouts/admin-layout"
+import { pluralize } from "@/admin/lib/format"
 import { adminServiceCategories, adminServices } from "@/routes"
 import { Button } from "@/shared/components/ui/button"
 import {
@@ -61,16 +62,12 @@ export default function ServiceCategoryShow({
         <PageHeader
           title={
             <span className="flex items-center gap-3">
-              {category.name} <ActiveBadge active={category.is_active} />
+              {category.name}
+              {!can("service_categories", "update") && (
+                <ActiveBadge active={category.is_active} />
+              )}
             </span>
           }
-          description={category.translations
-            .filter((t) => !t.default && t.name)
-            .map((t) => (
-              <span key={t.language_id} lang={t.code} className="mr-3">
-                {t.language}: {t.name}
-              </span>
-            ))}
           actions={
             <>
               {can("service_categories", "update") && (
@@ -79,6 +76,7 @@ export default function ServiceCategoryShow({
                     active={category.is_active}
                     name={category.name}
                     action={adminServiceCategories.activation(category.id)}
+                    label="Active"
                   />
                   <Button variant="outline" asChild>
                     <Link href={adminServiceCategories.edit(category.id)}>
@@ -92,7 +90,7 @@ export default function ServiceCategoryShow({
                   title={`Delete ${category.name}?`}
                   description={
                     services.length > 0
-                      ? `${category.name} still has ${services.length} service(s). Delete or move them first, or disable the category instead.`
+                      ? `${category.name} still has ${pluralize(services.length, "service")}. Delete or move them first, or disable the category instead.`
                       : "This permanently deletes the category and its translations."
                   }
                   action={adminServiceCategories.destroy(category.id)}
@@ -109,7 +107,7 @@ export default function ServiceCategoryShow({
               <CardDescription>
                 {services.length === 0
                   ? "No services in this category yet."
-                  : `${services.length} service(s).`}
+                  : `${pluralize(services.length, "service")}.`}
               </CardDescription>
             </div>
             {can("services", "create") && (
@@ -166,7 +164,14 @@ export default function ServiceCategoryShow({
           )}
         </Card>
 
-        <TranslationsCard translations={category.translations} />
+        <TranslationsCard
+          translations={category.translations}
+          columns={[
+            { key: "name", label: "Name" },
+            { key: "seo_title", label: "SEO title" },
+            { key: "seo_description", label: "SEO description", long: true },
+          ]}
+        />
       </div>
     </AdminLayout>
   )

@@ -14,7 +14,7 @@ RSpec.describe "Admin service categories", type: :request do
   end
 
   def translations(en:, ar: "", **seo)
-    [ { language_id: english.id, name: en, **seo }, { language_id: arabic.id, name: ar } ]
+    { english.id.to_s => { name: en, **seo }, arabic.id.to_s => { name: ar } }
   end
 
   describe "GET /admin/service_categories" do

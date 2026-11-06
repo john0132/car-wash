@@ -7,16 +7,19 @@ import type {
   PaymentMethodTranslation,
 } from "@/admin/features/payments/types"
 import AdminLayout from "@/admin/layouts/admin-layout"
+import type { AdminLanguage } from "@/admin/types"
 import { adminPaymentMethods } from "@/routes"
 
 interface Props {
   payment_method: PaymentMethodDetail & { id: number }
   translations: PaymentMethodTranslation[]
+  languages: AdminLanguage[]
 }
 
 export default function PaymentMethodEdit({
   payment_method,
   translations,
+  languages,
 }: Props) {
   const title = payment_method.name ?? payment_method.code
 
@@ -34,6 +37,7 @@ export default function PaymentMethodEdit({
         <PaymentMethodForm
           paymentMethod={payment_method}
           translations={translations}
+          languages={languages}
           action={adminPaymentMethods.update(payment_method.id)}
           cancelHref={adminPaymentMethods.index().url}
           submitLabel="Save changes"

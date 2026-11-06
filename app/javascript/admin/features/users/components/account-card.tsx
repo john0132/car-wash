@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 
-import { ActiveBadge } from "@/admin/features/users/components/active-badge"
+import { ActiveBadge } from "@/admin/components/active-badge"
+import { Detail } from "@/admin/components/detail"
 import { UserIdentity } from "@/admin/features/users/components/user-identity"
 import type { ManagedUser } from "@/admin/features/users/types"
 import { formatDate, formatDateTime } from "@/admin/lib/format"
@@ -47,20 +48,5 @@ export function AccountCard({
         )}
       </CardContent>
     </Card>
-  )
-}
-
-export function Detail({
-  label,
-  children,
-}: {
-  label: string
-  children: ReactNode
-}) {
-  return (
-    <div className="space-y-0.5">
-      <dt className="text-muted-foreground text-xs">{label}</dt>
-      <dd>{children}</dd>
-    </div>
   )
 }

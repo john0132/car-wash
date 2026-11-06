@@ -1,36 +1,43 @@
-import { Link, useForm } from "@inertiajs/react"
+import { useForm } from "@inertiajs/react"
 
-import { asFieldErrors } from "@/admin/components/form-fields"
 import {
-  type TranslationEntry,
-  TranslationFields,
-  translationParams,
-} from "@/admin/components/translation-fields"
+  FormSection,
+  SwitchField,
+  TextField,
+  TranslatedSection,
+} from "@/admin/components/form-fields"
+import { FormLayout } from "@/admin/components/form-layout"
+import { LanguageSwitcher } from "@/admin/components/language-switcher"
+import { NoLanguages } from "@/admin/components/no-languages"
+import { useLanguageTabs } from "@/admin/hooks/use-language-tabs"
+import { SUBMIT_OPTIONS, formErrors } from "@/admin/lib/forms"
+import { emptyLanguageCodes, textDirection } from "@/admin/lib/languages"
+import {
+  blankValues,
+  patchTranslation,
+  translationValues,
+} from "@/admin/lib/translations"
+import type { AdminLanguage, TranslationEntry } from "@/admin/types"
 import type { RouteDefinition } from "@/routes/runtime"
-import { Button } from "@/shared/components/ui/button"
-import { Card, CardContent } from "@/shared/components/ui/card"
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from "@/shared/components/ui/field"
-import { Input } from "@/shared/components/ui/input"
-import { Spinner } from "@/shared/components/ui/spinner"
-import { Switch } from "@/shared/components/ui/switch"
+
+const FIELDS = ["name"] as const
+type ExtraText = Record<(typeof FIELDS)[number], string>
 
 interface ExtraFormData {
   price: string
   is_active: boolean
-  translations: TranslationEntry[]
+  translations: Record<number, ExtraText>
 }
 
-/** Create/edit form for a booking extra. Posts `{ extra: { price, is_active, translations } }`. */
+/**
+ * Create/edit form for a booking extra, one language at a time. Posts
+ * `{ extra: { price, is_active, translations: { <language_id>: { name } } } }`.
+ */
 export function ExtraForm({
   price,
   isActive,
   translations,
+  languages,
   action,
   cancelHref,
   submitLabel,
@@ -38,6 +45,7 @@ export function ExtraForm({
   price: number | null
   isActive: boolean
   translations: TranslationEntry[]
+  languages: AdminLanguage[]
   action: RouteDefinition<"post" | "patch">
   cancelHref: string
   submitLabel: string
@@ -45,77 +53,78 @@ export function ExtraForm({
   const form = useForm<ExtraFormData>({
     price: price != null ? String(price) : "",
     is_active: isActive,
-    translations,
+    translations: translationValues(translations, FIELDS),
   })
-  const { data, setData, errors, processing } = form
+  const { data, setData, processing } = form
+  const errors = formErrors(form)
+  const tabs = useLanguageTabs(languages, errors)
+  const { language } = tabs
 
-  form.transform((values) => ({
-    extra: {
-      price: values.price,
-      is_active: values.is_active,
-      translations: translationParams(values.translations),
-    },
-  }))
+  form.transform((values) => ({ extra: values }))
+
+  if (!language) return <NoLanguages />
+
+  const current = data.translations[language.id] ?? blankValues(FIELDS)
+  const setTranslation = (patch: Partial<ExtraText>) =>
+    setData((previous) =>
+      patchTranslation(previous, language.id, patch, blankValues(FIELDS)),
+    )
 
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault()
-        form.submit(action, { preserveScroll: true })
-      }}
-      className="max-w-2xl space-y-6"
+    <FormLayout
+      onSubmit={() => form.submit(action, SUBMIT_OPTIONS)}
+      tabs={
+        <LanguageSwitcher
+          languages={languages}
+          value={language.code}
+          onChange={tabs.setCode}
+          errorCodes={tabs.errorCodes}
+          emptyCodes={emptyLanguageCodes(data.translations, languages)}
+        />
+      }
+      cancelHref={cancelHref}
+      submitLabel={submitLabel}
+      processing={processing}
     >
-      <Card>
-        <CardContent className="space-y-6">
-          <TranslationFields
-            translations={data.translations}
-            onChange={(value) => setData("translations", value)}
-            errors={errors.translations}
-          />
+      <TranslatedSection
+        title="Name"
+        language={language}
+        baseError={tabs.baseError}
+      >
+        <TextField
+          id={`name_${language.code}`}
+          label="Name"
+          value={current.name}
+          onChange={(name) => setTranslation({ name })}
+          errors={tabs.errorFor("name")}
+          required={language.default}
+          dir={textDirection(language.code)}
+          lang={language.code}
+        />
+      </TranslatedSection>
 
-          <Field data-invalid={errors.price ? true : undefined}>
-            <FieldLabel htmlFor="price">Price (EGP)</FieldLabel>
-            <Input
-              id="price"
-              type="number"
-              inputMode="decimal"
-              min="0"
-              step="0.01"
-              value={data.price}
-              onChange={(event) => setData("price", event.target.value)}
-              aria-invalid={errors.price ? true : undefined}
-              required
-              className="sm:max-w-xs"
-            />
-            <FieldError errors={asFieldErrors(errors.price)} />
-          </Field>
-
-          <Field orientation="horizontal">
-            <Switch
-              id="is_active"
-              checked={data.is_active}
-              onCheckedChange={(checked) => setData("is_active", checked)}
-            />
-            <FieldContent>
-              <FieldLabel htmlFor="is_active">Active</FieldLabel>
-              <FieldDescription>
-                Turn off to stop customers from adding it to a booking without
-                deleting it.
-              </FieldDescription>
-            </FieldContent>
-          </Field>
-        </CardContent>
-      </Card>
-
-      <div className="flex items-center gap-2">
-        <Button type="submit" disabled={processing}>
-          {processing && <Spinner />}
-          {submitLabel}
-        </Button>
-        <Button variant="ghost" asChild>
-          <Link href={cancelHref}>Cancel</Link>
-        </Button>
-      </div>
-    </form>
+      <FormSection title="Pricing & status" shared>
+        <TextField
+          id="price"
+          label="Price (EGP)"
+          type="number"
+          inputMode="decimal"
+          min="0"
+          step="0.01"
+          value={data.price}
+          onChange={(value) => setData("price", value)}
+          errors={errors.price}
+          required
+          className="sm:max-w-xs"
+        />
+        <SwitchField
+          id="is_active"
+          label="Active"
+          description="Turn off to stop customers from adding it to a booking without deleting it."
+          checked={data.is_active}
+          onChange={(checked) => setData("is_active", checked)}
+        />
+      </FormSection>
+    </FormLayout>
   )
 }

@@ -1,8 +1,12 @@
 import { Head, Link } from "@inertiajs/react"
 import { Coins, Pencil, Sparkles, Users } from "lucide-react"
 
+import { ActivationSwitch } from "@/admin/components/activation-switch"
+import { ActiveBadge } from "@/admin/components/active-badge"
+import { Detail } from "@/admin/components/detail"
 import { PageHeader } from "@/admin/components/page-header"
 import { StatCard } from "@/admin/components/stat-card"
+import { TranslationsCard } from "@/admin/components/translations-card"
 import { MembershipBadge } from "@/admin/features/customers/components/membership-badge"
 import type {
   MembershipCustomer,
@@ -10,9 +14,6 @@ import type {
   MembershipShowStats,
   MembershipTranslation,
 } from "@/admin/features/memberships/types"
-import { Detail } from "@/admin/features/users/components/account-card"
-import { ActivationSwitch } from "@/admin/features/users/components/activation-switch"
-import { ActiveBadge } from "@/admin/features/users/components/active-badge"
 import { useCan } from "@/admin/hooks/use-can"
 import AdminLayout from "@/admin/layouts/admin-layout"
 import { formatCompact, formatDate, formatNumber } from "@/admin/lib/format"
@@ -61,7 +62,12 @@ export default function MembershipShow({
 
       <div className="space-y-6 p-4">
         <PageHeader
-          title={name}
+          title={
+            <span className="flex items-center gap-3">
+              {name}
+              {!canUpdate && <ActiveBadge active={membership.is_active} />}
+            </span>
+          }
           description={
             <span className="inline-flex items-center gap-2">
               Membership #{membership.id}
@@ -70,11 +76,19 @@ export default function MembershipShow({
           }
           actions={
             canUpdate && (
-              <Button asChild>
-                <Link href={adminMemberships.edit(membership.id)}>
-                  <Pencil /> Edit
-                </Link>
-              </Button>
+              <>
+                <ActivationSwitch
+                  active={membership.is_active}
+                  name={name}
+                  action={adminMemberships.activation(membership.id)}
+                  label="Active"
+                />
+                <Button variant="outline" asChild>
+                  <Link href={adminMemberships.edit(membership.id)}>
+                    <Pencil /> Edit
+                  </Link>
+                </Button>
+              </>
             )
           }
         />
@@ -107,30 +121,12 @@ export default function MembershipShow({
         </div>
 
         <div className="grid gap-4 lg:grid-cols-3">
-          <Card className="lg:col-span-2">
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between gap-4">
-                <h2 className="font-medium">Details</h2>
-                <ActiveBadge active={membership.is_active} />
-              </div>
-              <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
-                {translations.map((t) => (
-                  <Detail key={t.language_id} label={`Name (${t.language})`}>
-                    <span dir={t.code === "ar" ? "rtl" : undefined}>
-                      {t.name ?? "—"}
-                    </span>
-                  </Detail>
-                ))}
-                {translations.map((t) => (
-                  <Detail
-                    key={`d${t.language_id}`}
-                    label={`Description (${t.language})`}
-                  >
-                    <span dir={t.code === "ar" ? "rtl" : undefined}>
-                      {t.description ?? "—"}
-                    </span>
-                  </Detail>
-                ))}
+          <Card>
+            <CardHeader>
+              <CardTitle>Details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <dl className="space-y-3 text-sm">
                 <Detail label="Colors">
                   <span className="font-mono text-xs">
                     {membership.background_color} on {membership.text_color}
@@ -142,25 +138,17 @@ export default function MembershipShow({
                 <Detail label="Last updated">
                   {formatDate(membership.updated_at)}
                 </Detail>
-                <Detail label="Active">
-                  <ActivationSwitch
-                    active={membership.is_active}
-                    name={name}
-                    action={adminMemberships.activation(membership.id)}
-                    disabled={!canUpdate}
-                  />
-                </Detail>
               </dl>
             </CardContent>
           </Card>
 
-          <Card className="lg:col-span-3">
+          <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle>Top members</CardTitle>
             </CardHeader>
             <CardContent className="px-2">
               {customers.length === 0 ? (
-                <p className="text-muted-foreground py-6 text-center text-sm">
+                <p className="text-muted-foreground py-10 text-center text-sm">
                   No customers on this tier yet.
                 </p>
               ) : (
@@ -204,6 +192,14 @@ export default function MembershipShow({
             </CardContent>
           </Card>
         </div>
+
+        <TranslationsCard
+          translations={translations}
+          columns={[
+            { key: "name", label: "Name" },
+            { key: "description", label: "Description", long: true },
+          ]}
+        />
       </div>
     </AdminLayout>
   )

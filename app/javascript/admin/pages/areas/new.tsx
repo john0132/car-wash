@@ -1,10 +1,10 @@
 import { Head } from "@inertiajs/react"
 
 import { PageHeader } from "@/admin/components/page-header"
-import type { TranslationEntry } from "@/admin/components/translation-fields"
 import { AreaForm } from "@/admin/features/areas/components/area-form"
 import type { CityOption, ReferenceArea } from "@/admin/features/areas/types"
 import AdminLayout from "@/admin/layouts/admin-layout"
+import type { AdminLanguage, TranslationEntry } from "@/admin/types"
 import { adminAreas } from "@/routes"
 
 interface Props {
@@ -12,6 +12,7 @@ interface Props {
   translations: TranslationEntry[]
   cities: CityOption[]
   reference_areas: ReferenceArea[]
+  languages: AdminLanguage[]
 }
 
 export default function AreaNew({
@@ -19,6 +20,7 @@ export default function AreaNew({
   translations,
   cities,
   reference_areas,
+  languages,
 }: Props) {
   return (
     <AdminLayout
@@ -35,6 +37,7 @@ export default function AreaNew({
           area={null}
           cityId={city_id}
           translations={translations}
+          languages={languages}
           cities={cities}
           referenceAreas={reference_areas}
           action={adminAreas.create()}

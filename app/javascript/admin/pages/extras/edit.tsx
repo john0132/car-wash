@@ -1,18 +1,19 @@
 import { Head } from "@inertiajs/react"
 
 import { PageHeader } from "@/admin/components/page-header"
-import type { TranslationEntry } from "@/admin/components/translation-fields"
 import { ExtraForm } from "@/admin/features/extras/components/extra-form"
 import type { ExtraDetail } from "@/admin/features/extras/types"
 import AdminLayout from "@/admin/layouts/admin-layout"
+import type { AdminLanguage, TranslationEntry } from "@/admin/types"
 import { adminExtras } from "@/routes"
 
 interface Props {
   extra: ExtraDetail
   translations: TranslationEntry[]
+  languages: AdminLanguage[]
 }
 
-export default function ExtraEdit({ extra, translations }: Props) {
+export default function ExtraEdit({ extra, translations, languages }: Props) {
   return (
     <AdminLayout
       breadcrumbs={[
@@ -30,6 +31,7 @@ export default function ExtraEdit({ extra, translations }: Props) {
           price={extra.price}
           isActive={extra.is_active}
           translations={translations}
+          languages={languages}
           action={adminExtras.update(extra.id)}
           cancelHref={adminExtras.show(extra.id).url}
           submitLabel="Save changes"

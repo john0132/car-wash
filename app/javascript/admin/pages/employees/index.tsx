@@ -1,11 +1,12 @@
 import { Head, Link } from "@inertiajs/react"
 import { Plus } from "lucide-react"
 
+import { ActivationSwitch } from "@/admin/components/activation-switch"
+import { hasFilters } from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
 import { ResourceTable } from "@/admin/components/resource-table"
 import type { EmployeeRow } from "@/admin/features/employees/types"
-import { ActivationSwitch } from "@/admin/features/users/components/activation-switch"
 import { UserIdentity } from "@/admin/features/users/components/user-identity"
 import { UserListFilters } from "@/admin/features/users/components/user-list-filters"
 import type { UserListFilters as Filters } from "@/admin/features/users/types"
@@ -55,7 +56,9 @@ export default function EmployeesIndex({
 
         <ResourceTable
           items={employees}
-          emptyMessage="No employees match these filters."
+          emptyMessage="No employees yet."
+          emptyFilteredMessage="No employees match these filters."
+          filtered={hasFilters(filters)}
           columns={
             <>
               <TableHead>Employee</TableHead>

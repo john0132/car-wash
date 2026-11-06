@@ -1,18 +1,19 @@
 import { Head } from "@inertiajs/react"
 
 import { PageHeader } from "@/admin/components/page-header"
-import type { TranslationEntry } from "@/admin/components/translation-fields"
 import { CityForm } from "@/admin/features/cities/components/city-form"
 import type { CityDetail } from "@/admin/features/cities/types"
 import AdminLayout from "@/admin/layouts/admin-layout"
+import type { AdminLanguage, TranslationEntry } from "@/admin/types"
 import { adminCities } from "@/routes"
 
 interface Props {
   city: CityDetail
   translations: TranslationEntry[]
+  languages: AdminLanguage[]
 }
 
-export default function CityEdit({ city, translations }: Props) {
+export default function CityEdit({ city, translations, languages }: Props) {
   return (
     <AdminLayout
       breadcrumbs={[
@@ -29,6 +30,7 @@ export default function CityEdit({ city, translations }: Props) {
           key={city.id}
           isActive={city.is_active}
           translations={translations}
+          languages={languages}
           action={adminCities.update(city.id)}
           cancelHref={adminCities.show(city.id).url}
           submitLabel="Save changes"

@@ -1,16 +1,9 @@
 import { cn } from "cn"
-import {
-  ArrowDown,
-  ArrowUp,
-  ChevronDown,
-  ChevronRight,
-  LayoutTemplate,
-  Plus,
-  Trash2,
-} from "lucide-react"
+import { ChevronDown, ChevronRight, LayoutTemplate, Plus } from "lucide-react"
 import { useState } from "react"
 
 import { asFieldErrors } from "@/admin/components/form-fields"
+import { ReorderButtons } from "@/admin/components/reorder-buttons"
 import type { ComponentOption } from "@/admin/features/components/types"
 import { SectionFields } from "@/admin/features/pages/components/section-fields"
 import type { SectionState } from "@/admin/features/pages/types"
@@ -19,6 +12,7 @@ import {
   sectionErrors,
   sectionSummary,
 } from "@/admin/features/pages/utils"
+import { moveItem } from "@/admin/lib/lists"
 import type { AdminLanguage } from "@/admin/types"
 import { Badge } from "@/shared/components/ui/badge"
 import { Button } from "@/shared/components/ui/button"
@@ -60,13 +54,6 @@ export function SectionList({
 
   const update = (uid: string, patch: Partial<SectionState>) =>
     onChange(sections.map((s) => (s.uid === uid ? { ...s, ...patch } : s)))
-
-  const move = (index: number, offset: number) => {
-    const next = [...sections]
-    const [section] = next.splice(index, 1)
-    next.splice(index + offset, 0, section)
-    onChange(next)
-  }
 
   const toggle = (uid: string) =>
     setCollapsed((current) => {
@@ -181,40 +168,17 @@ export function SectionList({
                     update(section.uid, { is_active })
                   }
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="size-8"
-                  aria-label="Move section up"
-                  disabled={index === 0}
-                  onClick={() => move(index, -1)}
-                >
-                  <ArrowUp />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="size-8"
-                  aria-label="Move section down"
-                  disabled={index === sections.length - 1}
-                  onClick={() => move(index, 1)}
-                >
-                  <ArrowDown />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="size-8"
-                  aria-label="Remove section"
-                  onClick={() =>
+                <ReorderButtons
+                  index={index}
+                  count={sections.length}
+                  noun="section"
+                  onMove={(offset) =>
+                    onChange(moveItem(sections, index, offset))
+                  }
+                  onRemove={() =>
                     onChange(sections.filter((s) => s.uid !== section.uid))
                   }
-                >
-                  <Trash2 />
-                </Button>
+                />
               </div>
             </div>
 

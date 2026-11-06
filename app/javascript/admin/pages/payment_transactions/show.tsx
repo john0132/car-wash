@@ -1,5 +1,6 @@
 import { Head, Link } from "@inertiajs/react"
 
+import { Detail } from "@/admin/components/detail"
 import { PageHeader } from "@/admin/components/page-header"
 import { PaymentStatusBadge } from "@/admin/features/bookings/components/payment-status-badge"
 import type {
@@ -8,7 +9,6 @@ import type {
 } from "@/admin/features/bookings/types"
 import { TransactionStatusBadge } from "@/admin/features/payments/components/transaction-status-badge"
 import type { TransactionRow } from "@/admin/features/payments/types"
-import { Detail } from "@/admin/features/users/components/account-card"
 import AdminLayout from "@/admin/layouts/admin-layout"
 import { formatDateTime, formatMoney, humanize } from "@/admin/lib/format"
 import { adminCustomers, adminPaymentTransactions } from "@/routes"

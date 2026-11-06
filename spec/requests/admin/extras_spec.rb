@@ -14,7 +14,7 @@ RSpec.describe "Admin extras", type: :request do
   end
 
   def translations(en:, ar: "")
-    [ { language_id: english.id, name: en }, { language_id: arabic.id, name: ar } ]
+    { english.id.to_s => { name: en }, arabic.id.to_s => { name: ar } }
   end
 
   describe "GET /admin/extras" do

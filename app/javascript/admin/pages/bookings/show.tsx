@@ -1,11 +1,11 @@
 import { Head, Link } from "@inertiajs/react"
 import { Pencil } from "lucide-react"
 
+import { Detail } from "@/admin/components/detail"
 import { PageHeader } from "@/admin/components/page-header"
 import { BookingStatusBadge } from "@/admin/features/bookings/components/booking-status-badge"
 import { PaymentStatusBadge } from "@/admin/features/bookings/components/payment-status-badge"
 import type { BookingDetail } from "@/admin/features/bookings/types"
-import { Detail } from "@/admin/features/users/components/account-card"
 import { useCan } from "@/admin/hooks/use-can"
 import AdminLayout from "@/admin/layouts/admin-layout"
 import { formatDateTime, formatMoney } from "@/admin/lib/format"

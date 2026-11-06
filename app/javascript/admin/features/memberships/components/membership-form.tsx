@@ -1,39 +1,60 @@
-import { Link, useForm } from "@inertiajs/react"
-import type { ReactNode } from "react"
+import { useForm } from "@inertiajs/react"
 
-import { asFieldErrors } from "@/admin/components/form-fields"
+import {
+  FormSection,
+  SwitchField,
+  TextField,
+  TranslatedSection,
+  asFieldErrors,
+} from "@/admin/components/form-fields"
+import { FormLayout } from "@/admin/components/form-layout"
+import { LanguageSwitcher } from "@/admin/components/language-switcher"
+import { NoLanguages } from "@/admin/components/no-languages"
 import { MembershipBadge } from "@/admin/features/customers/components/membership-badge"
 import type {
   MembershipDetail,
-  MembershipFormData,
   MembershipTranslation,
 } from "@/admin/features/memberships/types"
-import type { RouteDefinition } from "@/routes/runtime"
-import { Button } from "@/shared/components/ui/button"
-import { Card, CardContent } from "@/shared/components/ui/card"
+import { useLanguageTabs } from "@/admin/hooks/use-language-tabs"
+import { SUBMIT_OPTIONS, formErrors } from "@/admin/lib/forms"
+import { emptyLanguageCodes, textDirection } from "@/admin/lib/languages"
 import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from "@/shared/components/ui/field"
+  blankValues,
+  patchTranslation,
+  translationValues,
+} from "@/admin/lib/translations"
+import type { AdminLanguage } from "@/admin/types"
+import type { RouteDefinition } from "@/routes/runtime"
+import { Field, FieldError, FieldLabel } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
-import { Spinner } from "@/shared/components/ui/spinner"
-import { Switch } from "@/shared/components/ui/switch"
+
+const FIELDS = ["name", "description"] as const
+type MembershipText = Record<(typeof FIELDS)[number], string>
+
+/** Posted by MembershipForm as `membership[...]`. */
+interface MembershipFormData {
+  is_active: boolean
+  egp_to_points: string
+  points_to_egp: string
+  background_color: string
+  text_color: string
+  translations: Record<number, MembershipText>
+}
 
 const toHex = (color: string) => (color.startsWith("#") ? color : `#${color}`)
 
-/** Create/edit form for a membership tier. Posts `{ membership: {...} }`. */
+/** Create/edit form for a membership tier, one language at a time. Posts `{ membership: {...} }`. */
 export function MembershipForm({
   membership,
   translations,
+  languages,
   action,
   cancelHref,
   submitLabel,
 }: {
   membership: MembershipDetail
   translations: MembershipTranslation[]
+  languages: AdminLanguage[]
   action: RouteDefinition<"post" | "patch">
   cancelHref: string
   submitLabel: string
@@ -44,75 +65,77 @@ export function MembershipForm({
     points_to_egp: String(membership.points_to_egp),
     background_color: toHex(membership.background_color),
     text_color: toHex(membership.text_color),
-    translations: Object.fromEntries(
-      translations.map((t) => [
-        t.language_id,
-        { name: t.name ?? "", description: t.description ?? "" },
-      ]),
-    ),
+    translations: translationValues(translations, FIELDS),
   })
-  const { data, setData, errors, processing } = form
-  const fieldErrors = errors as Record<string, string[] | undefined>
+  const { data, setData, processing } = form
+  const errors = formErrors(form)
+  const tabs = useLanguageTabs(languages, errors)
+  const { language } = tabs
 
   form.transform((values) => ({ membership: values }))
 
-  const setTranslation = (
-    languageId: number,
-    key: "name" | "description",
-    value: string,
-  ) =>
-    setData("translations", {
-      ...data.translations,
-      [languageId]: { ...data.translations[languageId], [key]: value },
-    })
+  if (!language) return <NoLanguages />
 
+  const current = data.translations[language.id] ?? blankValues(FIELDS)
+  const setTranslation = (patch: Partial<MembershipText>) =>
+    setData((previous) =>
+      patchTranslation(previous, language.id, patch, blankValues(FIELDS)),
+    )
+  // The badge preview shows this tab's name, else the default language's.
+  const defaultLanguage = languages.find((l) => l.default)
   const previewName =
-    Object.values(data.translations).find((t) => t.name.trim())?.name ??
-    "Tier name"
+    [
+      current.name,
+      defaultLanguage ? data.translations[defaultLanguage.id]?.name : "",
+    ]
+      .map((name) => name?.trim())
+      .find(Boolean) ?? "Tier name"
+  const text = { dir: textDirection(language.code), lang: language.code }
 
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault()
-        form.submit(action, { preserveScroll: true })
-      }}
-      className="max-w-2xl space-y-6"
+    <FormLayout
+      onSubmit={() => form.submit(action, SUBMIT_OPTIONS)}
+      tabs={
+        <LanguageSwitcher
+          languages={languages}
+          value={language.code}
+          onChange={tabs.setCode}
+          errorCodes={tabs.errorCodes}
+          emptyCodes={emptyLanguageCodes(data.translations, languages)}
+        />
+      }
+      cancelHref={cancelHref}
+      submitLabel={submitLabel}
+      processing={processing}
     >
-      <Section
+      <TranslatedSection
         title="Name & description"
-        description="Shown to customers in their language. Fill in at least one language."
+        language={language}
+        baseError={tabs.baseError}
       >
-        {translations.map((t) => (
-          <div
-            key={t.language_id}
-            className="space-y-3 rounded-md border p-3"
-            dir={t.code === "ar" ? "rtl" : undefined}
-          >
-            <p className="text-muted-foreground text-xs font-medium uppercase">
-              {t.language}
-            </p>
-            <TextField
-              id={`name_${t.language_id}`}
-              label="Name"
-              value={data.translations[t.language_id]?.name ?? ""}
-              onChange={(value) => setTranslation(t.language_id, "name", value)}
-            />
-            <TextField
-              id={`description_${t.language_id}`}
-              label="Description"
-              value={data.translations[t.language_id]?.description ?? ""}
-              onChange={(value) =>
-                setTranslation(t.language_id, "description", value)
-              }
-            />
-          </div>
-        ))}
-        <FieldError errors={asFieldErrors(fieldErrors.translations)} />
-      </Section>
+        <TextField
+          id={`name_${language.code}`}
+          label="Name"
+          value={current.name}
+          onChange={(name) => setTranslation({ name })}
+          errors={tabs.errorFor("name")}
+          required={language.default}
+          {...text}
+        />
+        <TextField
+          id={`description_${language.code}`}
+          label="Description"
+          value={current.description}
+          onChange={(description) => setTranslation({ description })}
+          errors={tabs.errorFor("description")}
+          {...text}
+        />
+      </TranslatedSection>
 
-      <Section
+      <FormSection
         title="Points"
         description="How customers in this tier earn and spend points."
+        shared
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField
@@ -138,9 +161,9 @@ export function MembershipForm({
             required
           />
         </div>
-      </Section>
+      </FormSection>
 
-      <Section title="Appearance">
+      <FormSection title="Appearance" shared>
         <div className="grid gap-4 sm:grid-cols-2">
           <ColorField
             id="background_color"
@@ -168,96 +191,22 @@ export function MembershipForm({
             }}
           />
         </div>
-      </Section>
+      </FormSection>
 
-      <Section title="Status">
-        <Field orientation="horizontal">
-          <Switch
-            id="is_active"
-            checked={data.is_active}
-            onCheckedChange={(checked) => setData("is_active", checked)}
-          />
-          <FieldContent>
-            <FieldLabel htmlFor="is_active">Active</FieldLabel>
-            <FieldDescription>
-              Inactive tiers can&apos;t be assigned to new customers.
-            </FieldDescription>
-          </FieldContent>
-        </Field>
-      </Section>
-
-      <div className="flex items-center gap-2">
-        <Button type="submit" disabled={processing}>
-          {processing && <Spinner />}
-          {submitLabel}
-        </Button>
-        <Button variant="ghost" asChild>
-          <Link href={cancelHref}>Cancel</Link>
-        </Button>
-      </div>
-    </form>
+      <FormSection title="Status" shared>
+        <SwitchField
+          id="is_active"
+          label="Active"
+          description="Inactive tiers can't be assigned to new customers."
+          checked={data.is_active}
+          onChange={(checked) => setData("is_active", checked)}
+        />
+      </FormSection>
+    </FormLayout>
   )
 }
 
-function Section({
-  title,
-  description,
-  children,
-}: {
-  title: string
-  description?: string
-  children: ReactNode
-}) {
-  return (
-    <Card>
-      <CardContent className="space-y-4">
-        <div className="space-y-1">
-          <h2 className="font-medium">{title}</h2>
-          {description && (
-            <p className="text-muted-foreground text-sm">{description}</p>
-          )}
-        </div>
-        {children}
-      </CardContent>
-    </Card>
-  )
-}
-
-function TextField({
-  id,
-  label,
-  value,
-  onChange,
-  errors,
-  type = "text",
-  ...props
-}: {
-  id: string
-  label: string
-  value: string
-  onChange: (value: string) => void
-  errors?: string[]
-  type?: string
-  step?: string
-  min?: string
-  required?: boolean
-}) {
-  return (
-    <Field data-invalid={errors ? true : undefined}>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
-      <Input
-        id={id}
-        type={type}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        aria-invalid={errors ? true : undefined}
-        {...props}
-      />
-      <FieldError errors={asFieldErrors(errors)} />
-    </Field>
-  )
-}
-
+/** Hex color input with a native picker next to it. */
 function ColorField({
   id,
   label,
@@ -273,7 +222,12 @@ function ColorField({
 }) {
   return (
     <Field data-invalid={errors ? true : undefined}>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      <FieldLabel htmlFor={id}>
+        {label}
+        <span aria-hidden className="text-destructive">
+          *
+        </span>
+      </FieldLabel>
       <div className="flex items-center gap-2">
         <input
           type="color"

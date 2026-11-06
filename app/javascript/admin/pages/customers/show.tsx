@@ -1,6 +1,8 @@
 import { Head } from "@inertiajs/react"
 import { CalendarCheck, Coins, Gem, Receipt, Wallet } from "lucide-react"
 
+import { ActivationSwitch } from "@/admin/components/activation-switch"
+import { Detail } from "@/admin/components/detail"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
 import { StatCard } from "@/admin/components/stat-card"
@@ -17,11 +19,7 @@ import type {
   CustomerStats,
   CustomerTransaction,
 } from "@/admin/features/customers/types"
-import {
-  AccountCard,
-  Detail,
-} from "@/admin/features/users/components/account-card"
-import { ActivationSwitch } from "@/admin/features/users/components/activation-switch"
+import { AccountCard } from "@/admin/features/users/components/account-card"
 import { useCan } from "@/admin/hooks/use-can"
 import AdminLayout from "@/admin/layouts/admin-layout"
 import {

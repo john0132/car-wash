@@ -37,31 +37,6 @@ export const linkPayload = ({ children, ...link }: LinkState): LinkProps => ({
   ...(children && { children: children.map(linkPayload) }),
 })
 
-/** `list` with the entry at `index` moved by `offset` places. */
-export function moveItem<T>(list: T[], index: number, offset: number) {
-  const next = [...list]
-  const [entry] = next.splice(index, 1)
-  next.splice(index + offset, 0, entry)
-  return next
-}
-
 /** "sign_up" → "Sign up" */
 export const routeLabel = (key: string) =>
   key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, " ")
-
-/**
- * Codes of languages with errors, for LanguageSwitcher. Translation errors are
- * keyed `<path>.translations.<language_id>.<attribute>`.
- */
-export function navigationErrorLanguageCodes(
-  errors: Record<string, unknown>,
-  languages: { id: number; code: string }[],
-) {
-  const codes = new Set<string>()
-  for (const key of Object.keys(errors)) {
-    const match = /(?:^|\.)translations\.(\d+)\./.exec(key)
-    const language = match && languages.find((l) => l.id === Number(match[1]))
-    if (language) codes.add(language.code)
-  }
-  return [...codes]
-}

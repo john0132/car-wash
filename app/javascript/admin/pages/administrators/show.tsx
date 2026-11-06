@@ -1,10 +1,10 @@
 import { Head, Link, usePage } from "@inertiajs/react"
 import { Pencil, ShieldCheck } from "lucide-react"
 
+import { ActivationSwitch } from "@/admin/components/activation-switch"
 import { PageHeader } from "@/admin/components/page-header"
 import type { AssignedRole } from "@/admin/features/administrators/types"
 import { AccountCard } from "@/admin/features/users/components/account-card"
-import { ActivationSwitch } from "@/admin/features/users/components/activation-switch"
 import { DeleteUserDialog } from "@/admin/features/users/components/delete-user-dialog"
 import type { ManagedUser } from "@/admin/features/users/types"
 import { useCan } from "@/admin/hooks/use-can"

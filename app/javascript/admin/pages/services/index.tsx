@@ -2,7 +2,7 @@ import { Head, Link } from "@inertiajs/react"
 import { Plus } from "lucide-react"
 
 import { ActivationSwitch } from "@/admin/components/activation-switch"
-import { ListFilters } from "@/admin/components/list-filters"
+import { ListFilters, hasFilters } from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
 import { ResourceTable } from "@/admin/components/resource-table"
@@ -85,7 +85,9 @@ export default function ServicesIndex({
 
         <ResourceTable
           items={services}
-          emptyMessage="No services match these filters."
+          emptyMessage="No services yet."
+          emptyFilteredMessage="No services match these filters."
+          filtered={hasFilters(filters)}
           columns={
             <>
               <TableHead>Service</TableHead>

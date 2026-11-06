@@ -1,11 +1,11 @@
 import { Head, Link } from "@inertiajs/react"
-import { Pencil, Plus } from "lucide-react"
+import { Plus } from "lucide-react"
 
+import { ActivationSwitch } from "@/admin/components/activation-switch"
 import { PageHeader } from "@/admin/components/page-header"
 import { ResourceTable } from "@/admin/components/resource-table"
 import { StatCard } from "@/admin/components/stat-card"
 import type { PaymentMethodRow } from "@/admin/features/payments/types"
-import { ActivationSwitch } from "@/admin/features/users/components/activation-switch"
 import { useCan } from "@/admin/hooks/use-can"
 import AdminLayout from "@/admin/layouts/admin-layout"
 import { formatMoney, formatNumber } from "@/admin/lib/format"
@@ -60,13 +60,23 @@ export default function PaymentMethodsIndex({ payment_methods, stats }: Props) {
               <TableHead className="text-right">Transactions</TableHead>
               <TableHead className="text-right">Collected</TableHead>
               <TableHead className="text-right">Active</TableHead>
-              {canUpdate && <TableHead className="w-12" />}
             </>
           }
           renderRow={(method) => (
             <TableRow key={method.id}>
-              <TableCell className="font-medium">
-                {method.name ?? "—"}
+              <TableCell>
+                {canUpdate ? (
+                  <Link
+                    href={adminPaymentMethods.edit(method.id)}
+                    className="font-medium hover:underline"
+                  >
+                    {method.name ?? method.code}
+                  </Link>
+                ) : (
+                  <span className="font-medium">
+                    {method.name ?? method.code}
+                  </span>
+                )}
               </TableCell>
               <TableCell className="font-mono text-xs">{method.code}</TableCell>
               <TableCell className="text-right tabular-nums">
@@ -83,20 +93,6 @@ export default function PaymentMethodsIndex({ payment_methods, stats }: Props) {
                   disabled={!canUpdate}
                 />
               </TableCell>
-              {canUpdate && (
-                <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    asChild
-                    aria-label={`Edit ${method.name ?? method.code}`}
-                  >
-                    <Link href={adminPaymentMethods.edit(method.id)}>
-                      <Pencil />
-                    </Link>
-                  </Button>
-                </TableCell>
-              )}
             </TableRow>
           )}
         />

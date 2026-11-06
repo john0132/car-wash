@@ -8,18 +8,21 @@ import type {
   ServiceTranslationEntry,
 } from "@/admin/features/services/types"
 import AdminLayout from "@/admin/layouts/admin-layout"
+import type { AdminLanguage } from "@/admin/types"
 import { adminServices } from "@/routes"
 
 interface Props {
   service: ServiceDetail
   translations: ServiceTranslationEntry[]
   categories: ServiceCategoryOption[]
+  languages: AdminLanguage[]
 }
 
 export default function ServiceEdit({
   service,
   translations,
   categories,
+  languages,
 }: Props) {
   return (
     <AdminLayout
@@ -38,6 +41,7 @@ export default function ServiceEdit({
           service={service}
           serviceCategoryId={service.service_category.id}
           translations={translations}
+          languages={languages}
           categories={categories}
           action={adminServices.update(service.id)}
           cancelHref={adminServices.show(service.id).url}

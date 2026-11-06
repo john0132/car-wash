@@ -5,7 +5,9 @@
 class Admin::ExtrasController < Admin::BaseController
   include Admin::Activation
   include Admin::Pagination
-  include Admin::Translations
+  include Admin::ContentTranslations
+
+  TRANSLATION_FIELDS = %i[name].freeze
 
   after_action :verify_authorized
 
@@ -48,7 +50,7 @@ class Admin::ExtrasController < Admin::BaseController
     if extra.save
       redirect_to admin_extra_path(extra), notice: "#{translated_name(extra)} was created"
     else
-      redirect_to new_admin_extra_path, inertia: { errors: extra.errors }
+      redirect_to new_admin_extra_path, inertia: { errors: content_errors(extra) }
     end
   end
 
@@ -65,7 +67,7 @@ class Admin::ExtrasController < Admin::BaseController
     if @extra.save
       redirect_to admin_extra_path(@extra), notice: "#{translated_name(@extra.reload)} was updated"
     else
-      redirect_to edit_admin_extra_path(@extra), inertia: { errors: @extra.errors }
+      redirect_to edit_admin_extra_path(@extra), inertia: { errors: content_errors(@extra) }
     end
   end
 
@@ -92,12 +94,12 @@ class Admin::ExtrasController < Admin::BaseController
   end
 
   def extra_params
-    @extra_params ||= params.expect(extra: [ :price, :is_active, translations: [ [ :language_id, :name ] ] ])
+    @extra_params ||= params.fetch(:extra, {}).permit(:price, :is_active)
   end
 
   def assign_extra(extra)
     extra.assign_attributes(extra_params.slice(:price, :is_active))
-    assign_translations(extra, extra_params[:translations])
+    assign_content_translations(extra, submitted_translations(:extra), fields: TRANSLATION_FIELDS)
   end
 
   def extra_props(extra)
@@ -106,12 +108,16 @@ class Admin::ExtrasController < Admin::BaseController
       name: translated_name(extra),
       price: extra.price.to_f,
       is_active: extra.is_active,
-      translations: translations_props(extra),
+      translations: content_translations_props(extra, fields: TRANSLATION_FIELDS),
       created_at: extra.created_at
     }
   end
 
   def form_props(extra)
-    { extra: extra.persisted? ? extra_props(extra) : nil, translations: translations_props(extra) }
+    {
+      extra: extra.persisted? ? extra_props(extra) : nil,
+      translations: content_translations_props(extra, fields: TRANSLATION_FIELDS),
+      languages: languages_props
+    }
   end
 end

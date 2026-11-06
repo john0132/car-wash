@@ -1,7 +1,6 @@
-import { Head, Link, router } from "@inertiajs/react"
-import { Search } from "lucide-react"
-import { useState } from "react"
+import { Head, Link } from "@inertiajs/react"
 
+import { ListFilters, hasFilters } from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
 import { ResourceTable } from "@/admin/components/resource-table"
@@ -10,7 +9,6 @@ import AdminLayout from "@/admin/layouts/admin-layout"
 import { formatDate } from "@/admin/lib/format"
 import type { Pagination as PaginationData } from "@/admin/types"
 import { adminCars, adminCustomers } from "@/routes"
-import { Input } from "@/shared/components/ui/input"
 import { TableCell, TableHead, TableRow } from "@/shared/components/ui/table"
 
 interface Props {
@@ -20,8 +18,6 @@ interface Props {
 }
 
 export default function CarsIndex({ cars, filters, pagination }: Props) {
-  const [query, setQuery] = useState(filters.q ?? "")
-
   return (
     <AdminLayout breadcrumbs={[{ title: "Cars", href: adminCars.index().url }]}>
       <Head title="Cars" />
@@ -32,31 +28,18 @@ export default function CarsIndex({ cars, filters, pagination }: Props) {
           description="Cars saved by customers. Customers manage them on the website."
         />
 
-        <form
-          className="relative w-full max-w-sm"
-          onSubmit={(event) => {
-            event.preventDefault()
-            router.get(
-              adminCars.index().url,
-              { q: query.trim() || undefined },
-              { preserveState: true, preserveScroll: true, replace: true },
-            )
-          }}
-        >
-          <Search className="text-muted-foreground absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-          <Input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search make, model, plate or customer…"
-            aria-label="Search cars"
-            className="pl-8"
-          />
-        </form>
+        <ListFilters
+          url={adminCars.index().url}
+          filters={filters}
+          searchPlaceholder="Search make, model, plate or customer…"
+          showStatus={false}
+        />
 
         <ResourceTable
           items={cars}
-          emptyMessage="No cars match this search."
+          emptyMessage="No cars yet."
+          emptyFilteredMessage="No cars match this search."
+          filtered={hasFilters(filters)}
           columns={
             <>
               <TableHead>Car</TableHead>

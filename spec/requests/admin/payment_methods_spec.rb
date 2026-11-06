@@ -7,9 +7,7 @@ RSpec.describe "Admin payment methods", type: :request do
 
   let(:admin) { users(:admin) }
   let!(:english) { Language.find_or_create_by!(code: "en") { |l| l.name = "English" } }
-  let!(:cash) do
-    PaymentMethod.create!(code: "cash").tap { |m| m.payment_method_translations.create!(language: english, name: "Cash") }
-  end
+  let!(:cash) { create_payment_method("cash", name: "Cash") }
 
   describe "GET /admin/payment_methods" do
     it "lists methods with transaction counts and revenue" do
@@ -48,13 +46,18 @@ RSpec.describe "Admin payment methods", type: :request do
       expect(response).to redirect_to(admin_payment_methods_path)
     end
 
-    it "requires a name in at least one language" do
+    it "requires an English name" do
       grant(admin, "payment_methods.create")
       sign_in admin
 
       expect {
-        post admin_payment_methods_path, params: { payment_method: { code: "wallet", translations: { english.id => { name: "" } } } }
+        post admin_payment_methods_path, params: {
+          payment_method: { code: "wallet", translations: { english.id => { name: "" }, arabic.id => { name: "المحفظة" } } }
+        }
       }.not_to change(PaymentMethod, :count)
+
+      expect(response).to redirect_to(new_admin_payment_method_path)
+      expect(session[:inertia_errors]).to include(translations: [ "must include a name in English" ])
     end
 
     it "is forbidden with read-only access" do

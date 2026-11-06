@@ -12,7 +12,7 @@ RSpec.describe "Website checkout", type: :request do
   let(:car) { user.cars.create!(make: "Toyota", model: "Corolla", license_plate: "ABC 123", color: "White") }
   let(:query) { { service: service.slug, extras: [ extra.id ] } }
 
-  before { PaymentMethod.create!(code: "cash") }
+  before { create_payment_method("cash") }
 
   it "sends a guest to sign in, then back to the same checkout" do
     get checkout_path(query)

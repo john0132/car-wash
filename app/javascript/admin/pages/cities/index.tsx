@@ -2,7 +2,7 @@ import { Head, Link } from "@inertiajs/react"
 import { Plus } from "lucide-react"
 
 import { ActivationSwitch } from "@/admin/components/activation-switch"
-import { ListFilters } from "@/admin/components/list-filters"
+import { ListFilters, hasFilters } from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
 import { ResourceTable } from "@/admin/components/resource-table"
@@ -53,7 +53,9 @@ export default function CitiesIndex({ cities, filters, pagination }: Props) {
 
         <ResourceTable
           items={cities}
-          emptyMessage="No cities match these filters."
+          emptyMessage="No cities yet."
+          emptyFilteredMessage="No cities match these filters."
+          filtered={hasFilters(filters)}
           columns={
             <>
               <TableHead>City</TableHead>

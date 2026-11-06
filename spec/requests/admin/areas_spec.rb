@@ -19,7 +19,7 @@ RSpec.describe "Admin areas", type: :request do
     {
       area: {
         city_id: city.id, rate: "1.25", is_active: true, geofence: geofence,
-        translations: [ { language_id: english.id, name: name }, { language_id: arabic.id, name: "" } ],
+        translations: { english.id.to_s => { name: name }, arabic.id.to_s => { name: "" } },
         **attrs
       }
     }

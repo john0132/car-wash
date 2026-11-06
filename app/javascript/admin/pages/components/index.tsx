@@ -1,8 +1,8 @@
 import { Head, Link } from "@inertiajs/react"
-import { Pencil, Plus } from "lucide-react"
+import { Plus } from "lucide-react"
 
 import { ActivationSwitch } from "@/admin/components/activation-switch"
-import { ListFilters } from "@/admin/components/list-filters"
+import { ListFilters, hasFilters } from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
 import { ResourceTable } from "@/admin/components/resource-table"
@@ -61,7 +61,9 @@ export default function ComponentsIndex({
 
         <ResourceTable
           items={components}
-          emptyMessage="No components match these filters."
+          emptyMessage="No components yet."
+          emptyFilteredMessage="No components match these filters."
+          filtered={hasFilters(filters)}
           columns={
             <>
               <TableHead>Component</TableHead>
@@ -69,7 +71,6 @@ export default function ComponentsIndex({
               <TableHead className="text-right">Fields</TableHead>
               <TableHead className="text-right">Used on pages</TableHead>
               <TableHead className="text-right">Active</TableHead>
-              <TableHead className="w-12" />
             </>
           }
           renderRow={(component) => (
@@ -109,18 +110,6 @@ export default function ComponentsIndex({
                   action={adminComponents.activation(component.id)}
                   disabled={!canUpdate}
                 />
-              </TableCell>
-              <TableCell>
-                {canUpdate && (
-                  <Button variant="ghost" size="icon" asChild>
-                    <Link
-                      href={adminComponents.edit(component.id)}
-                      aria-label={`Edit ${component.name}`}
-                    >
-                      <Pencil />
-                    </Link>
-                  </Button>
-                )}
               </TableCell>
             </TableRow>
           )}

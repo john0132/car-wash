@@ -7,8 +7,8 @@ RSpec.describe "Admin payment transactions", type: :request do
 
   let(:admin) { users(:admin) }
   let(:customer) { users(:one) }
-  let(:cash) { PaymentMethod.create!(code: "cash") }
-  let(:card) { PaymentMethod.create!(code: "card") }
+  let(:cash) { create_payment_method("cash") }
+  let(:card) { create_payment_method("card") }
 
   before do
     cash.payment_transactions.create!(user: customer, amount: 100, status: :completed, reference: "TX-000001")
@@ -62,7 +62,7 @@ RSpec.describe "Admin payment transactions", type: :request do
       get admin_payment_transaction_path(transaction)
 
       expect_inertia.to render_component("admin/payment_transactions/show")
-      expect(inertia.props[:transaction]).to include(id: transaction.id, amount: 100.0, payment_method: "cash")
+      expect(inertia.props[:transaction]).to include(id: transaction.id, amount: 100.0, payment_method: "Cash")
     end
   end
 

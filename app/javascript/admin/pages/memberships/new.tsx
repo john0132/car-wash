@@ -7,14 +7,20 @@ import type {
   MembershipTranslation,
 } from "@/admin/features/memberships/types"
 import AdminLayout from "@/admin/layouts/admin-layout"
+import type { AdminLanguage } from "@/admin/types"
 import { adminMemberships } from "@/routes"
 
 interface Props {
   membership: MembershipDetail
   translations: MembershipTranslation[]
+  languages: AdminLanguage[]
 }
 
-export default function MembershipNew({ membership, translations }: Props) {
+export default function MembershipNew({
+  membership,
+  translations,
+  languages,
+}: Props) {
   return (
     <AdminLayout
       breadcrumbs={[
@@ -29,6 +35,7 @@ export default function MembershipNew({ membership, translations }: Props) {
         <MembershipForm
           membership={membership}
           translations={translations}
+          languages={languages}
           action={adminMemberships.create()}
           cancelHref={adminMemberships.index().url}
           submitLabel="Create membership"

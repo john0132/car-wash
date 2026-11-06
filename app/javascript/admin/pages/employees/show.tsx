@@ -8,6 +8,8 @@ import {
   Wallet,
 } from "lucide-react"
 
+import { ActivationSwitch } from "@/admin/components/activation-switch"
+import { Detail } from "@/admin/components/detail"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
 import { StatCard } from "@/admin/components/stat-card"
@@ -15,11 +17,7 @@ import { BookingStatusFilter } from "@/admin/features/bookings/components/bookin
 import { BookingsTable } from "@/admin/features/bookings/components/bookings-table"
 import type { BookingRow, BookingStatus } from "@/admin/features/bookings/types"
 import type { EmployeeStats } from "@/admin/features/employees/types"
-import {
-  AccountCard,
-  Detail,
-} from "@/admin/features/users/components/account-card"
-import { ActivationSwitch } from "@/admin/features/users/components/activation-switch"
+import { AccountCard } from "@/admin/features/users/components/account-card"
 import { DeleteUserDialog } from "@/admin/features/users/components/delete-user-dialog"
 import type { ManagedUser } from "@/admin/features/users/types"
 import { useCan } from "@/admin/hooks/use-can"

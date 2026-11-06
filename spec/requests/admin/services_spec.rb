@@ -15,7 +15,7 @@ RSpec.describe "Admin services", type: :request do
   end
 
   def translations(en:, ar: "", **seo)
-    [ { language_id: english.id, name: en, **seo }, { language_id: arabic.id, name: ar } ]
+    { english.id.to_s => { name: en, **seo }, arabic.id.to_s => { name: ar } }
   end
 
   def book(service)
@@ -240,6 +240,20 @@ RSpec.describe "Admin services", type: :request do
       expect(response).to redirect_to(admin_service_path(service))
       expect(service.reload).to have_attributes(service_category: interior, price: 250, sale_price: nil)
       expect(service.translation(:en).name).to eq("Deluxe")
+    end
+
+    it "rejects a language with text but no name instead of dropping its text" do
+      grant(admin, "services.update")
+      service = create_service("Wash", service_category: category)
+      service.service_translations.create!(language: arabic, name: "غسيل", seo_title: "غسيل السيارات")
+
+      patch admin_service_path(service), params: {
+        service: { translations: { english.id.to_s => { name: "Wash" }, arabic.id.to_s => { name: "", seo_title: "غسيل السيارات" } } }
+      }
+
+      expect(response).to redirect_to(edit_admin_service_path(service))
+      expect(session[:inertia_errors]).to include(:"translations.#{arabic.id}.name")
+      expect(service.translation(:ar).reload.seo_title).to eq("غسيل السيارات")
     end
 
     it "is forbidden without services.update" do

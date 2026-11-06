@@ -1,6 +1,7 @@
-import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react"
+import { Plus } from "lucide-react"
 
 import { asFieldErrors } from "@/admin/components/form-fields"
+import { ReorderButtons } from "@/admin/components/reorder-buttons"
 import type { ComponentField } from "@/admin/features/components/types"
 import {
   FieldInput,
@@ -8,6 +9,7 @@ import {
 } from "@/admin/features/pages/components/field-input"
 import type { FieldValues, RepeaterItem } from "@/admin/features/pages/types"
 import { newItemId } from "@/admin/features/pages/utils"
+import { moveItem } from "@/admin/lib/lists"
 import { Button } from "@/shared/components/ui/button"
 import { FieldError, FieldLabel } from "@/shared/components/ui/field"
 
@@ -38,12 +40,8 @@ export function RepeaterInput({
   errors?: string[]
   context: FieldInputContext
 }) {
-  const move = (index: number, offset: number) => {
-    const next = [...items]
-    const [item] = next.splice(index, 1)
-    next.splice(index + offset, 0, item)
-    onChange(next, texts)
-  }
+  const move = (index: number, offset: number) =>
+    onChange(moveItem(items, index, offset), texts)
 
   return (
     <fieldset className="space-y-3">
@@ -69,47 +67,20 @@ export function RepeaterInput({
               <span className="text-muted-foreground text-xs font-medium uppercase">
                 Item {index + 1}
               </span>
-              <div className="flex items-center">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="size-7"
-                  aria-label={`Move item ${index + 1} up`}
-                  disabled={index === 0}
-                  onClick={() => move(index, -1)}
-                >
-                  <ArrowUp />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="size-7"
-                  aria-label={`Move item ${index + 1} down`}
-                  disabled={index === items.length - 1}
-                  onClick={() => move(index, 1)}
-                >
-                  <ArrowDown />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="size-7"
-                  aria-label={`Remove item ${index + 1}`}
-                  onClick={() => {
-                    onChange(
-                      items.filter((other) => other._id !== item._id),
-                      Object.fromEntries(
-                        Object.entries(texts).filter(([id]) => id !== item._id),
-                      ),
-                    )
-                  }}
-                >
-                  <Trash2 />
-                </Button>
-              </div>
+              <ReorderButtons
+                index={index}
+                count={items.length}
+                noun={`item ${index + 1}`}
+                onMove={(offset) => move(index, offset)}
+                onRemove={() => {
+                  onChange(
+                    items.filter((other) => other._id !== item._id),
+                    Object.fromEntries(
+                      Object.entries(texts).filter(([id]) => id !== item._id),
+                    ),
+                  )
+                }}
+              />
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">

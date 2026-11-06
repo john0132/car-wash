@@ -13,6 +13,7 @@ import type {
 import { catalogKeys } from "@/admin/features/roles/utils"
 import { useCan, useIsSuperAdmin } from "@/admin/hooks/use-can"
 import AdminLayout from "@/admin/layouts/admin-layout"
+import { pluralize } from "@/admin/lib/format"
 import { adminAdministrators, adminRoles } from "@/routes"
 import { Badge } from "@/shared/components/ui/badge"
 import { Button } from "@/shared/components/ui/button"
@@ -79,7 +80,7 @@ export default function RoleShow({
                   title={`Delete ${role.name}?`}
                   description={
                     administrators_count > 0
-                      ? `${administrators_count} administrator(s) hold this role and will lose the permissions it grants.`
+                      ? `${pluralize(administrators_count, "administrator")} ${administrators_count === 1 ? "holds" : "hold"} this role and will lose the permissions it grants.`
                       : "No administrator holds this role. This permanently deletes it."
                   }
                   action={adminRoles.destroy(role.id)}
@@ -121,7 +122,7 @@ export default function RoleShow({
               <CardDescription>
                 {administrators_count === 0
                   ? "No administrator holds this role."
-                  : `${administrators_count} administrator(s) hold this role.`}
+                  : `${pluralize(administrators_count, "administrator")} ${administrators_count === 1 ? "holds" : "hold"} this role.`}
               </CardDescription>
             </CardHeader>
             {administrators && administrators.length > 0 && (

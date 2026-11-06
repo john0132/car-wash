@@ -6,11 +6,12 @@ import { ActivationSwitch } from "@/admin/components/activation-switch"
 import { ActiveBadge } from "@/admin/components/active-badge"
 import { ConfirmDeleteDialog } from "@/admin/components/confirm-delete-dialog"
 import { PageHeader } from "@/admin/components/page-header"
+import { TranslationsCard } from "@/admin/components/translations-card"
 import { AreasMap } from "@/admin/features/areas/components/areas-map"
 import type { AreaDetail, ReferenceArea } from "@/admin/features/areas/types"
 import { useCan } from "@/admin/hooks/use-can"
 import AdminLayout from "@/admin/layouts/admin-layout"
-import { formatDate, formatNumber } from "@/admin/lib/format"
+import { formatDate, formatNumber, pluralize } from "@/admin/lib/format"
 import { adminAreas, adminCities } from "@/routes"
 import { Button } from "@/shared/components/ui/button"
 import {
@@ -42,7 +43,10 @@ export default function AreaShow({ area, reference_areas }: Props) {
         <PageHeader
           title={
             <span className="flex items-center gap-3">
-              {area.name} <ActiveBadge active={area.is_active} />
+              {area.name}
+              {!can("areas", "update") && (
+                <ActiveBadge active={area.is_active} />
+              )}
             </span>
           }
           description={
@@ -65,6 +69,7 @@ export default function AreaShow({ area, reference_areas }: Props) {
                     active={area.is_active}
                     name={area.name}
                     action={adminAreas.activation(area.id)}
+                    label="Active"
                   />
                   <Button variant="outline" asChild>
                     <Link href={adminAreas.edit(area.id)}>
@@ -78,7 +83,7 @@ export default function AreaShow({ area, reference_areas }: Props) {
                   title={`Delete ${area.name}?`}
                   description={
                     area.addresses_count > 0
-                      ? `${formatNumber(area.addresses_count)} customer address(es) are in this area, so it can't be deleted. Disable it instead.`
+                      ? `${pluralize(area.addresses_count, "customer address", "customer addresses")} ${area.addresses_count === 1 ? "is" : "are"} in this area, so it can't be deleted. Disable it instead.`
                       : "This permanently deletes the area, its boundary and its translations."
                   }
                   action={adminAreas.destroy(area.id)}
@@ -95,15 +100,6 @@ export default function AreaShow({ area, reference_areas }: Props) {
             </CardHeader>
             <CardContent>
               <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-sm">
-                {area.translations.map((t) => (
-                  <Row key={t.language_id} label={`Name (${t.language})`}>
-                    <span lang={t.code}>
-                      {t.name || (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                    </span>
-                  </Row>
-                ))}
                 <Row label="Rate">
                   <span className="tabular-nums">{area.rate.toFixed(2)}</span>
                 </Row>
@@ -129,6 +125,11 @@ export default function AreaShow({ area, reference_areas }: Props) {
             </CardContent>
           </Card>
         </div>
+
+        <TranslationsCard
+          translations={area.translations}
+          columns={[{ key: "name", label: "Name" }]}
+        />
       </div>
     </AdminLayout>
   )

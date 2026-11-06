@@ -3,8 +3,9 @@
 require "rails_helper"
 
 RSpec.describe MembershipTranslation, type: :model do
-  let(:membership) { Membership.create!(egp_to_points: 1, points_to_egp: 1, background_color: "#FFFFFF", text_color: "#000000") }
-  let(:language) { Language.create!(code: "en", name: "English") }
+  # Has its English name already, so these build the Arabic one.
+  let(:membership) { create_membership }
+  let(:language) { arabic }
 
   it "is valid with a membership, language, and name" do
     expect(MembershipTranslation.new(membership: membership, language: language, name: "Gold")).to be_valid

@@ -1,19 +1,17 @@
 import { cn } from "cn"
-import { ArrowDown, ArrowUp, Link2, ListTree, Plus, Trash2 } from "lucide-react"
+import { Link2, ListTree, Plus } from "lucide-react"
 
 import { TextField, asFieldErrors } from "@/admin/components/form-fields"
+import { ReorderButtons } from "@/admin/components/reorder-buttons"
 import {
   LINK_TYPES,
   type LinkOptions,
   type LinkState,
   type LinkType,
 } from "@/admin/features/navigation/types"
-import {
-  moveItem,
-  newLink,
-  routeLabel,
-} from "@/admin/features/navigation/utils"
+import { newLink, routeLabel } from "@/admin/features/navigation/utils"
 import { textDirection } from "@/admin/lib/languages"
+import { moveItem } from "@/admin/lib/lists"
 import type { AdminLanguage } from "@/admin/types"
 import { Badge } from "@/shared/components/ui/badge"
 import { Button } from "@/shared/components/ui/button"
@@ -346,40 +344,17 @@ export function LinkList({
                   <span className="text-muted-foreground mr-1 text-xs tabular-nums">
                     {index + 1}
                   </span>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="size-8"
-                    aria-label="Move link up"
-                    disabled={index === 0}
-                    onClick={() => onChange(moveItem(links, index, -1))}
-                  >
-                    <ArrowUp />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="size-8"
-                    aria-label="Move link down"
-                    disabled={index === links.length - 1}
-                    onClick={() => onChange(moveItem(links, index, 1))}
-                  >
-                    <ArrowDown />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="size-8"
-                    aria-label="Remove link"
-                    onClick={() =>
+                  <ReorderButtons
+                    index={index}
+                    count={links.length}
+                    noun="link"
+                    onMove={(offset) =>
+                      onChange(moveItem(links, index, offset))
+                    }
+                    onRemove={() =>
                       onChange(links.filter((l) => l.uid !== link.uid))
                     }
-                  >
-                    <Trash2 />
-                  </Button>
+                  />
                 </div>
               </div>
 

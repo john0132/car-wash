@@ -1,4 +1,5 @@
 import type { ListFilterValues } from "@/admin/components/list-filters"
+import type { TranslationEntry } from "@/admin/types"
 
 /** ComponentSchema::TYPES */
 export type FieldType =
@@ -45,14 +46,8 @@ export interface ComponentDetail extends Omit<ComponentOption, "id"> {
   locked_fields: string[]
 }
 
-export interface ComponentTranslation {
-  language_id: number
-  code: string
-  language: string
-  default: boolean
-  name: string
-  description: string
-}
+/** Admin::ContentTranslations#content_translations_props entry. */
+export type ComponentTranslation = TranslationEntry<"name" | "description">
 
 export type ComponentFilters = ListFilterValues
 

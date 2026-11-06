@@ -1,6 +1,5 @@
 import type { ListFilterValues } from "@/admin/components/list-filters"
-import type { SeoTranslationEntry } from "@/admin/components/seo-fields"
-import type { ImageValue } from "@/admin/types"
+import type { ImageValue, TranslationEntry } from "@/admin/types"
 
 /** Admin::ServiceCategoriesController#category_props */
 export interface ServiceCategoryDetail {
@@ -10,7 +9,7 @@ export interface ServiceCategoryDetail {
   is_active: boolean
   display_in_home_page: boolean
   image: ImageValue | null
-  translations: SeoTranslationEntry[]
+  translations: ServiceCategoryTranslationEntry[]
   created_at: string
 }
 
@@ -36,11 +35,15 @@ export interface ServiceSummary {
   is_active: boolean
 }
 
+/** A category's per-language text: name and SEO. */
+export type ServiceCategoryTranslationEntry = TranslationEntry<
+  "name" | "seo_title" | "seo_description"
+>
+
 /** A service's per-language text: name, headline, description and SEO. */
-export interface ServiceTranslationEntry extends SeoTranslationEntry {
-  title: string
-  description: string
-}
+export type ServiceTranslationEntry = TranslationEntry<
+  "name" | "title" | "description" | "seo_title" | "seo_description"
+>
 
 /** Admin::ServicesController#service_props */
 export interface ServiceDetail extends ServiceSummary {

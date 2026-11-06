@@ -9,6 +9,7 @@ import {
   Wallet,
 } from "lucide-react"
 
+import { PageHeader } from "@/admin/components/page-header"
 import { StatCard } from "@/admin/components/stat-card"
 import { BookingsTable } from "@/admin/features/bookings/components/bookings-table"
 import type {
@@ -89,6 +90,10 @@ function AdminDashboard({
 }) {
   return (
     <div className="space-y-6 p-4">
+      <PageHeader
+        title="Dashboard"
+        description="Bookings and revenue at a glance."
+      />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Revenue this month"
@@ -158,6 +163,7 @@ function EmployeeDashboard({
 }) {
   return (
     <div className="space-y-6 p-4">
+      <PageHeader title="Dashboard" description="Your assigned bookings." />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Bookings done"

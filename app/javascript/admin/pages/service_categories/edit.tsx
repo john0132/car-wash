@@ -1,20 +1,25 @@
 import { Head } from "@inertiajs/react"
 
 import { PageHeader } from "@/admin/components/page-header"
-import type { SeoTranslationEntry } from "@/admin/components/seo-fields"
 import { ServiceCategoryForm } from "@/admin/features/services/components/service-category-form"
-import type { ServiceCategoryDetail } from "@/admin/features/services/types"
+import type {
+  ServiceCategoryDetail,
+  ServiceCategoryTranslationEntry,
+} from "@/admin/features/services/types"
 import AdminLayout from "@/admin/layouts/admin-layout"
+import type { AdminLanguage } from "@/admin/types"
 import { adminServiceCategories } from "@/routes"
 
 interface Props {
   service_category: ServiceCategoryDetail
-  translations: SeoTranslationEntry[]
+  translations: ServiceCategoryTranslationEntry[]
+  languages: AdminLanguage[]
 }
 
 export default function ServiceCategoryEdit({
   service_category: category,
   translations,
+  languages,
 }: Props) {
   return (
     <AdminLayout
@@ -38,6 +43,7 @@ export default function ServiceCategoryEdit({
           key={category.id}
           category={category}
           translations={translations}
+          languages={languages}
           action={adminServiceCategories.update(category.id)}
           cancelHref={adminServiceCategories.show(category.id).url}
           submitLabel="Save changes"

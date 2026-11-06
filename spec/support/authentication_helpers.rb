@@ -19,13 +19,17 @@ module AuthenticationHelpers
   end
 
   module System
+    # Selenium can only set cookies for the page it's on, so load one first.
     def sign_in(user)
       session = user.sessions.create!
-      page.driver.set_cookie("session_token", AuthenticationHelpers.signed_cookie(:session_token, session.id))
+      visit "/up"
+      page.driver.browser.manage.add_cookie(
+        name: "session_token", value: AuthenticationHelpers.signed_cookie(:session_token, session.id), path: "/"
+      )
     end
 
     def sign_out
-      page.driver.set_cookie("session_token", "")
+      page.driver.browser.manage.delete_cookie("session_token")
     end
   end
 end

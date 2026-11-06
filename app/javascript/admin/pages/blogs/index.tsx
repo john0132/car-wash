@@ -1,8 +1,12 @@
 import { Head, Link } from "@inertiajs/react"
-import { ImageOff, Pencil, Plus } from "lucide-react"
+import { ImageOff, Plus } from "lucide-react"
 
 import { ActivationSwitch } from "@/admin/components/activation-switch"
-import { ListFilters } from "@/admin/components/list-filters"
+import {
+  ListFilters,
+  PUBLISHED_LABELS,
+  hasFilters,
+} from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
 import { ResourceTable } from "@/admin/components/resource-table"
@@ -51,18 +55,20 @@ export default function BlogsIndex({ blogs, filters, pagination }: Props) {
           url={adminBlogs.index().url}
           filters={filters}
           searchPlaceholder="Search name or slug…"
+          statusLabels={PUBLISHED_LABELS}
         />
 
         <ResourceTable
           items={blogs}
-          emptyMessage="No posts match these filters."
+          emptyMessage="No posts yet."
+          emptyFilteredMessage="No posts match these filters."
+          filtered={hasFilters(filters)}
           columns={
             <>
               <TableHead>Post</TableHead>
               <TableHead>Languages</TableHead>
               <TableHead>Updated</TableHead>
               <TableHead className="text-right">Published</TableHead>
-              <TableHead className="w-12" />
             </>
           }
           renderRow={(blog) => {
@@ -116,18 +122,6 @@ export default function BlogsIndex({ blogs, filters, pagination }: Props) {
                     action={adminBlogs.activation(blog.id)}
                     disabled={!canUpdate}
                   />
-                </TableCell>
-                <TableCell>
-                  {canUpdate && (
-                    <Button variant="ghost" size="icon" asChild>
-                      <Link
-                        href={adminBlogs.edit(blog.id)}
-                        aria-label={`Edit ${name}`}
-                      >
-                        <Pencil />
-                      </Link>
-                    </Button>
-                  )}
                 </TableCell>
               </TableRow>
             )
