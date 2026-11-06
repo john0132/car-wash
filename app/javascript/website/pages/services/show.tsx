@@ -14,6 +14,7 @@ import {
 } from "@/website/features/service-detail/utils"
 import { useSessionState } from "@/website/hooks/use-session-state"
 import SiteLayout from "@/website/layouts/site-layout"
+import { useI18n } from "@/website/lib/i18n"
 import type { ServiceSummary } from "@/website/lib/types"
 
 interface Props {
@@ -31,12 +32,13 @@ export default function ServiceShow(props: Props) {
 const NO_EXTRAS: ExtraOption[] = []
 
 function ServicePage({ service, related, extras }: Props) {
+  const { t } = useI18n()
   // Kept for this tab, so a refresh or coming back keeps the picks.
   const [selectedExtras, setSelectedExtras] = useSessionState(
     selectedExtrasKey(service.slug),
     NO_EXTRAS,
   )
-  const name = service.name ?? "Service"
+  const name = service.name ?? t("Service")
   const heading = service.title ?? name
   const body = paragraphs(service.description)
 
@@ -62,18 +64,25 @@ function ServicePage({ service, related, extras }: Props) {
             ]}
           />
 
-          <h1 className="font-display mt-6 text-5xl leading-[1.05] text-balance sm:text-6xl lg:text-7xl">
+          <h1
+            dir="auto"
+            className="font-display mt-6 text-5xl leading-[1.05] text-balance sm:text-6xl lg:text-7xl"
+          >
             {heading}
           </h1>
 
           {service.title && service.title !== name && (
-            <p className="text-bronze mt-4 text-lg">{name}</p>
+            <p dir="auto" className="text-bronze mt-4 text-lg">
+              {name}
+            </p>
           )}
 
           {body.length > 0 && (
             <div className="text-moss mt-10 max-w-prose space-y-5 text-lg leading-relaxed">
               {body.map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
+                <p dir="auto" key={index}>
+                  {paragraph}
+                </p>
               ))}
             </div>
           )}

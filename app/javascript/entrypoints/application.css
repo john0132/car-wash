@@ -92,8 +92,9 @@
   --color-mist: #e3e6dc;
   --color-danger: #b3261e;
 
-  --font-display: "Italiana", ui-serif, Georgia, serif;
-  --font-sans: "Jost", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Italiana", "Reem Kufi", ui-serif, Georgia, serif;
+  --font-sans:
+    "Jost", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
 }
 
 @theme inline {

@@ -11,11 +11,14 @@ import {
   SectionHeading,
 } from "@/website/features/profile/components/profile-card"
 import type { ProfileData } from "@/website/features/profile/types"
+import { useI18n } from "@/website/lib/i18n"
 
 const toErrors = (messages?: string[]) =>
   messages?.map((message) => ({ message }))
 
 export function DetailsForm({ profile }: { profile: ProfileData }) {
+  const { t } = useI18n()
+
   return (
     <ProfileCard id="details">
       <Form
@@ -26,13 +29,13 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
         {({ errors, processing, recentlySuccessful }) => (
           <>
             <SectionHeading
-              title="Personal details"
-              description="How we address you and reach you."
+              title={t("Personal details")}
+              description={t("How we address you and reach you.")}
             />
 
             <div className="grid gap-5 sm:grid-cols-2">
               <Field>
-                <FieldLabel htmlFor="name">First name</FieldLabel>
+                <FieldLabel htmlFor="name">{t("First name")}</FieldLabel>
                 <Input
                   id="name"
                   name="name"
@@ -45,7 +48,7 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="last_name">Last name</FieldLabel>
+                <FieldLabel htmlFor="last_name">{t("Last name")}</FieldLabel>
                 <Input
                   id="last_name"
                   name="last_name"
@@ -58,7 +61,7 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
             </div>
 
             <Field>
-              <FieldLabel htmlFor="email">Email address</FieldLabel>
+              <FieldLabel htmlFor="email">{t("Email address")}</FieldLabel>
               <Input
                 id="email"
                 name="email"
@@ -72,7 +75,7 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="phone">Phone number</FieldLabel>
+              <FieldLabel htmlFor="phone">{t("Phone number")}</FieldLabel>
               <Input
                 id="phone"
                 name="phone"
@@ -93,11 +96,11 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
                 className={brandButton}
               >
                 {processing && <Spinner />}
-                Save changes
+                {t("Save changes")}
               </Button>
               {recentlySuccessful && (
                 <p className="text-sage text-sm" role="status">
-                  Saved
+                  {t("Saved")}
                 </p>
               )}
             </div>

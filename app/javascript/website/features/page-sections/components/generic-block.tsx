@@ -1,4 +1,5 @@
 import type { SchemaField } from "@/website/features/page-sections/types"
+import { useI18n } from "@/website/lib/i18n"
 
 function GenericValue({
   field,
@@ -7,6 +8,8 @@ function GenericValue({
   field: SchemaField
   value: unknown
 }) {
+  const { t } = useI18n()
+
   if (field.type === "image") {
     const image = value as { url: string } | null | undefined
     return image?.url ? (
@@ -36,7 +39,7 @@ function GenericValue({
     )
   }
 
-  if (field.type === "boolean") return <span>{value ? "Yes" : "No"}</span>
+  if (field.type === "boolean") return <span>{value ? t("Yes") : t("No")}</span>
 
   if (value === null || value === undefined || value === "") return null
 
@@ -44,7 +47,11 @@ function GenericValue({
     typeof value === "string" || typeof value === "number" ? value : null
   if (text === null) return null
 
-  return <p className="text-sage text-sm leading-relaxed">{text}</p>
+  return (
+    <p dir="auto" className="text-sage text-sm leading-relaxed">
+      {text}
+    </p>
+  )
 }
 
 // Renders a section whose component key has no dedicated React component —
@@ -63,7 +70,10 @@ export function GenericBlock({
       <div className="mx-auto max-w-3xl space-y-8">
         {schema.map((field) => (
           <div key={field.key}>
-            <p className="text-bronze text-xs font-medium tracking-[0.2em] uppercase">
+            <p
+              dir="auto"
+              className="text-bronze text-xs font-medium tracking-[0.2em] uppercase"
+            >
               {field.label}
             </p>
             <div className="mt-2">

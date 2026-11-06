@@ -9,6 +9,7 @@ import type {
   AreaOption,
   CustomerAddress,
 } from "@/website/features/addresses/types"
+import { useI18n } from "@/website/lib/i18n"
 
 export function AddressCard({
   address,
@@ -17,6 +18,8 @@ export function AddressCard({
   address: CustomerAddress
   areas: AreaOption[]
 }) {
+  const { t } = useI18n()
+
   const remove = () => {
     router.delete(websiteProfileAddresses.destroy(address.id), {
       preserveScroll: true,
@@ -46,13 +49,13 @@ export function AddressCard({
           areas={areas}
           trigger={
             <Button type="button" variant="outline" className={outline}>
-              Edit
+              {t("Edit")}
             </Button>
           }
         />
         <ConfirmRemove
-          title={`Remove "${address.name}"?`}
-          description="This address will be removed from your account."
+          title={t("Remove “{name}”?", { name: address.name })}
+          description={t("This address will be removed from your account.")}
           onConfirm={remove}
           trigger={
             <Button
@@ -60,7 +63,7 @@ export function AddressCard({
               variant="outline"
               className={`${outline} text-danger hover:text-danger`}
             >
-              Remove
+              {t("Remove")}
             </Button>
           }
         />

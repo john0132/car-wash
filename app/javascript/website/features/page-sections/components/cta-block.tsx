@@ -1,6 +1,5 @@
-import { Link } from "@inertiajs/react"
-
 import { Button } from "@/shared/components/ui/button"
+import { SmartLink } from "@/website/components/smart-link"
 
 export interface CtaData {
   heading: string
@@ -24,9 +23,12 @@ export function CtaBlock({ data, id }: { data: CtaData; id?: string }) {
     >
       <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
         <div className="max-w-lg">
-          <h2 className="font-display text-4xl sm:text-5xl">{data.heading}</h2>
+          <h2 dir="auto" className="font-display text-4xl sm:text-5xl">
+            {data.heading}
+          </h2>
           {data.text && (
             <p
+              dir="auto"
               className={`mt-4 text-base leading-relaxed ${primary ? "text-mist" : "text-sage"}`}
             >
               {data.text}
@@ -42,7 +44,7 @@ export function CtaBlock({ data, id }: { data: CtaData; id?: string }) {
               : "bg-pine text-ivory hover:bg-pine-deep shrink-0 rounded-full px-8 text-base"
           }
         >
-          <Link href={data.button_url}>{data.button_label}</Link>
+          <SmartLink href={data.button_url}>{data.button_label}</SmartLink>
         </Button>
       </div>
     </section>

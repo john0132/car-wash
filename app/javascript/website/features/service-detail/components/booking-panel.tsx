@@ -8,8 +8,7 @@ import type {
   ExtrasPage,
   ServiceDetail,
 } from "@/website/features/service-detail/types"
-import { formatMoney } from "@/website/lib/format"
-import { formatDuration } from "@/website/lib/format"
+import { useI18n } from "@/website/lib/i18n"
 
 /**
  * Price, duration, the chosen extras and the "Book now" call to action, laid
@@ -27,6 +26,8 @@ export function BookingPanel({
   selectedExtras: ExtraOption[]
   onExtrasChange: (extras: ExtraOption[]) => void
 }) {
+  const { t, formatMoney, formatDuration } = useI18n()
+
   const duration = formatDuration(service.duration_minutes)
   const onSale = service.sale_price !== null
   const savings = onSale
@@ -44,7 +45,7 @@ export function BookingPanel({
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <div>
           <p className="text-sage text-sm">
-            {onSale ? "Special price" : "Price"}
+            {onSale ? t("Special price") : t("Price")}
           </p>
           <p className="font-display text-pine mt-1 text-4xl tabular-nums">
             {formatMoney(onSale ? service.sale_price! : service.price)}
@@ -52,11 +53,11 @@ export function BookingPanel({
           {onSale && (
             <p className="text-sage relative mt-1 text-sm tabular-nums">
               <s>
-                <span className="sr-only">Was </span>
+                <span className="sr-only">{t("Was")} </span>
                 {formatMoney(service.price)}
               </s>
               <span className="text-bronze ms-2 font-medium">
-                {savings}% off
+                {t("{savings}% off", { savings })}
               </span>
             </p>
           )}
@@ -66,7 +67,7 @@ export function BookingPanel({
           <div className="sm:border-pine/15 flex items-center gap-2 sm:border-s sm:ps-6">
             <Clock className="text-bronze size-5" aria-hidden />
             <div>
-              <p className="text-sage text-sm">Takes about</p>
+              <p className="text-sage text-sm">{t("Takes about")}</p>
               <p className="text-pine font-medium">{duration}</p>
             </div>
           </div>
@@ -81,11 +82,14 @@ export function BookingPanel({
       />
 
       {selectedExtras.length > 0 && (
-        <ul aria-label="Selected extras" className="mt-4 flex flex-wrap gap-2">
+        <ul
+          aria-label={t("Selected extras")}
+          className="mt-4 flex flex-wrap gap-2"
+        >
           {selectedExtras.map((extra) => (
             <li
               key={extra.id}
-              className="border-pine/20 bg-ivory flex items-center gap-1.5 rounded-full border py-1 pr-1 pl-3 text-sm"
+              className="border-pine/20 bg-ivory flex items-center gap-1.5 rounded-full border py-1 ps-3 pe-1 text-sm"
             >
               <Check className="text-bronze size-3.5" aria-hidden />
               {extra.name}
@@ -99,7 +103,9 @@ export function BookingPanel({
                     selectedExtras.filter((e) => e.id !== extra.id),
                   )
                 }
-                aria-label={`Remove ${extra.name ?? "extra"}`}
+                aria-label={t("Remove {name}", {
+                  name: extra.name ?? t("extra"),
+                })}
                 className="text-sage hover:text-pine focus-visible:ring-bronze grid size-6 place-items-center rounded-full hover:bg-white focus-visible:ring-2 focus-visible:outline-none"
               >
                 <X className="size-3.5" aria-hidden />
@@ -113,7 +119,7 @@ export function BookingPanel({
         href={bookHref}
         className="bg-pine text-ivory hover:bg-pine-deep focus-visible:ring-bronze mt-4 block rounded-full px-6 py-3.5 text-center font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
       >
-        Book now
+        {t("Book now")}
       </Link>
     </div>
   )

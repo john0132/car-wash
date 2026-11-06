@@ -5,6 +5,7 @@ import { profileBookings, services } from "@/routes"
 import { BookingSummary } from "@/website/features/bookings/components/booking-summary"
 import type { BookingDetail } from "@/website/features/bookings/types"
 import BookingLayout from "@/website/layouts/booking-layout"
+import { useI18n } from "@/website/lib/i18n"
 
 /** A booking's own page; straight after checkout it is the thank-you page. */
 export default function BookingShow({
@@ -14,12 +15,14 @@ export default function BookingShow({
   booking: BookingDetail
   just_placed: boolean
 }) {
+  const { t } = useI18n()
+
   return (
     <BookingLayout
       title={
         just_placed
-          ? "Booking placed — Auto Atelier"
-          : `Booking #${booking.id} — Auto Atelier`
+          ? t("Booking placed")
+          : t("Booking #{id}", { id: booking.id })
       }
     >
       <div className="mx-auto max-w-2xl">
@@ -31,12 +34,15 @@ export default function BookingShow({
             />
           )}
           <h1 className="font-display text-4xl leading-tight sm:text-5xl">
-            {just_placed ? "Thank you!" : `Booking #${booking.id}`}
+            {just_placed
+              ? t("Thank you!")
+              : t("Booking #{id}", { id: booking.id })}
           </h1>
           {just_placed && (
             <p className="text-sage mx-auto mt-3 max-w-md">
-              Your booking is placed. We&apos;ll confirm it shortly and see you
-              at the time below.
+              {t(
+                "Your booking is placed. We'll confirm it shortly and see you at the time below.",
+              )}
             </p>
           )}
         </header>
@@ -48,13 +54,13 @@ export default function BookingShow({
             href={profileBookings()}
             className="bg-pine text-ivory hover:bg-pine-deep focus-visible:ring-bronze rounded-full px-6 py-3 font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
-            My bookings
+            {t("My bookings")}
           </Link>
           <Link
             href={services()}
             className="border-pine/30 hover:bg-pine/5 focus-visible:ring-bronze rounded-full border px-6 py-3 font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
-            Book another service
+            {t("Book another service")}
           </Link>
         </div>
       </div>

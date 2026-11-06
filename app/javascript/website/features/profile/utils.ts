@@ -16,29 +16,17 @@ const SYSTEMS: [RegExp, string][] = [
 ]
 
 /** "Chrome on Linux" from a raw user agent string. */
-export function describeDevice(userAgent: string | null): string {
-  if (!userAgent) return "Unknown device"
+export function describeDevice(
+  userAgent: string | null,
+  t: (key: string, vars?: Record<string, string>) => string,
+): string {
+  if (!userAgent) return t("Unknown device")
   const browser = BROWSERS.find(([re]) => re.test(userAgent))?.[1]
   const system = SYSTEMS.find(([re]) => re.test(userAgent))?.[1]
-  if (browser && system) return `${browser} on ${system}`
-  return browser ?? system ?? "Unknown device"
+  if (browser && system) return t("{browser} on {system}", { browser, system })
+  return browser ?? system ?? t("Unknown device")
 }
 
 export function fullName(name: string, lastName: string | null): string {
   return [name, lastName].filter(Boolean).join(" ")
-}
-
-export function formatMonthYear(value: string): string {
-  return new Date(value).toLocaleDateString("en", {
-    month: "long",
-    year: "numeric",
-  })
-}
-
-export function formatDate(value: string): string {
-  return new Date(value).toLocaleDateString("en", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  })
 }

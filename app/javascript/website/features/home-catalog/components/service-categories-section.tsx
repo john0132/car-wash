@@ -3,6 +3,7 @@ import { Link } from "@inertiajs/react"
 import { serviceCategory } from "@/routes"
 import { ImageOrMark } from "@/website/components/image-or-mark"
 import type { HomeCategory } from "@/website/features/home-catalog/types"
+import { useI18n } from "@/website/lib/i18n"
 
 /**
  * Categories as arch-framed portraits (echoing the hero's round frame) on a
@@ -13,6 +14,8 @@ export function ServiceCategoriesSection({
 }: {
   categories: HomeCategory[]
 }) {
+  const { t, tp } = useI18n()
+
   if (categories.length === 0) return null
 
   return (
@@ -23,14 +26,18 @@ export function ServiceCategoriesSection({
     >
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-xl text-center">
-          <p className="text-bronze text-xs font-medium tracking-[0.3em] uppercase">
-            The collections
+          <p
+            dir="auto"
+            className="text-bronze text-xs font-medium tracking-[0.3em] uppercase"
+          >
+            {t("The collections")}
           </p>
           <h2
+            dir="auto"
             id="service-categories-heading"
             className="font-display text-pine mt-4 text-4xl sm:text-5xl"
           >
-            Care for every corner
+            {t("Care for every corner")}
           </h2>
         </div>
 
@@ -50,13 +57,16 @@ export function ServiceCategoriesSection({
                   </div>
                 </div>
                 <div className="mt-5 text-center">
-                  <h3 className="font-display text-pine text-2xl">
+                  <h3 dir="auto" className="font-display text-pine text-2xl">
                     {category.name}
                   </h3>
                   {category.services_count > 0 && (
-                    <p className="text-sage mt-1 text-sm">
-                      {category.services_count}{" "}
-                      {category.services_count === 1 ? "service" : "services"}
+                    <p dir="auto" className="text-sage mt-1 text-sm">
+                      {tp(
+                        category.services_count,
+                        "{n} service",
+                        "{n} services",
+                      )}
                     </p>
                   )}
                 </div>

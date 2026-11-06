@@ -2,13 +2,14 @@ import type {
   CategoryFilters,
   SortOption,
 } from "@/website/features/category-detail/types"
+import { msg } from "@/website/lib/i18n"
 
 export const DEFAULT_SORT: SortOption = "name"
 
 export const SORT_LABELS: Record<SortOption, string> = {
-  name: "Name (A–Z)",
-  price_asc: "Price: low to high",
-  price_desc: "Price: high to low",
+  name: msg("Name (A–Z)"),
+  price_asc: msg("Price: low to high"),
+  price_desc: msg("Price: high to low"),
 }
 
 /** Query params for a filter state: defaults and blanks are left out so URLs stay clean. */

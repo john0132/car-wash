@@ -25,6 +25,7 @@ import { brandInput } from "@/website/components/brand"
 import type { ContactDefaults } from "@/website/features/contact/types"
 import type { PageProps } from "@/website/features/page-sections/types"
 import MarketingLayout from "@/website/layouts/marketing-layout"
+import { msg, useI18n } from "@/website/lib/i18n"
 
 const inputClass = `${brandInput} h-12 px-4`
 
@@ -37,18 +38,18 @@ const Required = () => (
 const reassurances = [
   {
     icon: Clock,
-    title: "Quick replies",
-    text: "We answer every message within one working day.",
+    title: msg("Quick replies"),
+    text: msg("We answer every message within one working day."),
   },
   {
     icon: MessageCircle,
-    title: "Real people",
-    text: "Talk to the team who will actually care for your car.",
+    title: msg("Real people"),
+    text: msg("Talk to the team who will actually care for your car."),
   },
   {
     icon: ShieldCheck,
-    title: "No pressure",
-    text: "Ask anything — there is no obligation to book.",
+    title: msg("No pressure"),
+    text: msg("Ask anything — there is no obligation to book."),
   },
 ]
 
@@ -58,23 +59,26 @@ interface Props {
 }
 
 export default function ContactShow({ page, defaults }: Props) {
+  const { t } = useI18n()
+
   const [sent, setSent] = useState(false)
 
   return (
     <>
       <MarketingLayout
         page={page}
-        fallbackTitle="Contact us — Auto Atelier"
+        fallbackTitle={t("Contact us")}
         emptyMessage=""
         afterHero={
           <section className="mx-auto grid max-w-6xl gap-12 px-6 py-16 lg:grid-cols-5 lg:gap-16 lg:py-24">
             <div className="lg:col-span-2">
               <h2 className="font-display text-pine text-3xl sm:text-4xl">
-                Let&apos;s talk about your car
+                {t("Let's talk about your car")}
               </h2>
               <p className="text-sage mt-4 leading-relaxed">
-                Questions about a service, a custom request or an existing
-                booking? Send us a note and we&apos;ll get back to you.
+                {t(
+                  "Questions about a service, a custom request or an existing booking? Send us a note and we'll get back to you.",
+                )}
               </p>
               <ul className="mt-8 flex flex-col gap-6">
                 {reassurances.map(({ icon: Icon, title, text }) => (
@@ -83,8 +87,8 @@ export default function ContactShow({ page, defaults }: Props) {
                       <Icon className="size-5" aria-hidden />
                     </span>
                     <div>
-                      <p className="text-pine font-medium">{title}</p>
-                      <p className="text-sage mt-0.5 text-sm">{text}</p>
+                      <p className="text-pine font-medium">{t(title)}</p>
+                      <p className="text-sage mt-0.5 text-sm">{t(text)}</p>
                     </div>
                   </li>
                 ))}
@@ -112,8 +116,13 @@ export default function ContactShow({ page, defaults }: Props) {
 
                   return (
                     <FieldGroup>
-                      <div className="absolute -left-[9999px]" aria-hidden>
-                        <label htmlFor="website">Leave this field empty</label>
+                      <div
+                        className="absolute start-0 top-0 size-0 overflow-hidden opacity-0"
+                        aria-hidden
+                      >
+                        <label htmlFor="website">
+                          {t("Leave this field empty")}
+                        </label>
                         <input
                           id="website"
                           name="website"
@@ -124,7 +133,7 @@ export default function ContactShow({ page, defaults }: Props) {
                       <div className="grid gap-6 sm:grid-cols-2">
                         <Field>
                           <FieldLabel htmlFor="first_name">
-                            First name <Required />
+                            {t("First name")} <Required />
                           </FieldLabel>
                           <Input
                             className={inputClass}
@@ -139,7 +148,7 @@ export default function ContactShow({ page, defaults }: Props) {
                         </Field>
                         <Field>
                           <FieldLabel htmlFor="last_name">
-                            Last name <Required />
+                            {t("Last name")} <Required />
                           </FieldLabel>
                           <Input
                             className={inputClass}
@@ -157,7 +166,7 @@ export default function ContactShow({ page, defaults }: Props) {
                       <div className="grid gap-6 sm:grid-cols-2">
                         <Field>
                           <FieldLabel htmlFor="email">
-                            Email address <Required />
+                            {t("Email address")} <Required />
                           </FieldLabel>
                           <Input
                             className={inputClass}
@@ -173,7 +182,7 @@ export default function ContactShow({ page, defaults }: Props) {
                         </Field>
                         <Field>
                           <FieldLabel htmlFor="phone">
-                            Phone <Required />
+                            {t("Phone")} <Required />
                           </FieldLabel>
                           <Input
                             className={inputClass}
@@ -182,7 +191,7 @@ export default function ContactShow({ page, defaults }: Props) {
                             required
                             maxLength={25}
                             pattern="\+?[0-9\s\-().]{7,25}"
-                            title="Enter a valid phone number"
+                            title={t("Enter a valid phone number")}
                             type="tel"
                             autoComplete="tel"
                           />
@@ -192,7 +201,7 @@ export default function ContactShow({ page, defaults }: Props) {
 
                       <Field>
                         <FieldLabel htmlFor="message">
-                          Message <Required />
+                          {t("Message")} <Required />
                         </FieldLabel>
                         <Textarea
                           id="message"
@@ -212,7 +221,7 @@ export default function ContactShow({ page, defaults }: Props) {
                         className="bg-pine text-ivory hover:bg-pine-deep h-11 w-full rounded-full"
                       >
                         {processing && <Spinner />}
-                        Send message
+                        {t("Send message")}
                       </Button>
                     </FieldGroup>
                   )
@@ -229,11 +238,12 @@ export default function ContactShow({ page, defaults }: Props) {
               <CircleCheck className="size-8" aria-hidden />
             </span>
             <DialogTitle className="font-display text-pine text-2xl">
-              Message sent
+              {t("Message sent")}
             </DialogTitle>
             <DialogDescription className="text-sage">
-              Thank you for reaching out. We have received your message and will
-              get back to you within one working day.
+              {t(
+                "Thank you for reaching out. We have received your message and will get back to you within one working day.",
+              )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-center">
@@ -241,7 +251,7 @@ export default function ContactShow({ page, defaults }: Props) {
               onClick={() => setSent(false)}
               className="bg-pine text-ivory hover:bg-pine-deep h-11 rounded-full px-10"
             >
-              Close
+              {t("Close")}
             </Button>
           </DialogFooter>
         </DialogContent>

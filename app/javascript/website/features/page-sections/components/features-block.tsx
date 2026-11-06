@@ -29,7 +29,10 @@ export function FeaturesBlock({
       <div className="mx-auto max-w-6xl">
         {data.heading && (
           <div className="max-w-xl">
-            <h2 className="font-display text-pine text-4xl sm:text-5xl">
+            <h2
+              dir="auto"
+              className="font-display text-pine text-4xl sm:text-5xl"
+            >
               {data.heading}
             </h2>
           </div>
@@ -50,9 +53,14 @@ export function FeaturesBlock({
               {item.icon && (
                 <img src={item.icon.url} alt="" className="mb-4 h-10 w-10" />
               )}
-              <h3 className="text-pine text-lg font-medium">{item.title}</h3>
+              <h3 dir="auto" className="text-pine text-lg font-medium">
+                {item.title}
+              </h3>
               {item.text && (
-                <p className="text-sage mt-3 text-sm leading-relaxed">
+                <p
+                  dir="auto"
+                  className="text-sage mt-3 text-sm leading-relaxed"
+                >
                   {item.text}
                 </p>
               )}

@@ -1,5 +1,5 @@
 import type { ProfileData } from "@/website/features/profile/types"
-import { formatMonthYear } from "@/website/features/profile/utils"
+import { useI18n } from "@/website/lib/i18n"
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
@@ -13,11 +13,16 @@ function Stat({ label, value }: { label: string; value: string }) {
 }
 
 export function ProfileStats({ profile }: { profile: ProfileData }) {
+  const { t, formatMonthYear } = useI18n()
+
   return (
     <div className="flex flex-wrap gap-3">
-      <Stat label="Points" value={String(profile.points)} />
-      <Stat label="Wallet" value={profile.wallet.toFixed(2)} />
-      <Stat label="Member since" value={formatMonthYear(profile.created_at)} />
+      <Stat label={t("Points")} value={String(profile.points)} />
+      <Stat label={t("Wallet")} value={profile.wallet.toFixed(2)} />
+      <Stat
+        label={t("Member since")}
+        value={formatMonthYear(profile.created_at)}
+      />
     </div>
   )
 }

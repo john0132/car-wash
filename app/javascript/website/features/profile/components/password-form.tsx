@@ -24,6 +24,7 @@ import {
   ProfileCard,
   SectionHeading,
 } from "@/website/features/profile/components/profile-card"
+import { msg, useI18n } from "@/website/lib/i18n"
 
 const toErrors = (messages?: string[]) =>
   messages?.map((message) => ({ message }))
@@ -31,18 +32,24 @@ const toErrors = (messages?: string[]) =>
 const FIELDS = [
   {
     name: "password_challenge",
-    label: "Current password",
+    label: msg("Current password"),
     autoComplete: "current-password",
   },
-  { name: "password", label: "New password", autoComplete: "new-password" },
+  {
+    name: "password",
+    label: msg("New password"),
+    autoComplete: "new-password",
+  },
   {
     name: "password_confirmation",
-    label: "Confirm new password",
+    label: msg("Confirm new password"),
     autoComplete: "new-password",
   },
 ] as const
 
 export function PasswordForm() {
+  const { t } = useI18n()
+
   const [open, setOpen] = useState(false)
 
   return (
@@ -50,8 +57,8 @@ export function PasswordForm() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="min-w-72 flex-1">
           <SectionHeading
-            title="Password"
-            description="Keep your account safe with a strong password."
+            title={t("Password")}
+            description={t("Keep your account safe with a strong password.")}
           />
         </div>
 
@@ -62,14 +69,15 @@ export function PasswordForm() {
               variant="outline"
               className={brandOutlineButton}
             >
-              Change password
+              {t("Change password")}
             </Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogTitle>Change password</DialogTitle>
+            <DialogTitle>{t("Change password")}</DialogTitle>
             <DialogDescription>
-              Use at least 12 characters. You&apos;ll stay signed in on this
-              device only.
+              {t(
+                "Use at least 12 characters. You'll stay signed in on this device only.",
+              )}
             </DialogDescription>
             <Form
               action={websitePasswords.update()}
@@ -83,7 +91,7 @@ export function PasswordForm() {
                 <>
                   {FIELDS.map(({ name, label, autoComplete }) => (
                     <Field key={name}>
-                      <FieldLabel htmlFor={name}>{label}</FieldLabel>
+                      <FieldLabel htmlFor={name}>{t(label)}</FieldLabel>
                       <Input
                         className={brandInput}
                         id={name}
@@ -104,7 +112,7 @@ export function PasswordForm() {
                         className={brandOutlineButton}
                         onClick={() => resetAndClearErrors()}
                       >
-                        Cancel
+                        {t("Cancel")}
                       </Button>
                     </DialogClose>
                     <Button
@@ -113,7 +121,7 @@ export function PasswordForm() {
                       disabled={processing}
                     >
                       {processing && <Spinner />}
-                      Update password
+                      {t("Update password")}
                     </Button>
                   </DialogFooter>
                 </>

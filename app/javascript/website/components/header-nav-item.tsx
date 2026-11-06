@@ -11,7 +11,7 @@ function SubLinks({ links, depth = 0 }: { links: SiteLink[]; depth?: number }) {
   return (
     <ul
       className={
-        depth > 0 ? "border-pine/10 mt-1 space-y-1 border-l pl-3" : "space-y-1"
+        depth > 0 ? "border-pine/10 mt-1 space-y-1 border-s ps-3" : "space-y-1"
       }
     >
       {links.map((link) => (

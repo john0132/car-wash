@@ -35,6 +35,7 @@ import type {
   CustomerAddress,
 } from "@/website/features/addresses/types"
 import { useGeolocation } from "@/website/hooks/use-geolocation"
+import { useI18n } from "@/website/lib/i18n"
 
 const toErrors = (messages?: string[]) =>
   messages?.map((message) => ({ message }))
@@ -47,6 +48,8 @@ interface Props {
 }
 
 export function AddressDialog({ trigger, areas, address }: Props) {
+  const { t } = useI18n()
+
   const [open, setOpen] = useState(false)
   const [coords, setCoords] = useState({
     latitude: address ? String(address.latitude) : "",
@@ -67,9 +70,11 @@ export function AddressDialog({ trigger, areas, address }: Props) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
-        <DialogTitle>{address ? "Edit address" : "Add an address"}</DialogTitle>
+        <DialogTitle>
+          {address ? t("Edit address") : t("Add an address")}
+        </DialogTitle>
         <DialogDescription>
-          Where should we come to? Pick your area and pin the location.
+          {t("Where should we come to? Pick your area and pin the location.")}
         </DialogDescription>
         <Form
           action={action}
@@ -80,27 +85,27 @@ export function AddressDialog({ trigger, areas, address }: Props) {
           {({ errors, processing }) => (
             <>
               <Field>
-                <FieldLabel htmlFor="address_name">Label</FieldLabel>
+                <FieldLabel htmlFor="address_name">{t("Label")}</FieldLabel>
                 <Input
                   className={brandInput}
                   id="address_name"
                   name="name"
                   defaultValue={address?.name}
-                  placeholder="Home, Work…"
+                  placeholder={t("Home, Work…")}
                   required
                 />
                 <FieldError errors={toErrors(errors.name)} />
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="address_area">Area</FieldLabel>
+                <FieldLabel htmlFor="address_area">{t("Area")}</FieldLabel>
                 <Select
                   name="area_id"
                   defaultValue={address ? String(address.area_id) : undefined}
                   required
                 >
                   <SelectTrigger id="address_area" className={brandSelect}>
-                    <SelectValue placeholder="Choose an area" />
+                    <SelectValue placeholder={t("Choose an area")} />
                   </SelectTrigger>
                   <SelectContent>
                     {areas.map((area) => (
@@ -116,7 +121,9 @@ export function AddressDialog({ trigger, areas, address }: Props) {
 
               <div className="grid grid-cols-2 gap-4">
                 <Field>
-                  <FieldLabel htmlFor="address_latitude">Latitude</FieldLabel>
+                  <FieldLabel htmlFor="address_latitude">
+                    {t("Latitude")}
+                  </FieldLabel>
                   <Input
                     className={brandInput}
                     id="address_latitude"
@@ -131,7 +138,9 @@ export function AddressDialog({ trigger, areas, address }: Props) {
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="address_longitude">Longitude</FieldLabel>
+                  <FieldLabel htmlFor="address_longitude">
+                    {t("Longitude")}
+                  </FieldLabel>
                   <Input
                     className={brandInput}
                     id="address_longitude"
@@ -157,7 +166,7 @@ export function AddressDialog({ trigger, areas, address }: Props) {
                 disabled={locating}
               >
                 {locating ? <Spinner /> : <LocateFixed />}
-                Use my current location
+                {t("Use my current location")}
               </Button>
               {error && (
                 <p role="alert" className="text-destructive -mt-2 text-sm">
@@ -172,7 +181,7 @@ export function AddressDialog({ trigger, areas, address }: Props) {
                     variant="outline"
                     className={brandOutlineButton}
                   >
-                    Cancel
+                    {t("Cancel")}
                   </Button>
                 </DialogClose>
                 <Button
@@ -181,7 +190,7 @@ export function AddressDialog({ trigger, areas, address }: Props) {
                   disabled={processing}
                 >
                   {processing && <Spinner />}
-                  {address ? "Save address" : "Add address"}
+                  {address ? t("Save address") : t("Add address")}
                 </Button>
               </DialogFooter>
             </>

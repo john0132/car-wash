@@ -12,6 +12,7 @@ import type {
 import { useGeolocation } from "@/website/hooks/use-geolocation"
 import type { Coordinates } from "@/website/hooks/use-geolocation"
 import { useIsClient } from "@/website/hooks/use-is-client"
+import { useI18n } from "@/website/lib/i18n"
 
 // Leaflet needs `window`, so the map is split out and only loaded in the browser.
 const LocationMap = lazy(
@@ -43,6 +44,8 @@ export function LocationStep({
   onChange: (location: PickedLocation) => void
   error?: string
 }) {
+  const { t } = useI18n()
+
   const { url } = usePage()
   const isClient = useIsClient()
   const [checking, setChecking] = useState(false)
@@ -70,8 +73,10 @@ export function LocationStep({
   return (
     <StepCard
       step={step}
-      title="Location"
-      description="Where is the car parked? Use your location or drop a pin on the map."
+      title={t("Location")}
+      description={t(
+        "Where is the car parked? Use your location or drop a pin on the map.",
+      )}
       error={error}
     >
       <div className="flex flex-wrap gap-2">
@@ -82,7 +87,7 @@ export function LocationStep({
           className="bg-pine text-ivory hover:bg-pine-deep rounded-full"
         >
           {gps.locating ? <Spinner /> : <LocateFixed aria-hidden />}
-          Use my current location
+          {t("Use my current location")}
         </Button>
         {addresses.map((address) => (
           <Button
@@ -110,7 +115,7 @@ export function LocationStep({
       </div>
       {gps.error && (
         <p role="alert" className="text-danger mt-2 text-sm">
-          {gps.error} Drop a pin on the map instead.
+          {gps.error} {t("Drop a pin on the map instead.")}
         </p>
       )}
 
@@ -130,18 +135,19 @@ export function LocationStep({
       <div aria-live="polite" className="mt-4 min-h-6 text-[15px]">
         {checking ? (
           <span className="text-sage flex items-center gap-2">
-            <Spinner /> Checking we serve this spot…
+            <Spinner /> {t("Checking we serve this spot…")}
           </span>
         ) : coverage?.covered ? (
           <span className="flex items-center gap-2 text-emerald-800">
             <CircleCheck className="size-4" aria-hidden />
-            We serve {[coverage.area, coverage.city].filter(Boolean).join(", ")}
-            .
+            {t("We serve {place}.", {
+              place: [coverage.area, coverage.city].filter(Boolean).join(", "),
+            })}
           </span>
         ) : coverage ? (
           <span className="text-danger flex items-center gap-2">
             <CircleAlert className="size-4" aria-hidden />
-            Sorry, this location is outside our service reach.
+            {t("Sorry, this location is outside our service reach.")}
           </span>
         ) : null}
       </div>

@@ -1,6 +1,7 @@
 import { Link } from "@inertiajs/react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
+import { useI18n } from "@/website/lib/i18n"
 import { type PaginationData, pageWindow } from "@/website/lib/pagination"
 
 const base =
@@ -20,6 +21,8 @@ export function Pagination({
   hrefFor: (page: number) => string
   only?: string[]
 }) {
+  const { t } = useI18n()
+
   const { page, pages } = pagination
   if (pages <= 1) return null
 
@@ -27,14 +30,14 @@ export function Pagination({
 
   return (
     <nav
-      aria-label="Pagination"
+      aria-label={t("Pagination")}
       className="mt-12 flex flex-wrap items-center justify-center gap-2"
     >
       {page > 1 ? (
         <Link
           href={hrefFor(page - 1)}
           {...linkProps}
-          aria-label="Previous page"
+          aria-label={t("Previous page")}
           className={`${base} border-pine/15 text-pine hover:border-pine/40 bg-white`}
         >
           <ChevronLeft aria-hidden className="size-4 rtl:rotate-180" />
@@ -55,7 +58,7 @@ export function Pagination({
             key={entry}
             href={hrefFor(entry)}
             {...linkProps}
-            aria-label={`Page ${entry}`}
+            aria-label={t("Page {n}", { n: entry })}
             aria-current={entry === page ? "page" : undefined}
             className={`${base} ${
               entry === page
@@ -72,7 +75,7 @@ export function Pagination({
         <Link
           href={hrefFor(page + 1)}
           {...linkProps}
-          aria-label="Next page"
+          aria-label={t("Next page")}
           className={`${base} border-pine/15 text-pine hover:border-pine/40 bg-white`}
         >
           <ChevronRight aria-hidden className="size-4 rtl:rotate-180" />

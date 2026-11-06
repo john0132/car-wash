@@ -1,4 +1,5 @@
 import { ServiceCard } from "@/website/components/service-card"
+import { useI18n } from "@/website/lib/i18n"
 import type { ServiceSummary } from "@/website/lib/types"
 
 /**
@@ -7,6 +8,8 @@ import type { ServiceSummary } from "@/website/lib/types"
  * category portraits. Renders nothing when empty.
  */
 export function ServicesSection({ services }: { services: ServiceSummary[] }) {
+  const { t } = useI18n()
+
   if (services.length === 0) return null
 
   return (
@@ -18,13 +21,13 @@ export function ServicesSection({ services }: { services: ServiceSummary[] }) {
       <div className="mx-auto max-w-6xl">
         <div className="max-w-xl">
           <p className="text-bronze text-xs font-medium tracking-[0.3em] uppercase">
-            Most requested
+            {t("Most requested")}
           </p>
           <h2
             id="featured-services-heading"
             className="font-display text-pine mt-4 text-4xl sm:text-5xl"
           >
-            Treatments, finished by hand
+            {t("Treatments, finished by hand")}
           </h2>
         </div>
 

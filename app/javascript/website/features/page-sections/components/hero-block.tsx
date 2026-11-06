@@ -1,7 +1,7 @@
-import { Link } from "@inertiajs/react"
-
 import { Button } from "@/shared/components/ui/button"
 import { BrandMark } from "@/website/components/brand-mark"
+import { SmartLink } from "@/website/components/smart-link"
+import { useI18n } from "@/website/lib/i18n"
 
 export interface HeroData {
   heading: string
@@ -13,6 +13,8 @@ export interface HeroData {
 }
 
 export function HeroBlock({ data }: { data: HeroData }) {
+  const { t } = useI18n()
+
   const centered = data.alignment === "center"
 
   return (
@@ -28,14 +30,21 @@ export function HeroBlock({ data }: { data: HeroData }) {
         }
       >
         <div>
-          <p className="text-bronze text-xs font-medium tracking-[0.3em] uppercase">
-            Hand-Finished Auto Care
+          <p
+            dir="auto"
+            className="text-bronze text-xs font-medium tracking-[0.3em] uppercase"
+          >
+            {t("Hand-Finished Auto Care")}
           </p>
-          <h1 className="font-display text-pine mt-5 text-5xl leading-[1.1] sm:text-6xl lg:text-7xl">
+          <h1
+            dir="auto"
+            className="font-display text-pine mt-5 text-5xl leading-[1.1] sm:text-6xl lg:text-7xl"
+          >
             {data.heading}
           </h1>
           {data.subheading && (
             <p
+              dir="auto"
               className={`text-sage mt-6 text-lg leading-relaxed ${centered ? "mx-auto max-w-xl" : "max-w-md"}`}
             >
               {data.subheading}
@@ -50,7 +59,9 @@ export function HeroBlock({ data }: { data: HeroData }) {
                 size="lg"
                 className="bg-pine text-ivory hover:bg-pine-deep rounded-full px-8 text-base"
               >
-                <Link href={data.button_url}>{data.button_label}</Link>
+                <SmartLink href={data.button_url}>
+                  {data.button_label}
+                </SmartLink>
               </Button>
             </div>
           )}

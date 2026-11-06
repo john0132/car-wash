@@ -13,6 +13,7 @@ import {
   hasActiveFilters,
 } from "@/website/features/category-detail/utils"
 import SiteLayout from "@/website/layouts/site-layout"
+import { useI18n } from "@/website/lib/i18n"
 import type { PaginationData } from "@/website/lib/pagination"
 import type { ServiceSummary } from "@/website/lib/types"
 
@@ -33,8 +34,10 @@ export default function ServiceCategoryShow({
   filters,
   facets,
 }: Props) {
+  const { t, tp } = useI18n()
+
   // Kept across partial reloads: Inertia merges the new props over the old ones.
-  const name = category?.name ?? "Services"
+  const name = category?.name ?? t("Services")
   const filtered = hasActiveFilters(filters)
   const first = (pagination.page - 1) * pagination.per_page + 1
 
@@ -46,7 +49,10 @@ export default function ServiceCategoryShow({
     >
       <Breadcrumbs items={[{ label: name }]} />
 
-      <h1 className="font-display mt-6 text-5xl leading-[1.05] text-balance sm:text-6xl">
+      <h1
+        dir="auto"
+        className="font-display mt-6 text-5xl leading-[1.05] text-balance sm:text-6xl"
+      >
         {name}
       </h1>
 
@@ -58,10 +64,18 @@ export default function ServiceCategoryShow({
         />
       </div>
 
-      <p aria-live="polite" className="text-sage mt-8 mb-6 text-sm">
+      <p dir="auto" aria-live="polite" className="text-sage mt-8 mb-6 text-sm">
         {pagination.total === 0
-          ? "No services found"
-          : `Showing ${first}–${first + services.length - 1} of ${pagination.total} ${pagination.total === 1 ? "service" : "services"}`}
+          ? t("No services found")
+          : tp(
+              pagination.total,
+              "Showing {from}–{to} of {n} service",
+              "Showing {from}–{to} of {n} services",
+              {
+                from: first,
+                to: first + services.length - 1,
+              },
+            )}
       </p>
 
       {services.length > 0 ? (
@@ -74,14 +88,14 @@ export default function ServiceCategoryShow({
         </ul>
       ) : (
         <div className="border-pine/20 rounded-3xl border border-dashed bg-white/50 px-6 py-16 text-center">
-          <p className="text-lg">
+          <p dir="auto" className="text-lg">
             {filtered
-              ? "Nothing matches those filters."
-              : "No services in this category yet."}
+              ? t("Nothing matches those filters.")
+              : t("No services in this category yet.")}
           </p>
           {filtered && (
-            <p className="text-sage mt-1 text-sm">
-              Try a different search, or use “Clear all”.
+            <p dir="auto" className="text-sage mt-1 text-sm">
+              {t("Try a different search, or use “Clear all”.")}
             </p>
           )}
         </div>

@@ -5,6 +5,7 @@ import { CarDialog } from "@/website/features/cars/components/car-dialog"
 import { OptionCard } from "@/website/features/checkout/components/option-card"
 import { StepCard } from "@/website/features/checkout/components/step-card"
 import type { CheckoutCar } from "@/website/features/checkout/types"
+import { useI18n } from "@/website/lib/i18n"
 
 /** Pick one of the customer's cars, or add one without leaving checkout. */
 export function CarStep({
@@ -20,17 +21,19 @@ export function CarStep({
   onChange: (carId: number) => void
   error?: string
 }) {
+  const { t } = useI18n()
+
   return (
     <StepCard
       step={step}
-      title="Your car"
-      description="Which car are we washing?"
+      title={t("Your car")}
+      description={t("Which car are we washing?")}
       error={error}
     >
       {cars.length > 0 && (
         <div
           role="radiogroup"
-          aria-label="Your cars"
+          aria-label={t("Your cars")}
           className="grid gap-3 sm:grid-cols-2"
         >
           {cars.map((car) => (
@@ -55,7 +58,7 @@ export function CarStep({
             className="border-pine/30 text-pine hover:text-pine mt-3 rounded-full border-dashed bg-transparent hover:bg-white"
           >
             <Plus aria-hidden />
-            {cars.length === 0 ? "Add your car" : "Add another car"}
+            {cars.length === 0 ? t("Add your car") : t("Add another car")}
           </Button>
         }
       />

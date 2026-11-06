@@ -9,21 +9,24 @@ import { Spinner } from "@/shared/components/ui/spinner"
 import { brandButton, brandInput } from "@/website/components/brand"
 import { SeoHead } from "@/website/components/seo-head"
 import AuthLayout from "@/website/layouts/auth-layout"
+import { useI18n } from "@/website/lib/i18n"
 
 export default function ForgotPassword() {
+  const { t } = useI18n()
+
   return (
     <AuthLayout
-      title="Forgot password"
-      description="Enter your email to receive a password reset link"
+      title={t("Forgot password")}
+      description={t("Enter your email to receive a password reset link")}
     >
-      <SeoHead title="Forgot password" noindex />
+      <SeoHead title={t("Forgot password")} noindex />
 
       <div className="space-y-6">
         <Form action={websiteIdentityPasswordResets.create()}>
           {({ processing, errors }) => (
             <>
               <Field>
-                <FieldLabel htmlFor="email">Email address</FieldLabel>
+                <FieldLabel htmlFor="email">{t("Email address")}</FieldLabel>
                 <Input
                   className={brandInput}
                   id="email"
@@ -32,7 +35,7 @@ export default function ForgotPassword() {
                   autoComplete="email"
                   required
                   autoFocus
-                  placeholder="email@example.com"
+                  placeholder={t("email@example.com")}
                 />
                 <FieldError
                   errors={errors.email?.map((message) => ({ message }))}
@@ -45,15 +48,15 @@ export default function ForgotPassword() {
                   disabled={processing}
                 >
                   {processing && <Spinner />}
-                  Email password reset link
+                  {t("Email password reset link")}
                 </Button>
               </div>
             </>
           )}
         </Form>
         <div className="text-muted-foreground space-x-1 text-center text-sm">
-          <span>Or, return to</span>
-          <TextLink href={websiteSessions.new()}>log in</TextLink>
+          <span>{t("Or, return to")}</span>
+          <TextLink href={websiteSessions.new()}>{t("log in")}</TextLink>
         </div>
       </div>
     </AuthLayout>

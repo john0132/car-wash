@@ -7,17 +7,20 @@ import {
   SectionHeading,
 } from "@/website/features/profile/components/profile-card"
 import type { DeviceSession } from "@/website/features/profile/types"
-import { describeDevice, formatDate } from "@/website/features/profile/utils"
+import { describeDevice } from "@/website/features/profile/utils"
+import { useI18n } from "@/website/lib/i18n"
 
 export function DevicesList({ sessions }: { sessions: DeviceSession[] }) {
+  const { t, formatDate } = useI18n()
+
   const { auth } = usePage().props
 
   return (
     <ProfileCard id="devices">
       <div className="flex flex-col gap-5">
         <SectionHeading
-          title="Devices"
-          description="Where you are signed in right now."
+          title={t("Devices")}
+          description={t("Where you are signed in right now.")}
         />
 
         <ul className="flex flex-col">
@@ -30,16 +33,18 @@ export function DevicesList({ sessions }: { sessions: DeviceSession[] }) {
               >
                 <div>
                   <p className="font-medium">
-                    {describeDevice(session.user_agent)}
+                    {describeDevice(session.user_agent, t)}
                     {current && (
-                      <span className="bg-pine/10 ml-2 rounded-full px-2.5 py-0.5 text-xs font-normal">
-                        This device
+                      <span className="bg-pine/10 ms-2 rounded-full px-2.5 py-0.5 text-xs font-normal">
+                        {t("This device")}
                       </span>
                     )}
                   </p>
                   <p className="text-sage text-sm">
-                    {session.ip_address} · Signed in{" "}
-                    {formatDate(session.created_at)}
+                    {t("{ip} · Signed in {date}", {
+                      ip: session.ip_address,
+                      date: formatDate(session.created_at, "medium"),
+                    })}
                   </p>
                 </div>
                 {!current && (
@@ -52,7 +57,7 @@ export function DevicesList({ sessions }: { sessions: DeviceSession[] }) {
                       href={websiteSessions.destroy(session.id)}
                       as="button"
                     >
-                      Sign out
+                      {t("Sign out")}
                     </Link>
                   </Button>
                 )}

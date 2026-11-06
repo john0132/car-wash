@@ -6,6 +6,13 @@
 @import "@fontsource/jost/500.css";
 @import "@fontsource/jost/600.css";
 
+/* Arabic glyphs: Italiana and Jost have none, so these come next in the font stacks.
+   They are only downloaded when a page actually shows Arabic text. */
+@import "@fontsource/reem-kufi/arabic-400.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-400.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-500.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-600.css";
+
 /*
  * The website is always light and on-brand: map the shadcn tokens to the
  * Auto Atelier palette so the shared primitives (inputs, selects, dialogs,
@@ -37,4 +44,11 @@
 
 body {
   font-family: var(--font-sans);
+}
+
+/* Emails, phone numbers and passwords are typed left to right even on a right-to-left page. */
+[dir="rtl"]
+  input:where([type="email"], [type="tel"], [type="password"], [type="url"]) {
+  direction: ltr;
+  text-align: right;
 }

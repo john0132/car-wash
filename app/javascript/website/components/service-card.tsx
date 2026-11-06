@@ -2,7 +2,7 @@ import { Link } from "@inertiajs/react"
 
 import { service as serviceRoute } from "@/routes"
 import { ImageOrMark } from "@/website/components/image-or-mark"
-import { formatDuration, formatMoney } from "@/website/lib/format"
+import { useI18n } from "@/website/lib/i18n"
 import type { ServiceSummary } from "@/website/lib/types"
 
 /** A service as a linked card: image, name, duration and the price (struck through when on sale). */
@@ -17,6 +17,8 @@ export function ServiceCard({
   /** Small label above the name, e.g. the category on the homepage. */
   eyebrow?: string | null
 }) {
+  const { t, formatMoney, formatDuration } = useI18n()
+
   const duration = formatDuration(service.duration_minutes)
 
   return (
@@ -28,28 +30,42 @@ export function ServiceCard({
         <ImageOrMark image={service.image} priority={priority} />
         {service.sale_price !== null && (
           <span className="bg-pine text-ivory absolute start-3 top-3 rounded-full px-3 py-1 text-xs font-medium tracking-wide uppercase">
-            Sale
+            {t("Sale")}
           </span>
         )}
       </div>
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 p-5">
         <div>
           {eyebrow && (
-            <p className="text-bronze mb-1 text-xs font-medium tracking-[0.2em] uppercase">
+            <p
+              dir="auto"
+              className="text-bronze mb-1 text-xs font-medium tracking-[0.2em] uppercase"
+            >
               {eyebrow}
             </p>
           )}
-          <h3 className="text-pine font-medium">{service.name}</h3>
-          {duration && <p className="text-sage mt-0.5 text-sm">{duration}</p>}
+          <h3 dir="auto" className="text-pine font-medium">
+            {service.name}
+          </h3>
+          {duration && (
+            <p dir="auto" className="text-sage mt-0.5 text-sm">
+              {duration}
+            </p>
+          )}
         </div>
-        <p className="text-pine relative shrink-0 text-end text-sm tabular-nums">
+        <p
+          dir="auto"
+          className="text-pine relative shrink-0 text-end text-sm tabular-nums"
+        >
           {service.sale_price !== null && (
             <span className="text-sage me-1.5 line-through">
-              <span className="sr-only">Was </span>
+              <span className="sr-only">{t("Was")} </span>
               {formatMoney(service.price)}
             </span>
           )}
-          {service.sale_price !== null && <span className="sr-only">Now </span>}
+          {service.sale_price !== null && (
+            <span className="sr-only">{t("Now")} </span>
+          )}
           {formatMoney(service.sale_price ?? service.price)}
         </p>
       </div>

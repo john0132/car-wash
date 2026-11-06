@@ -18,14 +18,17 @@ import { Spinner } from "@/shared/components/ui/spinner"
 import { brandInput } from "@/website/components/brand"
 import { SeoHead } from "@/website/components/seo-head"
 import AuthLayout from "@/website/layouts/auth-layout"
+import { useI18n } from "@/website/lib/i18n"
 
 export default function Login() {
+  const { t } = useI18n()
+
   return (
     <AuthLayout
-      title="Log in to your account"
-      description="Enter your email and password below to log in"
+      title={t("Log in to your account")}
+      description={t("Enter your email and password below to log in")}
     >
-      <SeoHead title="Log in" noindex />
+      <SeoHead title={t("Log in")} noindex />
       <Form
         action={websiteSessions.create()}
         resetOnSuccess={["password"]}
@@ -35,7 +38,7 @@ export default function Login() {
           <>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="email">Email address</FieldLabel>
+                <FieldLabel htmlFor="email">{t("Email address")}</FieldLabel>
                 <Input
                   className={brandInput}
                   id="email"
@@ -44,7 +47,7 @@ export default function Login() {
                   required
                   autoFocus
                   autoComplete="email"
-                  placeholder="email@example.com"
+                  placeholder={t("email@example.com")}
                 />
                 <FieldError
                   errors={errors.email?.map((message) => ({ message }))}
@@ -53,12 +56,12 @@ export default function Login() {
 
               <Field>
                 <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <FieldLabel htmlFor="password">{t("Password")}</FieldLabel>
                   <TextLink
                     href={websiteIdentityPasswordResets.new()}
                     className="ms-auto text-sm"
                   >
-                    Forgot password?
+                    {t("Forgot password?")}
                   </TextLink>
                 </div>
                 <Input
@@ -68,7 +71,7 @@ export default function Login() {
                   name="password"
                   required
                   autoComplete="current-password"
-                  placeholder="Password"
+                  placeholder={t("Password")}
                 />
                 <FieldError
                   errors={errors.password?.map((message) => ({ message }))}
@@ -81,13 +84,13 @@ export default function Login() {
                 disabled={processing}
               >
                 {processing && <Spinner />}
-                Log in
+                {t("Log in")}
               </Button>
             </FieldGroup>
 
             <div className="text-muted-foreground text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <TextLink href={websiteUsers.new()}>Sign up</TextLink>
+              {t("Don't have an account?")}{" "}
+              <TextLink href={websiteUsers.new()}>{t("Sign up")}</TextLink>
             </div>
           </>
         )}

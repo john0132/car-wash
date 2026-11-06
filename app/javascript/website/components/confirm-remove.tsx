@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/shared/components/ui/alert-dialog"
+import { useI18n } from "@/website/lib/i18n"
 
 /** Wraps a trigger button with a styled "are you sure?" dialog for destructive actions. */
 export function ConfirmRemove({
@@ -24,6 +25,8 @@ export function ConfirmRemove({
   description: string
   onConfirm: () => void
 }) {
+  const { t } = useI18n()
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
@@ -33,12 +36,12 @@ export function ConfirmRemove({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t("Cancel")}</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             className="bg-danger hover:bg-danger/90 text-white"
           >
-            Remove
+            {t("Remove")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

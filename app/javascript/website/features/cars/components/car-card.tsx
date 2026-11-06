@@ -6,8 +6,11 @@ import { Button } from "@/shared/components/ui/button"
 import { ConfirmRemove } from "@/website/components/confirm-remove"
 import { CarDialog } from "@/website/features/cars/components/car-dialog"
 import type { CustomerCar } from "@/website/features/cars/types"
+import { useI18n } from "@/website/lib/i18n"
 
 export function CarCard({ car }: { car: CustomerCar }) {
+  const { t } = useI18n()
+
   const remove = () => {
     router.delete(websiteProfileCars.destroy(car.id), { preserveScroll: true })
   }
@@ -33,13 +36,15 @@ export function CarCard({ car }: { car: CustomerCar }) {
           car={car}
           trigger={
             <Button type="button" variant="outline" className={outline}>
-              Edit
+              {t("Edit")}
             </Button>
           }
         />
         <ConfirmRemove
-          title={`Remove ${car.make} ${car.model}?`}
-          description="This car will be removed from your account. Past bookings keep their details."
+          title={t("Remove {car}?", { car: `${car.make} ${car.model}` })}
+          description={t(
+            "This car will be removed from your account. Past bookings keep their details.",
+          )}
           onConfirm={remove}
           trigger={
             <Button
@@ -47,7 +52,7 @@ export function CarCard({ car }: { car: CustomerCar }) {
               variant="outline"
               className={`${outline} text-danger hover:text-danger`}
             >
-              Remove
+              {t("Remove")}
             </Button>
           }
         />

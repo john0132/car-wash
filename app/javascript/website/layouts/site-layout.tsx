@@ -3,6 +3,7 @@ import type { ReactNode } from "react"
 import { SeoHead } from "@/website/components/seo-head"
 import { SiteFooter } from "@/website/components/site-footer"
 import { SiteHeader } from "@/website/components/site-header"
+import { useI18n } from "@/website/lib/i18n"
 
 interface SiteLayoutProps {
   title: string
@@ -25,6 +26,8 @@ export default function SiteLayout({
   mainClassName = "mx-auto max-w-6xl px-6 pt-10 pb-24 lg:pt-16",
   children,
 }: SiteLayoutProps) {
+  const { t } = useI18n()
+
   return (
     <>
       <SeoHead title={title} description={description} noindex={noindex} />
@@ -33,7 +36,7 @@ export default function SiteLayout({
         href="#main"
         className="bg-pine text-ivory focus-visible:ring-bronze sr-only z-50 rounded-full px-5 py-3 text-sm focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus-visible:ring-2 focus-visible:outline-none"
       >
-        Skip to content
+        {t("Skip to content")}
       </a>
 
       <div className="bg-ivory text-pine min-h-svh">

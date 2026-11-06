@@ -14,14 +14,17 @@ import { Spinner } from "@/shared/components/ui/spinner"
 import { brandInput } from "@/website/components/brand"
 import { SeoHead } from "@/website/components/seo-head"
 import AuthLayout from "@/website/layouts/auth-layout"
+import { useI18n } from "@/website/lib/i18n"
 
 export default function Register() {
+  const { t } = useI18n()
+
   return (
     <AuthLayout
-      title="Create an account"
-      description="Enter your details below to create your account"
+      title={t("Create an account")}
+      description={t("Enter your details below to create your account")}
     >
-      <SeoHead title="Register" noindex />
+      <SeoHead title={t("Register")} noindex />
       <Form
         action={websiteUsers.create()}
         resetOnSuccess={["password", "password_confirmation"]}
@@ -33,7 +36,7 @@ export default function Register() {
             <FieldGroup>
               <div className="grid gap-6 sm:grid-cols-2">
                 <Field>
-                  <FieldLabel htmlFor="name">First name</FieldLabel>
+                  <FieldLabel htmlFor="name">{t("First name")}</FieldLabel>
                   <Input
                     className={brandInput}
                     id="name"
@@ -50,7 +53,7 @@ export default function Register() {
                 </Field>
 
                 <Field>
-                  <FieldLabel htmlFor="last_name">Last name</FieldLabel>
+                  <FieldLabel htmlFor="last_name">{t("Last name")}</FieldLabel>
                   <Input
                     className={brandInput}
                     id="last_name"
@@ -66,7 +69,7 @@ export default function Register() {
               </div>
 
               <Field>
-                <FieldLabel htmlFor="email">Email address</FieldLabel>
+                <FieldLabel htmlFor="email">{t("Email address")}</FieldLabel>
                 <Input
                   className={brandInput}
                   id="email"
@@ -74,7 +77,7 @@ export default function Register() {
                   name="email"
                   required
                   autoComplete="email"
-                  placeholder="email@example.com"
+                  placeholder={t("email@example.com")}
                 />
                 <FieldError
                   errors={errors.email?.map((message) => ({ message }))}
@@ -82,7 +85,7 @@ export default function Register() {
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <FieldLabel htmlFor="password">{t("Password")}</FieldLabel>
                 <Input
                   className={brandInput}
                   id="password"
@@ -90,7 +93,7 @@ export default function Register() {
                   name="password"
                   required
                   autoComplete="new-password"
-                  placeholder="Password"
+                  placeholder={t("Password")}
                 />
                 <FieldError
                   errors={errors.password?.map((message) => ({ message }))}
@@ -99,7 +102,7 @@ export default function Register() {
 
               <Field>
                 <FieldLabel htmlFor="password_confirmation">
-                  Confirm password
+                  {t("Confirm password")}
                 </FieldLabel>
                 <Input
                   className={brandInput}
@@ -108,7 +111,7 @@ export default function Register() {
                   name="password_confirmation"
                   required
                   autoComplete="new-password"
-                  placeholder="Confirm password"
+                  placeholder={t("Confirm password")}
                 />
                 <FieldError
                   errors={errors.password_confirmation?.map((message) => ({
@@ -122,13 +125,13 @@ export default function Register() {
                 className="bg-pine text-ivory hover:bg-pine-deep mt-2 h-11 w-full rounded-full"
               >
                 {processing && <Spinner />}
-                Create account
+                {t("Create account")}
               </Button>
             </FieldGroup>
 
             <div className="text-muted-foreground text-center text-sm">
-              Already have an account?{" "}
-              <TextLink href={websiteSessions.new()}>Log in</TextLink>
+              {t("Already have an account?")}{" "}
+              <TextLink href={websiteSessions.new()}>{t("Log in")}</TextLink>
             </div>
           </>
         )}

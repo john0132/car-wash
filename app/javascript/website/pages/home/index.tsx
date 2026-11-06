@@ -5,6 +5,7 @@ import { ServicesSection } from "@/website/features/home-catalog/components/serv
 import type { HomeCategory } from "@/website/features/home-catalog/types"
 import type { PageProps } from "@/website/features/page-sections/types"
 import MarketingLayout from "@/website/layouts/marketing-layout"
+import { useI18n } from "@/website/lib/i18n"
 import type { ServiceSummary } from "@/website/lib/types"
 
 interface Props {
@@ -20,13 +21,15 @@ export default function Welcome({
   home_categories: categories,
   home_blogs: blogs,
 }: Props) {
+  const { t } = useI18n()
+
   return (
     <MarketingLayout
       page={page}
-      fallbackTitle="Auto Atelier — Hand-Finished Auto Care"
-      emptyMessage={
-        'This page hasn’t been set up yet. Add a "home" page from the dashboard to show content here.'
-      }
+      fallbackTitle={t("Auto Atelier — Hand-Finished Auto Care")}
+      emptyMessage={t(
+        'This page hasn’t been set up yet. Add a "home" page from the dashboard to show content here.',
+      )}
       afterHero={
         <>
           <ServiceCategoriesSection categories={categories} />

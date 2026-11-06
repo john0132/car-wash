@@ -3,6 +3,7 @@ import { useState } from "react"
 import { OptionCard } from "@/website/features/checkout/components/option-card"
 import { StepCard } from "@/website/features/checkout/components/step-card"
 import type { SlotDay } from "@/website/features/checkout/types"
+import { useI18n } from "@/website/lib/i18n"
 
 /** A row of days, then that day's hourly slots. The value is the slot's ISO time. */
 export function ScheduleStep({
@@ -18,6 +19,8 @@ export function ScheduleStep({
   onChange: (slot: string) => void
   error?: string
 }) {
+  const { t } = useI18n()
+
   const chosenDay = days.find((day) =>
     day.slots.some((slot) => slot.value === value),
   )
@@ -29,17 +32,17 @@ export function ScheduleStep({
   return (
     <StepCard
       step={step}
-      title="Date & time"
-      description="When should we come?"
+      title={t("Date & time")}
+      description={t("When should we come?")}
       error={error}
     >
       {!day ? (
-        <p className="text-sage">No times are available right now.</p>
+        <p className="text-sage">{t("No times are available right now.")}</p>
       ) : (
         <>
           <div
             role="group"
-            aria-label="Day"
+            aria-label={t("Day")}
             className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-2"
           >
             {days.map((d) => (
@@ -61,7 +64,7 @@ export function ScheduleStep({
 
           <div
             role="radiogroup"
-            aria-label={`Times on ${day.label}`}
+            aria-label={t("Times on {day}", { day: day.label })}
             className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4"
           >
             {day.slots.map((slot) => (

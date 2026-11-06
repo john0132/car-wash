@@ -23,7 +23,7 @@ import {
   hasActiveFilters,
   parsePrice,
 } from "@/website/features/category-detail/utils"
-import { formatDuration } from "@/website/lib/format"
+import { useI18n } from "@/website/lib/i18n"
 
 const DEBOUNCE_MS = 350
 const ANY = "any"
@@ -43,6 +43,8 @@ export function ServiceFilters({
   filters: CategoryFilters
   facets: CategoryFacets | undefined
 }) {
+  const { t, formatDuration } = useI18n()
+
   const [search, setSearch] = useState(filters.q ?? "")
   const [minPrice, setMinPrice] = useState(filters.min_price?.toString() ?? "")
   const [maxPrice, setMaxPrice] = useState(filters.max_price?.toString() ?? "")
@@ -124,7 +126,7 @@ export function ServiceFilters({
       <div className="relative">
         <Search
           aria-hidden
-          className="text-bronze pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2"
+          className="text-bronze pointer-events-none absolute start-4 top-1/2 size-5 -translate-y-1/2"
         />
         <Input
           type="search"
@@ -133,8 +135,8 @@ export function ServiceFilters({
             setSearch(event.target.value)
             apply({ q: event.target.value.trim() || null }, DEBOUNCE_MS)
           }}
-          placeholder="Search services"
-          aria-label="Search services"
+          placeholder={t("Search services")}
+          aria-label={t("Search services")}
           maxLength={100}
           className={`${brandInput} h-12 ps-12 text-base`}
         />
@@ -142,15 +144,15 @@ export function ServiceFilters({
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
         <div className="grid gap-2">
-          <span className={labelClass}>Price (EGP)</span>
+          <span className={labelClass}>{t("Price (EGP)")}</span>
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
             <Input
               type="number"
               inputMode="decimal"
               min={0}
               value={minPrice}
-              placeholder={priceHint(facets?.min_price) || "Min"}
-              aria-label="Minimum price"
+              placeholder={priceHint(facets?.min_price) || t("Min")}
+              aria-label={t("Minimum price")}
               onChange={(event) => {
                 setMinPrice(event.target.value)
                 apply(
@@ -168,8 +170,8 @@ export function ServiceFilters({
               inputMode="decimal"
               min={0}
               value={maxPrice}
-              placeholder={priceHint(facets?.max_price) || "Max"}
-              aria-label="Maximum price"
+              placeholder={priceHint(facets?.max_price) || t("Max")}
+              aria-label={t("Maximum price")}
               onChange={(event) => {
                 setMaxPrice(event.target.value)
                 apply(
@@ -184,7 +186,7 @@ export function ServiceFilters({
 
         <div className="grid gap-2">
           <span id="duration-label" className={labelClass}>
-            Duration
+            {t("Duration")}
           </span>
           <Select
             value={filters.max_duration?.toString() ?? ANY}
@@ -198,15 +200,19 @@ export function ServiceFilters({
             >
               <SelectValue>
                 {filters.max_duration
-                  ? `Up to ${formatDuration(filters.max_duration)}`
-                  : "Any length"}
+                  ? t("Up to {duration}", {
+                      duration: formatDuration(filters.max_duration) ?? "",
+                    })
+                  : t("Any length")}
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ANY}>Any length</SelectItem>
+              <SelectItem value={ANY}>{t("Any length")}</SelectItem>
               {(facets?.durations ?? []).map((minutes) => (
                 <SelectItem key={minutes} value={String(minutes)}>
-                  Up to {formatDuration(minutes)}
+                  {t("Up to {duration}", {
+                    duration: formatDuration(minutes) ?? "",
+                  })}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -215,7 +221,7 @@ export function ServiceFilters({
 
         <div className="grid gap-2">
           <span id="sort-label" className={labelClass}>
-            Sort by
+            {t("Sort by")}
           </span>
           <Select
             value={filters.sort}
@@ -225,12 +231,12 @@ export function ServiceFilters({
               aria-labelledby="sort-label"
               className={triggerClass}
             >
-              <SelectValue>{SORT_LABELS[filters.sort]}</SelectValue>
+              <SelectValue>{t(SORT_LABELS[filters.sort])}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               {(Object.keys(SORT_LABELS) as SortOption[]).map((option) => (
                 <SelectItem key={option} value={option}>
-                  {SORT_LABELS[option]}
+                  {t(SORT_LABELS[option])}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -251,7 +257,7 @@ export function ServiceFilters({
                   : "border-pine/15 text-pine hover:border-pine/40 bg-white"
               }`}
             >
-              On sale
+              {t("On sale")}
             </button>
           ) : (
             <span />
@@ -264,7 +270,7 @@ export function ServiceFilters({
               className="text-bronze flex h-9 items-center gap-1.5 text-sm underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
             >
               <X aria-hidden className="size-4" />
-              Clear all
+              {t("Clear all")}
             </button>
           )}
         </div>

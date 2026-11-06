@@ -2,8 +2,8 @@ import { blogs as blogsRoute } from "@/routes"
 import { Breadcrumbs } from "@/website/components/breadcrumbs"
 import { BlogCard } from "@/website/features/blogs/components/blog-card"
 import type { BlogCardData, BlogDetail } from "@/website/features/blogs/types"
-import { formatDate } from "@/website/features/blogs/utils"
 import SiteLayout from "@/website/layouts/site-layout"
+import { useI18n } from "@/website/lib/i18n"
 
 interface Props {
   blog: BlogDetail
@@ -11,7 +11,9 @@ interface Props {
 }
 
 export default function BlogShow({ blog, related }: Props) {
-  const title = blog.title ?? "Blog"
+  const { t, formatDate } = useI18n()
+
+  const title = blog.title ?? t("Blog")
 
   return (
     <SiteLayout
@@ -21,7 +23,10 @@ export default function BlogShow({ blog, related }: Props) {
     >
       <article className="mx-auto max-w-3xl px-6 pt-10 pb-20 lg:pt-16">
         <Breadcrumbs
-          items={[{ label: "Blog", href: blogsRoute().url }, { label: title }]}
+          items={[
+            { label: t("Blog"), href: blogsRoute().url },
+            { label: title },
+          ]}
         />
 
         <time
@@ -30,9 +35,13 @@ export default function BlogShow({ blog, related }: Props) {
         >
           {formatDate(blog.published_at)}
         </time>
-        <h1 className="font-display mt-3 text-4xl sm:text-5xl">{title}</h1>
+        <h1 dir="auto" className="font-display mt-3 text-4xl sm:text-5xl">
+          {title}
+        </h1>
         {blog.subtitle && (
-          <p className="text-sage mt-4 text-lg">{blog.subtitle}</p>
+          <p dir="auto" className="text-sage mt-4 text-lg">
+            {blog.subtitle}
+          </p>
         )}
 
         {blog.cover_image && (
@@ -57,8 +66,8 @@ export default function BlogShow({ blog, related }: Props) {
           className="border-pine/10 border-t px-6 py-20"
         >
           <div className="mx-auto max-w-6xl">
-            <h2 id="more-blogs" className="font-display text-3xl">
-              Keep reading
+            <h2 dir="auto" id="more-blogs" className="font-display text-3xl">
+              {t("Keep reading")}
             </h2>
             <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((item) => (

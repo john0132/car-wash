@@ -12,8 +12,11 @@ import type { LocaleProps } from "@/website/lib/i18n"
  * helpers (/ar/services), and the shared flash → toast layout.
  */
 export default function WebsiteShell({ children }: { children: ReactNode }) {
-  const { code, dir, default: defaultCode } = usePage<{ locale: LocaleProps }>()
-    .props.locale
+  const {
+    code,
+    dir,
+    default: defaultCode,
+  } = usePage<{ locale: LocaleProps }>().props.locale
 
   // Set while rendering (before any page below calls a route helper); it is
   // idempotent, and SSR renders one request at a time.

@@ -19,6 +19,7 @@ import {
   clearSessionState,
   useSessionState,
 } from "@/website/hooks/use-session-state"
+import { useI18n } from "@/website/lib/i18n"
 
 const EMPTY_DRAFT: CheckoutFormData = {
   car_id: null,
@@ -42,6 +43,8 @@ export function CheckoutForm({
   needs_phone,
   coverage,
 }: CheckoutProps) {
+  const { t } = useI18n()
+
   const draftKey = `checkout:${summary.service.slug}`
   const [draft, setDraft] = useSessionState(draftKey, EMPTY_DRAFT)
   const update = (changes: Partial<CheckoutFormData>) =>
@@ -154,11 +157,11 @@ export function CheckoutForm({
             className="bg-pine text-ivory hover:bg-pine-deep h-12 w-full rounded-full text-base"
           >
             {processing && <Spinner />}
-            Confirm booking
+            {t("Confirm booking")}
           </Button>
           {outOfReach && (
             <p className="text-sage mt-2 text-center text-sm">
-              Pick a location we serve to continue.
+              {t("Pick a location we serve to continue.")}
             </p>
           )}
         </OrderSummary>

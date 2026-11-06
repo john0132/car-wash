@@ -1,6 +1,7 @@
 import { Link } from "@inertiajs/react"
 
 import { root } from "@/routes"
+import { useI18n } from "@/website/lib/i18n"
 
 export interface Crumb {
   label: string
@@ -16,12 +17,17 @@ export function Breadcrumbs({
   items: Crumb[]
   className?: string
 }) {
+  const { t } = useI18n()
+
   return (
-    <nav aria-label="Breadcrumb" className={`text-sage text-sm ${className}`}>
+    <nav
+      aria-label={t("Breadcrumb")}
+      className={`text-sage text-sm ${className}`}
+    >
       <ol className="flex flex-wrap items-center gap-2">
         <li>
           <Link href={root()} className="hover:text-pine">
-            Home
+            {t("Home")}
           </Link>
         </li>
         {items.map((item) => (

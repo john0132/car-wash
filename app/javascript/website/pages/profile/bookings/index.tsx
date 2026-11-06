@@ -11,6 +11,7 @@ import {
   SectionHeading,
 } from "@/website/features/profile/components/profile-card"
 import ProfileLayout from "@/website/layouts/profile-layout"
+import { useI18n } from "@/website/lib/i18n"
 import type { PaginationData } from "@/website/lib/pagination"
 
 export default function BookingsIndex({
@@ -20,19 +21,21 @@ export default function BookingsIndex({
   bookings: CustomerBooking[]
   pagination: PaginationData
 }) {
+  const { t } = useI18n()
+
   return (
-    <ProfileLayout title="My bookings">
+    <ProfileLayout title={t("My bookings")}>
       {bookings.length === 0 ? (
         <ProfileCard id="bookings">
           <div className="flex flex-col gap-8">
             <SectionHeading
-              title="My bookings"
-              description="Your past and upcoming visits."
+              title={t("My bookings")}
+              description={t("Your past and upcoming visits.")}
             />
             <div className="border-pine/25 flex flex-col items-center gap-4 rounded-2xl border border-dashed px-6 py-14 text-center">
-              <p className="font-medium">No bookings yet</p>
+              <p className="font-medium">{t("No bookings yet")}</p>
               <Button asChild className={brandButton}>
-                <Link href={services()}>Book your first visit</Link>
+                <Link href={services()}>{t("Book your first visit")}</Link>
               </Button>
             </div>
           </div>
@@ -40,8 +43,8 @@ export default function BookingsIndex({
       ) : (
         <>
           <SectionHeading
-            title="My bookings"
-            description="Your past and upcoming visits."
+            title={t("My bookings")}
+            description={t("Your past and upcoming visits.")}
           />
           <ul className="flex flex-col gap-4">
             {bookings.map((booking) => (

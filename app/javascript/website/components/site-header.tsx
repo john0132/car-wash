@@ -7,9 +7,13 @@ import { Button } from "@/shared/components/ui/button"
 import { useInitials } from "@/shared/hooks/use-initials"
 import { Logo } from "@/website/components/brand-mark"
 import { HeaderNavItem } from "@/website/components/header-nav-item"
+import { LanguageSwitcher } from "@/website/components/language-switcher"
 import type { SiteSharedProps } from "@/website/features/site-chrome/types"
+import { useI18n } from "@/website/lib/i18n"
 
 export function SiteHeader() {
+  const { t } = useI18n()
+
   const { props } = usePage<SiteSharedProps>()
   const { auth, site } = props
   const getInitials = useInitials()
@@ -28,10 +32,11 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <LanguageSwitcher className="max-sm:hidden" />
           {auth.user ? (
             <Link
               href={profile()}
-              aria-label="My profile"
+              aria-label={t("My profile")}
               title={auth.user.name}
               className="focus-visible:ring-pine/40 rounded-full focus-visible:ring-2 focus-visible:outline-none"
             >
@@ -48,7 +53,7 @@ export function SiteHeader() {
               size="icon"
               className="text-pine hover:bg-pine/5 hover:text-pine size-10 rounded-full"
             >
-              <Link href={signIn()} aria-label="Log in or register">
+              <Link href={signIn()} aria-label={t("Log in or register")}>
                 <User className="size-5" />
               </Link>
             </Button>
@@ -57,8 +62,9 @@ export function SiteHeader() {
             asChild
             className="bg-pine text-ivory hover:bg-pine-deep rounded-full px-4 sm:px-5"
           >
-            <Link href={services()} aria-label="Book your visit">
-              Book<span className="max-sm:hidden">&nbsp;your visit</span>
+            <Link href={services()} aria-label={t("Book your visit")}>
+              <span className="sm:hidden">{t("Book")}</span>
+              <span className="max-sm:hidden">{t("Book your visit")}</span>
             </Link>
           </Button>
         </div>

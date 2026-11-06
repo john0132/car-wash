@@ -3,6 +3,7 @@ import type { ReactNode } from "react"
 
 import { root } from "@/routes"
 import { Logo } from "@/website/components/brand-mark"
+import { useI18n } from "@/website/lib/i18n"
 
 export default function AuthLayout({
   children,
@@ -13,11 +14,13 @@ export default function AuthLayout({
   title: string
   description: string
 }) {
+  const { t } = useI18n()
+
   return (
     <div className="bg-ivory text-pine flex min-h-svh flex-col items-center justify-center px-6 py-10">
       <div className="w-full max-w-md">
         <div className="mb-8 flex justify-center">
-          <Link href={root()} aria-label="Auto Atelier home">
+          <Link href={root()} aria-label={t("Auto Atelier home")}>
             <Logo />
           </Link>
         </div>

@@ -12,12 +12,13 @@ import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar"
 import { useInitials } from "@/shared/hooks/use-initials"
 import { fullName } from "@/website/features/profile/utils"
 import SiteLayout from "@/website/layouts/site-layout"
+import { msg, useI18n } from "@/website/lib/i18n"
 
 const TABS = [
-  { label: "Profile", route: profile, icon: User },
-  { label: "My bookings", route: profileBookings, icon: CalendarCheck },
-  { label: "My addresses", route: profileAddresses, icon: MapPin },
-  { label: "My cars", route: profileCars, icon: Car },
+  { label: msg("Profile"), route: profile, icon: User },
+  { label: msg("My bookings"), route: profileBookings, icon: CalendarCheck },
+  { label: msg("My addresses"), route: profileAddresses, icon: MapPin },
+  { label: msg("My cars"), route: profileCars, icon: Car },
 ]
 
 // Shared chrome for the customer account area: header, summary and the tab sidebar.
@@ -28,6 +29,8 @@ export default function ProfileLayout({
   title: string
   children: ReactNode
 }) {
+  const { t } = useI18n()
+
   const { props, url } = usePage()
   const user = props.auth.user
   const getInitials = useInitials()
@@ -57,7 +60,7 @@ export default function ProfileLayout({
 
       <div className="flex flex-wrap items-start gap-10">
         <nav
-          aria-label="My account"
+          aria-label={t("My account")}
           className="flex w-full shrink-0 flex-row flex-wrap gap-1 lg:sticky lg:top-28 lg:w-56 lg:flex-col"
         >
           {TABS.map(({ label, route, icon: Icon }) => {
@@ -74,7 +77,7 @@ export default function ProfileLayout({
                 }`}
               >
                 <Icon className="size-4" aria-hidden="true" />
-                {label}
+                {t(label)}
               </Link>
             )
           })}
