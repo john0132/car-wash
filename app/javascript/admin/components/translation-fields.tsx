@@ -1,3 +1,4 @@
+import { asFieldErrors } from "@/admin/components/form-fields"
 import {
   Field,
   FieldDescription,
@@ -21,9 +22,6 @@ const RTL_LANGUAGES = new Set(["ar", "fa", "he", "ur"])
 /** `dir` for an input holding text in `code`'s language. */
 export const textDirection = (code: string) =>
   RTL_LANGUAGES.has(code) ? "rtl" : undefined
-
-const asFieldErrors = (messages?: string[]) =>
-  messages?.map((message) => ({ message }))
 
 /** The `translations` param Admin::Translations#assign_translations expects. */
 export const translationParams = (translations: TranslationEntry[]) =>

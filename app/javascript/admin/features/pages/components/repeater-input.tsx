@@ -1,5 +1,6 @@
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react"
 
+import { asFieldErrors } from "@/admin/components/form-fields"
 import type { ComponentField } from "@/admin/features/components/types"
 import {
   FieldInput,
@@ -9,9 +10,6 @@ import type { FieldValues, RepeaterItem } from "@/admin/features/pages/types"
 import { newItemId } from "@/admin/features/pages/utils"
 import { Button } from "@/shared/components/ui/button"
 import { FieldError, FieldLabel } from "@/shared/components/ui/field"
-
-const asFieldErrors = (messages?: string[]) =>
-  messages?.map((message) => ({ message }))
 
 /**
  * A `repeater` field. Items (order + shared sub-fields) are the same in every

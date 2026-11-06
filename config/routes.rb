@@ -57,6 +57,11 @@ Rails.application.routes.draw do
     end
 
     root "home#index"
+
+    # Any other active Page by slug (see Website::PagesController and the
+    # admin-side Page/PageSection/Component CMS). Kept last so it never
+    # shadows the named routes above.
+    get ":slug", to: "pages#show", as: :page, constraints: { slug: Page::SLUG_SEGMENT }
   end
 
   # ActiveStorage's own direct-upload endpoint is open to anyone; send it through

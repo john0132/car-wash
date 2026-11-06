@@ -6,7 +6,8 @@ class Page < ApplicationRecord
   include Activatable
   include Translatable
 
-  SLUG_REGEXP = /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/
+  SLUG_SEGMENT = /[a-z0-9]+(?:-[a-z0-9]+)*/
+  SLUG_REGEXP = /\A#{SLUG_SEGMENT}\z/
 
   has_many :page_translations, dependent: :destroy, autosave: true
   has_many :page_sections, -> { order(:position, :id) }, dependent: :destroy, autosave: true, index_errors: true

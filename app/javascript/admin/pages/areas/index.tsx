@@ -5,6 +5,7 @@ import { ActivationSwitch } from "@/admin/components/activation-switch"
 import { ListFilters } from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
+import { ResourceTable } from "@/admin/components/resource-table"
 import type {
   AreaDetail,
   AreaFilters,
@@ -16,15 +17,7 @@ import type { Pagination as PaginationData } from "@/admin/types"
 import { adminAreas, adminCities } from "@/routes"
 import { Badge } from "@/shared/components/ui/badge"
 import { Button } from "@/shared/components/ui/button"
-import { Card, CardContent } from "@/shared/components/ui/card"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/shared/components/ui/table"
+import { TableCell, TableHead, TableRow } from "@/shared/components/ui/table"
 
 interface Props {
   areas: AreaDetail[]
@@ -85,73 +78,63 @@ export default function AreasIndex({
           ]}
         />
 
-        <Card className="py-2">
-          <CardContent className="px-2">
-            {areas.length === 0 ? (
-              <p className="text-muted-foreground py-10 text-center text-sm">
-                No areas match these filters.
-              </p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Area</TableHead>
-                    <TableHead>City</TableHead>
-                    <TableHead className="text-right">Rate</TableHead>
-                    <TableHead>Boundary</TableHead>
-                    <TableHead className="text-right">Active</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {areas.map((area) => (
-                    <TableRow key={area.id}>
-                      <TableCell>
-                        <Link
-                          href={adminAreas.show(area.id)}
-                          className="font-medium hover:underline"
-                        >
-                          {area.name}
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        {can("cities", "read") ? (
-                          <Link
-                            href={adminCities.show(area.city.id)}
-                            className="hover:underline"
-                          >
-                            {area.city.name}
-                          </Link>
-                        ) : (
-                          area.city.name
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {area.rate.toFixed(2)}
-                      </TableCell>
-                      <TableCell>
-                        {area.geofence ? (
-                          <span className="text-muted-foreground text-sm">
-                            {area.geofence.coordinates[0].length - 1} points
-                          </span>
-                        ) : (
-                          <Badge variant="outline">Not drawn</Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <ActivationSwitch
-                          active={area.is_active}
-                          name={area.name}
-                          action={adminAreas.activation(area.id)}
-                          disabled={!can("areas", "update")}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+        <ResourceTable
+          items={areas}
+          emptyMessage="No areas match these filters."
+          columns={
+            <>
+              <TableHead>Area</TableHead>
+              <TableHead>City</TableHead>
+              <TableHead className="text-right">Rate</TableHead>
+              <TableHead>Boundary</TableHead>
+              <TableHead className="text-right">Active</TableHead>
+            </>
+          }
+          renderRow={(area) => (
+            <TableRow key={area.id}>
+              <TableCell>
+                <Link
+                  href={adminAreas.show(area.id)}
+                  className="font-medium hover:underline"
+                >
+                  {area.name}
+                </Link>
+              </TableCell>
+              <TableCell>
+                {can("cities", "read") ? (
+                  <Link
+                    href={adminCities.show(area.city.id)}
+                    className="hover:underline"
+                  >
+                    {area.city.name}
+                  </Link>
+                ) : (
+                  area.city.name
+                )}
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {area.rate.toFixed(2)}
+              </TableCell>
+              <TableCell>
+                {area.geofence ? (
+                  <span className="text-muted-foreground text-sm">
+                    {area.geofence.coordinates[0].length - 1} points
+                  </span>
+                ) : (
+                  <Badge variant="outline">Not drawn</Badge>
+                )}
+              </TableCell>
+              <TableCell className="text-right">
+                <ActivationSwitch
+                  active={area.is_active}
+                  name={area.name}
+                  action={adminAreas.activation(area.id)}
+                  disabled={!can("areas", "update")}
+                />
+              </TableCell>
+            </TableRow>
+          )}
+        />
 
         <Pagination pagination={pagination} noun="areas" />
       </div>

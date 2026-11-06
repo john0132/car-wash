@@ -3,6 +3,7 @@ import { CircleAlert, Clock, HandCoins, Undo2 } from "lucide-react"
 
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
+import { ResourceTable } from "@/admin/components/resource-table"
 import { StatCard } from "@/admin/components/stat-card"
 import { TransactionFilters } from "@/admin/features/payments/components/transaction-filters"
 import { TransactionStatusBadge } from "@/admin/features/payments/components/transaction-status-badge"
@@ -15,15 +16,7 @@ import AdminLayout from "@/admin/layouts/admin-layout"
 import { formatDateTime, formatMoney, formatNumber } from "@/admin/lib/format"
 import type { Pagination as PaginationData } from "@/admin/types"
 import { adminCustomers, adminPaymentTransactions } from "@/routes"
-import { Card, CardContent } from "@/shared/components/ui/card"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/shared/components/ui/table"
+import { TableCell, TableHead, TableRow } from "@/shared/components/ui/table"
 
 interface Props {
   transactions: TransactionRow[]
@@ -87,69 +80,59 @@ export default function PaymentTransactionsIndex({
           methods={payment_method_options}
         />
 
-        <Card className="py-2">
-          <CardContent className="px-2">
-            {transactions.length === 0 ? (
-              <p className="text-muted-foreground py-10 text-center text-sm">
-                No transactions match these filters.
-              </p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Reference</TableHead>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>For</TableHead>
-                    <TableHead>Method</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {transactions.map((transaction) => (
-                    <TableRow key={transaction.id}>
-                      <TableCell className="tabular-nums">
-                        {formatDateTime(transaction.created_at)}
-                      </TableCell>
-                      <TableCell className="font-mono text-xs">
-                        <Link
-                          href={adminPaymentTransactions.show(transaction.id)}
-                          className="hover:underline"
-                        >
-                          {transaction.reference ?? `#${transaction.id}`}
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        <Link
-                          href={adminCustomers.show(transaction.customer.id)}
-                          className="font-medium hover:underline"
-                        >
-                          {transaction.customer.full_name}
-                        </Link>
-                        <div className="text-muted-foreground text-xs">
-                          {transaction.customer.email}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {transaction.booking_id
-                          ? `Booking #${transaction.booking_id}`
-                          : "Wallet top-up"}
-                      </TableCell>
-                      <TableCell>{transaction.payment_method}</TableCell>
-                      <TableCell>
-                        <TransactionStatusBadge status={transaction.status} />
-                      </TableCell>
-                      <TableCell className="text-right font-medium tabular-nums">
-                        {formatMoney(transaction.amount)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+        <ResourceTable
+          items={transactions}
+          emptyMessage="No transactions match these filters."
+          columns={
+            <>
+              <TableHead>Date</TableHead>
+              <TableHead>Reference</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>For</TableHead>
+              <TableHead>Method</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+            </>
+          }
+          renderRow={(transaction) => (
+            <TableRow key={transaction.id}>
+              <TableCell className="tabular-nums">
+                {formatDateTime(transaction.created_at)}
+              </TableCell>
+              <TableCell className="font-mono text-xs">
+                <Link
+                  href={adminPaymentTransactions.show(transaction.id)}
+                  className="hover:underline"
+                >
+                  {transaction.reference ?? `#${transaction.id}`}
+                </Link>
+              </TableCell>
+              <TableCell>
+                <Link
+                  href={adminCustomers.show(transaction.customer.id)}
+                  className="font-medium hover:underline"
+                >
+                  {transaction.customer.full_name}
+                </Link>
+                <div className="text-muted-foreground text-xs">
+                  {transaction.customer.email}
+                </div>
+              </TableCell>
+              <TableCell>
+                {transaction.booking_id
+                  ? `Booking #${transaction.booking_id}`
+                  : "Wallet top-up"}
+              </TableCell>
+              <TableCell>{transaction.payment_method}</TableCell>
+              <TableCell>
+                <TransactionStatusBadge status={transaction.status} />
+              </TableCell>
+              <TableCell className="text-right font-medium tabular-nums">
+                {formatMoney(transaction.amount)}
+              </TableCell>
+            </TableRow>
+          )}
+        />
 
         <Pagination pagination={pagination} noun="transactions" />
       </div>

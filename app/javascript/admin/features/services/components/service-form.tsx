@@ -1,5 +1,6 @@
 import { Link, useForm } from "@inertiajs/react"
 
+import { asFieldErrors } from "@/admin/components/form-fields"
 import {
   SeoFields,
   type SeoTranslationEntry,
@@ -30,9 +31,6 @@ import {
 } from "@/shared/components/ui/select"
 import { Spinner } from "@/shared/components/ui/spinner"
 import { Switch } from "@/shared/components/ui/switch"
-
-const asFieldErrors = (messages?: string[]) =>
-  messages?.map((message) => ({ message }))
 
 interface ServiceFormData {
   service_category_id: number | null

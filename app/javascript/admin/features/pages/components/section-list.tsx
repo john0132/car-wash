@@ -10,6 +10,7 @@ import {
 } from "lucide-react"
 import { useState } from "react"
 
+import { asFieldErrors } from "@/admin/components/form-fields"
 import type { ComponentOption } from "@/admin/features/components/types"
 import { SectionFields } from "@/admin/features/pages/components/section-fields"
 import type { SectionState } from "@/admin/features/pages/types"
@@ -32,9 +33,6 @@ import {
 } from "@/shared/components/ui/dropdown-menu"
 import { FieldError } from "@/shared/components/ui/field"
 import { Switch } from "@/shared/components/ui/switch"
-
-const asFieldErrors = (messages?: string[]) =>
-  messages?.map((message) => ({ message }))
 
 /** The page's ordered sections: each one a component instance with its own editor. */
 export function SectionList({

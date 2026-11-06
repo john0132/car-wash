@@ -1,5 +1,6 @@
 import { Link, useForm } from "@inertiajs/react"
 
+import { asFieldErrors } from "@/admin/components/form-fields"
 import {
   type TranslationEntry,
   TranslationFields,
@@ -18,9 +19,6 @@ import {
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
 import { Switch } from "@/shared/components/ui/switch"
-
-const asFieldErrors = (messages?: string[]) =>
-  messages?.map((message) => ({ message }))
 
 interface ExtraFormData {
   price: string

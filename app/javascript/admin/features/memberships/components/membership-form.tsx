@@ -1,6 +1,7 @@
 import { Link, useForm } from "@inertiajs/react"
 import type { ReactNode } from "react"
 
+import { asFieldErrors } from "@/admin/components/form-fields"
 import { MembershipBadge } from "@/admin/features/customers/components/membership-badge"
 import type {
   MembershipDetail,
@@ -20,9 +21,6 @@ import {
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
 import { Switch } from "@/shared/components/ui/switch"
-
-const asFieldErrors = (messages?: string[]) =>
-  messages?.map((message) => ({ message }))
 
 const toHex = (color: string) => (color.startsWith("#") ? color : `#${color}`)
 

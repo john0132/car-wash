@@ -92,8 +92,8 @@ export default function RoleShow({
         {role.super_admin && (
           <p className="text-muted-foreground text-sm">
             The {role.name} role can&apos;t be deleted
-            {!isSuperAdmin && " or edited"}, and always holds every
-            permission, including ones added later
+            {!isSuperAdmin && " or edited"}, and always holds every permission,
+            including ones added later
             {isSuperAdmin && " unless you change that here"}.
           </p>
         )}

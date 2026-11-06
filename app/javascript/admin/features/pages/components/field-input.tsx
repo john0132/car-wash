@@ -1,5 +1,6 @@
 import { Globe } from "lucide-react"
 
+import { asFieldErrors } from "@/admin/components/form-fields"
 import { ImageUploadField } from "@/admin/components/image-upload-field"
 import { RichTextEditor } from "@/admin/components/rich-text-editor"
 import type { ComponentField } from "@/admin/features/components/types"
@@ -31,9 +32,6 @@ const NONE = "__none__"
 
 const asText = (value: FieldValue | undefined) =>
   typeof value === "string" || typeof value === "number" ? String(value) : ""
-
-const asFieldErrors = (messages?: string[]) =>
-  messages?.map((message) => ({ message }))
 
 /** Context an input needs beyond its own value. */
 export interface FieldInputContext {

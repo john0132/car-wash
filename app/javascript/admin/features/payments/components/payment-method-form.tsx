@@ -1,6 +1,7 @@
 import { Link, useForm } from "@inertiajs/react"
 import type { ReactNode } from "react"
 
+import { asFieldErrors } from "@/admin/components/form-fields"
 import type {
   PaymentMethodDetail,
   PaymentMethodFormData,
@@ -19,9 +20,6 @@ import {
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
 import { Switch } from "@/shared/components/ui/switch"
-
-const asFieldErrors = (messages?: string[]) =>
-  messages?.map((message) => ({ message }))
 
 /** Create/edit form for a payment method. Posts `{ payment_method: {...} }`. */
 export function PaymentMethodForm({

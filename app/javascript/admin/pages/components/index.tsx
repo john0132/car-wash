@@ -5,6 +5,7 @@ import { ActivationSwitch } from "@/admin/components/activation-switch"
 import { ListFilters } from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
+import { ResourceTable } from "@/admin/components/resource-table"
 import type {
   ComponentFilters,
   ComponentRow,
@@ -15,15 +16,7 @@ import { formatNumber } from "@/admin/lib/format"
 import type { Pagination as PaginationData } from "@/admin/types"
 import { adminComponents } from "@/routes"
 import { Button } from "@/shared/components/ui/button"
-import { Card, CardContent } from "@/shared/components/ui/card"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/shared/components/ui/table"
+import { TableCell, TableHead, TableRow } from "@/shared/components/ui/table"
 
 interface Props {
   components: ComponentRow[]
@@ -66,84 +59,72 @@ export default function ComponentsIndex({
           searchPlaceholder="Search component name…"
         />
 
-        <Card className="py-2">
-          <CardContent className="px-2">
-            {components.length === 0 ? (
-              <p className="text-muted-foreground py-10 text-center text-sm">
-                No components match these filters.
-              </p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Component</TableHead>
-                    <TableHead>Key</TableHead>
-                    <TableHead className="text-right">Fields</TableHead>
-                    <TableHead className="text-right">Used on pages</TableHead>
-                    <TableHead className="text-right">Active</TableHead>
-                    <TableHead className="w-12" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {components.map((component) => (
-                    <TableRow key={component.id}>
-                      <TableCell>
-                        <div className="space-y-0.5">
-                          {canUpdate ? (
-                            <Link
-                              href={adminComponents.edit(component.id)}
-                              className="font-medium hover:underline"
-                            >
-                              {component.name}
-                            </Link>
-                          ) : (
-                            <span className="font-medium">
-                              {component.name}
-                            </span>
-                          )}
-                          {component.description && (
-                            <p className="text-muted-foreground max-w-md truncate text-xs">
-                              {component.description}
-                            </p>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-mono text-sm">
-                        {component.key}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {formatNumber(component.fields_count)}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {formatNumber(component.pages_count)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <ActivationSwitch
-                          active={component.is_active}
-                          name={component.name}
-                          action={adminComponents.activation(component.id)}
-                          disabled={!canUpdate}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        {canUpdate && (
-                          <Button variant="ghost" size="icon" asChild>
-                            <Link
-                              href={adminComponents.edit(component.id)}
-                              aria-label={`Edit ${component.name}`}
-                            >
-                              <Pencil />
-                            </Link>
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+        <ResourceTable
+          items={components}
+          emptyMessage="No components match these filters."
+          columns={
+            <>
+              <TableHead>Component</TableHead>
+              <TableHead>Key</TableHead>
+              <TableHead className="text-right">Fields</TableHead>
+              <TableHead className="text-right">Used on pages</TableHead>
+              <TableHead className="text-right">Active</TableHead>
+              <TableHead className="w-12" />
+            </>
+          }
+          renderRow={(component) => (
+            <TableRow key={component.id}>
+              <TableCell>
+                <div className="space-y-0.5">
+                  {canUpdate ? (
+                    <Link
+                      href={adminComponents.edit(component.id)}
+                      className="font-medium hover:underline"
+                    >
+                      {component.name}
+                    </Link>
+                  ) : (
+                    <span className="font-medium">{component.name}</span>
+                  )}
+                  {component.description && (
+                    <p className="text-muted-foreground max-w-md truncate text-xs">
+                      {component.description}
+                    </p>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell className="font-mono text-sm">
+                {component.key}
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {formatNumber(component.fields_count)}
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {formatNumber(component.pages_count)}
+              </TableCell>
+              <TableCell className="text-right">
+                <ActivationSwitch
+                  active={component.is_active}
+                  name={component.name}
+                  action={adminComponents.activation(component.id)}
+                  disabled={!canUpdate}
+                />
+              </TableCell>
+              <TableCell>
+                {canUpdate && (
+                  <Button variant="ghost" size="icon" asChild>
+                    <Link
+                      href={adminComponents.edit(component.id)}
+                      aria-label={`Edit ${component.name}`}
+                    >
+                      <Pencil />
+                    </Link>
+                  </Button>
+                )}
+              </TableCell>
+            </TableRow>
+          )}
+        />
 
         <Pagination pagination={pagination} noun="components" />
       </div>

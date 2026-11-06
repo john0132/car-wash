@@ -9,6 +9,9 @@ super_admin = Role.super_admin!
 # Every environment: starter page components (hero, rich text, CTA, features).
 load Rails.root.join("db/seeds/components.rb")
 
+# Every environment: the public homepage, built from the components above.
+load Rails.root.join("db/seeds/pages.rb")
+
 # Development-only staff account for signing in at /admin/sign_in.
 # Override with ADMIN_EMAIL / ADMIN_PASSWORD. Production admins must be created explicitly.
 if Rails.env.development?

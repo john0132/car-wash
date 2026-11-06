@@ -5,6 +5,7 @@ import { ActivationSwitch } from "@/admin/components/activation-switch"
 import { ListFilters } from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
+import { ResourceTable } from "@/admin/components/resource-table"
 import type {
   ServiceCategoryFilters,
   ServiceCategoryRow,
@@ -15,15 +16,7 @@ import { formatNumber } from "@/admin/lib/format"
 import type { Pagination as PaginationData } from "@/admin/types"
 import { adminServiceCategories, adminServices } from "@/routes"
 import { Button } from "@/shared/components/ui/button"
-import { Card, CardContent } from "@/shared/components/ui/card"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/shared/components/ui/table"
+import { TableCell, TableHead, TableRow } from "@/shared/components/ui/table"
 
 interface Props {
   service_categories: ServiceCategoryRow[]
@@ -70,73 +63,61 @@ export default function ServiceCategoriesIndex({
           searchPlaceholder="Search category name…"
         />
 
-        <Card className="py-2">
-          <CardContent className="px-2">
-            {categories.length === 0 ? (
-              <p className="text-muted-foreground py-10 text-center text-sm">
-                No service categories match these filters.
-              </p>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Other names</TableHead>
-                    <TableHead className="text-right">Services</TableHead>
-                    <TableHead className="text-right">Active</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {categories.map((category) => (
-                    <TableRow key={category.id}>
-                      <TableCell>
-                        <Link
-                          href={adminServiceCategories.show(category.id)}
-                          className="font-medium hover:underline"
-                        >
-                          {category.name}
-                        </Link>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground space-x-3">
-                        {category.translations
-                          .filter((t) => !t.default && t.name)
-                          .map((t) => (
-                            <span key={t.language_id} lang={t.code}>
-                              {t.name}
-                            </span>
-                          ))}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {can("services", "read") ? (
-                          <Link
-                            href={adminServices.index({
-                              query: { service_category_id: category.id },
-                            })}
-                            className="hover:underline"
-                          >
-                            {formatNumber(category.services_count)}
-                          </Link>
-                        ) : (
-                          formatNumber(category.services_count)
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <ActivationSwitch
-                          active={category.is_active}
-                          name={category.name}
-                          action={adminServiceCategories.activation(
-                            category.id,
-                          )}
-                          disabled={!can("service_categories", "update")}
-                        />
-                      </TableCell>
-                    </TableRow>
+        <ResourceTable
+          items={categories}
+          emptyMessage="No service categories match these filters."
+          columns={
+            <>
+              <TableHead>Category</TableHead>
+              <TableHead>Other names</TableHead>
+              <TableHead className="text-right">Services</TableHead>
+              <TableHead className="text-right">Active</TableHead>
+            </>
+          }
+          renderRow={(category) => (
+            <TableRow key={category.id}>
+              <TableCell>
+                <Link
+                  href={adminServiceCategories.show(category.id)}
+                  className="font-medium hover:underline"
+                >
+                  {category.name}
+                </Link>
+              </TableCell>
+              <TableCell className="text-muted-foreground space-x-3">
+                {category.translations
+                  .filter((t) => !t.default && t.name)
+                  .map((t) => (
+                    <span key={t.language_id} lang={t.code}>
+                      {t.name}
+                    </span>
                   ))}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {can("services", "read") ? (
+                  <Link
+                    href={adminServices.index({
+                      query: { service_category_id: category.id },
+                    })}
+                    className="hover:underline"
+                  >
+                    {formatNumber(category.services_count)}
+                  </Link>
+                ) : (
+                  formatNumber(category.services_count)
+                )}
+              </TableCell>
+              <TableCell className="text-right">
+                <ActivationSwitch
+                  active={category.is_active}
+                  name={category.name}
+                  action={adminServiceCategories.activation(category.id)}
+                  disabled={!can("service_categories", "update")}
+                />
+              </TableCell>
+            </TableRow>
+          )}
+        />
 
         <Pagination pagination={pagination} noun="categories" />
       </div>
