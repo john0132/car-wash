@@ -26,7 +26,7 @@ export default function ServiceCategoryNew({ translations }: Props) {
       <div className="space-y-6 p-4">
         <PageHeader title="New service category" />
         <ServiceCategoryForm
-          isActive
+          category={null}
           translations={translations}
           action={adminServiceCategories.create()}
           cancelHref={adminServiceCategories.index().url}

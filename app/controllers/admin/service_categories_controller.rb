@@ -4,6 +4,7 @@
 # service_category_translations. A category can only be deleted once it has no services.
 class Admin::ServiceCategoriesController < Admin::BaseController
   include Admin::Activation
+  include Admin::Images
   include Admin::Pagination
   include Admin::Translations
 
@@ -18,7 +19,7 @@ class Admin::ServiceCategoriesController < Admin::BaseController
 
     scope = ServiceCategory.search_name(params[:q]).with_status(params[:status])
     categories, pagination = paginate(scope.ordered_by_name)
-    categories = categories.includes(:service_category_translations)
+    categories = categories.includes(:service_category_translations, image_attachment: :blob)
     services_counts = Service.where(service_category_id: categories.map(&:id)).group(:service_category_id).count
 
     render inertia: {
@@ -99,16 +100,18 @@ class Admin::ServiceCategoriesController < Admin::BaseController
   private
 
   def set_service_category
-    @service_category = ServiceCategory.includes(:service_category_translations).find(params[:id])
+    @service_category = ServiceCategory.includes(:service_category_translations, image_attachment: :blob).find(params[:id])
   end
 
   def category_params
-    @category_params ||= params.expect(service_category: [ :is_active,
+    @category_params ||= params.expect(service_category: [ :is_active, :display_in_home_page, :image,
                                                            translations: [ [ :language_id, :name, *TRANSLATION_FIELDS ] ] ])
   end
 
   def assign_category(category)
     category.is_active = category_params[:is_active] if category_params.key?(:is_active)
+    category.display_in_home_page = category_params[:display_in_home_page] if category_params.key?(:display_in_home_page)
+    assign_image(category, :image, category_params[:image]) if category_params.key?(:image)
     assign_translations(category, category_params[:translations], fields: TRANSLATION_FIELDS)
   end
 
@@ -117,6 +120,8 @@ class Admin::ServiceCategoriesController < Admin::BaseController
       id: category.id,
       name: translated_name(category),
       is_active: category.is_active,
+      display_in_home_page: category.display_in_home_page,
+      image: image_prop(category.image),
       translations: translations_props(category, fields: TRANSLATION_FIELDS),
       created_at: category.created_at
     }

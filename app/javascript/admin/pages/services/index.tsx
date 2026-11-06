@@ -6,6 +6,7 @@ import { ListFilters } from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
 import { ResourceTable } from "@/admin/components/resource-table"
+import { HomePageBadge } from "@/admin/features/services/components/home-page-badge"
 import { ServicePrice } from "@/admin/features/services/components/service-price"
 import type {
   ServiceCategoryOption,
@@ -90,6 +91,7 @@ export default function ServicesIndex({
               <TableHead>Service</TableHead>
               <TableHead>Category</TableHead>
               <TableHead className="text-right">Price</TableHead>
+              <TableHead>Display on Homepage</TableHead>
               <TableHead className="text-right">Active</TableHead>
             </>
           }
@@ -122,6 +124,9 @@ export default function ServicesIndex({
                   price={service.price}
                   salePrice={service.sale_price}
                 />
+              </TableCell>
+              <TableCell>
+                <HomePageBadge displayed={service.display_in_home_page} />
               </TableCell>
               <TableCell className="text-right">
                 <ActivationSwitch

@@ -36,7 +36,7 @@ export default function ServiceCategoryEdit({
         <PageHeader title={`Edit ${category.name}`} />
         <ServiceCategoryForm
           key={category.id}
-          isActive={category.is_active}
+          category={category}
           translations={translations}
           action={adminServiceCategories.update(category.id)}
           cancelHref={adminServiceCategories.show(category.id).url}

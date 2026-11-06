@@ -127,6 +127,59 @@ RSpec.describe "Admin services", type: :request do
     end
   end
 
+  describe "homepage display and image" do
+    let(:service) { create_service(service_category: category) }
+
+    it "defaults to hidden, with no image" do
+      grant(admin, "services.update")
+
+      get edit_admin_service_path(service)
+
+      expect(inertia.props[:service]).to include(display_in_home_page: false, image: nil)
+    end
+
+    it "creates a service shown on the homepage with an image" do
+      grant(admin, "services.create")
+      blob = uploaded_blob
+
+      post admin_services_path, params: {
+        service: { service_category_id: category.id, price: "100", display_in_home_page: true,
+                   image: blob.signed_id, translations: translations(en: "Full Wash") }
+      }
+
+      created = Service.last
+      expect(created.display_in_home_page).to be(true)
+      expect(created.image.blob).to eq(blob)
+    end
+
+    it "replaces, keeps and removes the image" do
+      grant(admin, "services.update")
+      old_blob = uploaded_blob
+      service.image.attach(old_blob)
+      new_blob = uploaded_blob
+      params = ->(image) { { service: { price: "100", display_in_home_page: true, image: image } } }
+
+      patch admin_service_path(service), params: params.(old_blob.signed_id)
+      expect(service.reload.image.blob).to eq(old_blob)
+      expect(service.display_in_home_page).to be(true)
+
+      patch admin_service_path(service), params: params.(new_blob.signed_id)
+      expect(service.reload.image.blob).to eq(new_blob)
+
+      patch admin_service_path(service), params: params.("")
+      expect(service.reload.image).not_to be_attached
+    end
+
+    it "leaves the image alone when the form doesn't send one" do
+      grant(admin, "services.update")
+      service.image.attach(uploaded_blob)
+
+      patch admin_service_path(service), params: { service: { price: "120" } }
+
+      expect(service.reload.image).to be_attached
+    end
+  end
+
   describe "PATCH /admin/services/:id" do
     it "updates prices, moves the service and clears the sale price" do
       grant(admin, "services.update")

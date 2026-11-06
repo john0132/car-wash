@@ -8,10 +8,12 @@ import {
 } from "@/admin/components/seo-fields"
 import { TranslationFields } from "@/admin/components/translation-fields"
 import { FormSection } from "@/admin/features/services/components/form-section"
+import { HomePageFields } from "@/admin/features/services/components/home-page-fields"
 import type {
   ServiceCategoryOption,
   ServiceDetail,
 } from "@/admin/features/services/types"
+import type { ImageValue } from "@/admin/types"
 import type { RouteDefinition } from "@/routes/runtime"
 import { Button } from "@/shared/components/ui/button"
 import {
@@ -37,6 +39,8 @@ interface ServiceFormData {
   price: string
   sale_price: string
   is_active: boolean
+  display_in_home_page: boolean
+  image: ImageValue | null
   translations: SeoTranslationEntry[]
 }
 
@@ -64,6 +68,8 @@ export function ServiceForm({
     price: service ? String(service.price) : "",
     sale_price: service?.sale_price != null ? String(service.sale_price) : "",
     is_active: service?.is_active ?? true,
+    display_in_home_page: service?.display_in_home_page ?? false,
+    image: service?.image ?? null,
     translations,
   })
   const { data, setData, processing } = form
@@ -77,6 +83,8 @@ export function ServiceForm({
       price: values.price,
       sale_price: values.sale_price,
       is_active: values.is_active,
+      display_in_home_page: values.display_in_home_page,
+      image: values.image?.signed_id ?? "",
       translations: seoTranslationParams(values.translations),
     },
   }))
@@ -170,6 +178,15 @@ export function ServiceForm({
             <FieldError errors={asFieldErrors(errors.sale_price)} />
           </Field>
         </div>
+
+        <HomePageFields
+          noun="service"
+          image={data.image}
+          onImageChange={(image) => setData("image", image)}
+          display={data.display_in_home_page}
+          onDisplayChange={(value) => setData("display_in_home_page", value)}
+          errors={errors}
+        />
 
         <Field orientation="horizontal">
           <Switch

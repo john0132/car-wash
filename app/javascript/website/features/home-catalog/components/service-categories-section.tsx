@@ -1,0 +1,66 @@
+import { ImageOrMark } from "@/website/features/home-catalog/components/image-or-mark"
+import type { HomeCategory } from "@/website/features/home-catalog/types"
+
+/**
+ * Categories as arch-framed portraits (echoing the hero's round frame) on a
+ * white band, centred however many there are. Renders nothing when empty.
+ */
+export function ServiceCategoriesSection({
+  categories,
+}: {
+  categories: HomeCategory[]
+}) {
+  if (categories.length === 0) return null
+
+  return (
+    <section
+      id="service-categories"
+      aria-labelledby="service-categories-heading"
+      className="bg-white px-6 py-24"
+    >
+      <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-xl text-center">
+          <p className="text-xs font-medium tracking-[0.3em] text-[#8A6240] uppercase">
+            The collections
+          </p>
+          <h2
+            id="service-categories-heading"
+            style={{ fontFamily: "'Italiana', serif" }}
+            className="mt-4 text-4xl text-[#2B3A32] sm:text-5xl"
+          >
+            Care for every corner
+          </h2>
+        </div>
+
+        <ul className="mt-14 flex flex-wrap justify-center gap-x-6 gap-y-12">
+          {categories.map((category) => (
+            <li
+              key={category.id}
+              className="group w-[calc(50%-12px)] md:w-[calc(33.333%-16px)] lg:w-[calc(25%-18px)]"
+            >
+              <div className="aspect-[3/4] overflow-hidden rounded-t-full border border-[#A97C50]/30 bg-[#F6F1E7] p-2">
+                <div className="h-full w-full overflow-hidden rounded-t-full">
+                  <ImageOrMark image={category.image} />
+                </div>
+              </div>
+              <div className="mt-5 text-center">
+                <h3
+                  style={{ fontFamily: "'Italiana', serif" }}
+                  className="text-2xl text-[#2B3A32]"
+                >
+                  {category.name}
+                </h3>
+                {category.services_count > 0 && (
+                  <p className="mt-1 text-sm text-[#5B6B5E]">
+                    {category.services_count}{" "}
+                    {category.services_count === 1 ? "service" : "services"}
+                  </p>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}

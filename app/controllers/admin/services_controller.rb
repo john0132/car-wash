@@ -4,6 +4,7 @@
 # service_translations. Services that were booked can't be deleted, only disabled.
 class Admin::ServicesController < Admin::BaseController
   include Admin::Activation
+  include Admin::Images
   include Admin::Pagination
   include Admin::Translations
 
@@ -19,7 +20,7 @@ class Admin::ServicesController < Admin::BaseController
     scope = Service.search_name(params[:q]).with_status(params[:status])
     scope = scope.where(service_category_id: category_filter) if category_filter
     services, pagination = paginate(scope.ordered_by_name)
-    services = services.includes(:service_translations, service_category: :service_category_translations)
+    services = services.includes(:service_translations, image_attachment: :blob, service_category: :service_category_translations)
 
     render inertia: {
       services: services.map { |service| service_props(service) },
@@ -94,17 +95,18 @@ class Admin::ServicesController < Admin::BaseController
   private
 
   def set_service
-    @service = Service.includes(:service_translations, service_category: :service_category_translations)
+    @service = Service.includes(:service_translations, image_attachment: :blob, service_category: :service_category_translations)
       .find(params[:id])
   end
 
   def service_params
-    @service_params ||= params.expect(service: [ :service_category_id, :price, :sale_price, :is_active,
+    @service_params ||= params.expect(service: [ :service_category_id, :price, :sale_price, :is_active, :display_in_home_page, :image,
                                                  translations: [ [ :language_id, :name, *TRANSLATION_FIELDS ] ] ])
   end
 
   def assign_service(service)
-    service.assign_attributes(service_params.slice(:service_category_id, :price, :is_active))
+    service.assign_attributes(service_params.slice(:service_category_id, :price, :is_active, :display_in_home_page))
+    assign_image(service, :image, service_params[:image]) if service_params.key?(:image)
     # A blank sale price means "no sale", not 0.
     service.sale_price = service_params[:sale_price].presence if service_params.key?(:sale_price)
     assign_translations(service, service_params[:translations], fields: TRANSLATION_FIELDS)
@@ -127,6 +129,8 @@ class Admin::ServicesController < Admin::BaseController
       price: service.price.to_f,
       sale_price: service.sale_price&.to_f,
       is_active: service.is_active,
+      display_in_home_page: service.display_in_home_page,
+      image: image_prop(service.image),
       translations: translations_props(service, fields: TRANSLATION_FIELDS),
       service_category: { id: service.service_category.id, name: translated_name(service.service_category) },
       created_at: service.created_at

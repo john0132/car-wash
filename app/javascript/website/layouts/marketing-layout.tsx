@@ -1,4 +1,5 @@
 import { Head } from "@inertiajs/react"
+import type { ReactNode } from "react"
 
 import { SiteFooter } from "@/website/components/site-footer"
 import { SiteHeader } from "@/website/components/site-header"
@@ -9,6 +10,8 @@ interface MarketingLayoutProps {
   page: PageProps | null
   fallbackTitle: string
   emptyMessage: string
+  /** Extra sections shown right under the page's hero. */
+  afterHero?: ReactNode
 }
 
 // Shared chrome for every CMS-driven public page (home, and any page served
@@ -19,6 +22,7 @@ export default function MarketingLayout({
   page,
   fallbackTitle,
   emptyMessage,
+  afterHero,
 }: MarketingLayoutProps) {
   return (
     <>
@@ -48,6 +52,7 @@ export default function MarketingLayout({
             <PageSections
               sections={page.sections}
               components={page.components}
+              afterHero={afterHero}
             />
           ) : (
             <div className="px-6 py-32 text-center text-[#5B6B5E]">

@@ -109,6 +109,58 @@ RSpec.describe "Admin service categories", type: :request do
     end
   end
 
+  describe "homepage display and image" do
+    let(:category) { create_service_category("Exterior") }
+
+    it "defaults to hidden, with no image" do
+      grant(admin, "service_categories.update")
+
+      get edit_admin_service_category_path(category)
+
+      expect(inertia.props[:service_category]).to include(display_in_home_page: false, image: nil)
+    end
+
+    it "creates a category shown on the homepage with an image" do
+      grant(admin, "service_categories.create")
+      blob = uploaded_blob
+
+      post admin_service_categories_path, params: {
+        service_category: { display_in_home_page: true, image: blob.signed_id, translations: translations(en: "Interior") }
+      }
+
+      created = ServiceCategory.last
+      expect(created.display_in_home_page).to be(true)
+      expect(created.image.blob).to eq(blob)
+    end
+
+    it "replaces, keeps and removes the image" do
+      grant(admin, "service_categories.update")
+      old_blob = uploaded_blob
+      category.image.attach(old_blob)
+      new_blob = uploaded_blob
+      params = ->(image) { { service_category: { display_in_home_page: true, image: image } } }
+
+      patch admin_service_category_path(category), params: params.(old_blob.signed_id)
+      expect(category.reload.image.blob).to eq(old_blob)
+
+      patch admin_service_category_path(category), params: params.(new_blob.signed_id)
+      expect(category.reload.image.blob).to eq(new_blob)
+
+      patch admin_service_category_path(category), params: params.("")
+      expect(category.reload.image).not_to be_attached
+    end
+
+    it "is independent of its services' flag" do
+      grant(admin, "service_categories.update")
+      service = create_service(service_category: category, display_in_home_page: true)
+
+      patch admin_service_category_path(category), params: { service_category: { display_in_home_page: true } }
+
+      expect(category.reload.display_in_home_page).to be(true)
+      expect(service.reload.display_in_home_page).to be(true)
+    end
+  end
+
   describe "PATCH /admin/service_categories/:id" do
     it "renames the category, clears blank SEO text and removes a blanked-out translation" do
       grant(admin, "service_categories.update")

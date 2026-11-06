@@ -9,9 +9,11 @@
 # A language whose text fields are all blank is removed, and the model
 # validates that the default language keeps one.
 #
-# Also builds `{ signed_id:, url: }` image props and assigns submitted signed ids.
+# Image props/assignment come from Admin::Images.
 module Admin::ContentTranslations
   extend ActiveSupport::Concern
+
+  include Admin::Images
 
   private
 
@@ -74,23 +76,5 @@ module Admin::ContentTranslations
       end
     end
     errors
-  end
-
-  def image_prop(attachment)
-    return nil unless attachment&.attached?
-
-    { signed_id: attachment.blob.signed_id, url: rails_blob_path(attachment.blob, only_path: true) }
-  end
-
-  # Attaches a submitted blob signed id; blank removes the image. Unchanged ids are left alone.
-  def assign_image(record, name, signed_id)
-    attachment = record.public_send(name)
-    signed_id = signed_id.to_s.presence
-
-    if signed_id.nil?
-      record.public_send(:"#{name}=", nil) if attachment.attached?
-    elsif !attachment.attached? || attachment.blob.signed_id != signed_id
-      record.public_send(:"#{name}=", signed_id) if ActiveStorage::Blob.find_signed(signed_id)
-    end
   end
 end

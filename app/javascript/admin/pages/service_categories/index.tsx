@@ -6,6 +6,7 @@ import { ListFilters } from "@/admin/components/list-filters"
 import { PageHeader } from "@/admin/components/page-header"
 import { Pagination } from "@/admin/components/pagination"
 import { ResourceTable } from "@/admin/components/resource-table"
+import { HomePageBadge } from "@/admin/features/services/components/home-page-badge"
 import type {
   ServiceCategoryFilters,
   ServiceCategoryRow,
@@ -71,6 +72,7 @@ export default function ServiceCategoriesIndex({
               <TableHead>Category</TableHead>
               <TableHead>Other names</TableHead>
               <TableHead className="text-right">Services</TableHead>
+              <TableHead>Display on Homepage</TableHead>
               <TableHead className="text-right">Active</TableHead>
             </>
           }
@@ -106,6 +108,9 @@ export default function ServiceCategoriesIndex({
                 ) : (
                   formatNumber(category.services_count)
                 )}
+              </TableCell>
+              <TableCell>
+                <HomePageBadge displayed={category.display_in_home_page} />
               </TableCell>
               <TableCell className="text-right">
                 <ActivationSwitch

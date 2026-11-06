@@ -7,6 +7,9 @@ import {
 } from "@/admin/components/seo-fields"
 import { TranslationFields } from "@/admin/components/translation-fields"
 import { FormSection } from "@/admin/features/services/components/form-section"
+import { HomePageFields } from "@/admin/features/services/components/home-page-fields"
+import type { ServiceCategoryDetail } from "@/admin/features/services/types"
+import type { ImageValue } from "@/admin/types"
 import type { RouteDefinition } from "@/routes/runtime"
 import { Button } from "@/shared/components/ui/button"
 import {
@@ -20,25 +23,30 @@ import { Switch } from "@/shared/components/ui/switch"
 
 interface ServiceCategoryFormData {
   is_active: boolean
+  display_in_home_page: boolean
+  image: ImageValue | null
   translations: SeoTranslationEntry[]
 }
 
-/** Create/edit form for a service category. Posts `{ service_category: { is_active, translations } }`. */
+/** Create/edit form for a service category. Posts `{ service_category: { is_active, display_in_home_page, image, translations } }`. */
 export function ServiceCategoryForm({
-  isActive,
+  category,
   translations,
   action,
   cancelHref,
   submitLabel,
 }: {
-  isActive: boolean
+  /** The category being edited; null when creating one. */
+  category: ServiceCategoryDetail | null
   translations: SeoTranslationEntry[]
   action: RouteDefinition<"post" | "patch">
   cancelHref: string
   submitLabel: string
 }) {
   const form = useForm<ServiceCategoryFormData>({
-    is_active: isActive,
+    is_active: category?.is_active ?? true,
+    display_in_home_page: category?.display_in_home_page ?? false,
+    image: category?.image ?? null,
     translations,
   })
   const { data, setData, processing } = form
@@ -47,6 +55,8 @@ export function ServiceCategoryForm({
   form.transform((values) => ({
     service_category: {
       is_active: values.is_active,
+      display_in_home_page: values.display_in_home_page,
+      image: values.image?.signed_id ?? "",
       translations: seoTranslationParams(values.translations),
     },
   }))
@@ -64,6 +74,15 @@ export function ServiceCategoryForm({
           translations={data.translations}
           onChange={(value) => setData("translations", value)}
           errors={errors.translations}
+        />
+
+        <HomePageFields
+          noun="category"
+          image={data.image}
+          onImageChange={(image) => setData("image", image)}
+          display={data.display_in_home_page}
+          onDisplayChange={(value) => setData("display_in_home_page", value)}
+          errors={errors}
         />
 
         <Field orientation="horizontal">
