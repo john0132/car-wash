@@ -7,6 +7,8 @@ class ServiceCategory < ApplicationRecord
 
   # A category can only be deleted once its services are gone (services can be on bookings).
   has_many :services, dependent: :restrict_with_error
+  has_many :header_items, dependent: :destroy
+  has_many :footer_items, dependent: :destroy
   has_many :service_category_translations, dependent: :destroy, autosave: true
   has_one_attached :image
 

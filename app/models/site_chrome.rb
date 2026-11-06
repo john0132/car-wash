@@ -4,7 +4,7 @@
 # page as the `site` Inertia prop (see Website::BaseController). Text falls
 # back per field: the locale, then the default locale, then any language.
 #
-#   { header: { items: [{ id:, label:, href:, external: }] },
+#   { header: { items: [{ id:, label:, href:, external:, children: [same, nested to any depth] }] },
 #     footer: { title:, description:, image: { url: } | nil, socials: [{ id:, name:, url:, icon: }],
 #               columns: [{ id:, title:, items: [{ id:, label:, href:, external: }] }] } | nil }
 #
@@ -16,7 +16,7 @@ class SiteChrome
   end
 
   def self.cache_version
-    [ HeaderItem, Footer, Page, Language ].map { |model| version_of(model) }
+    [ HeaderItem, Footer, Page, Language, ServiceCategory, Service ].map { |model| version_of(model) }
   end
 
   # Row count (deletions don't move the newest timestamp) and the newest
@@ -32,21 +32,31 @@ class SiteChrome
   end
 
   def props
-    { header: { items: link_props(header_items) }, footer: footer_props }
+    { header: { items: header_tree(nil) }, footer: footer_props }
   end
 
   private
 
   attr_reader :locale
 
-  def header_items
-    HeaderItem.active.ordered.includes(:header_item_translations, :page)
+  def header_items_by_parent
+    @header_items_by_parent ||= HeaderItem.active.ordered
+      .includes(:header_item_translations, :page, service_category: :service_category_translations, service: :service_category)
+      .group_by(&:parent_id)
+  end
+
+  # The links under `parent_id` (top level when nil). An item under a hidden or
+  # unresolvable parent never shows, since the walk only descends from shown items.
+  def header_tree(parent_id)
+    link_props(header_items_by_parent.fetch(parent_id, [])).map do |link|
+      link.merge(children: header_tree(link[:id]))
+    end
   end
 
   def footer_props
     footer = Footer.includes(
       :footer_translations, :footer_social_links, image_attachment: :blob,
-      footer_columns: [ :footer_column_translations, { footer_items: %i[footer_item_translations page] } ]
+      footer_columns: [ :footer_column_translations, { footer_items: [ :footer_item_translations, :page, :service_category, { service: :service_category } ] } ]
     ).first
     return nil unless footer
 

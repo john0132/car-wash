@@ -3,7 +3,7 @@ import { Link, usePage } from "@inertiajs/react"
 import { settingsProfile, signIn, signUp } from "@/routes"
 import { Button } from "@/shared/components/ui/button"
 import { Logo } from "@/website/components/brand-mark"
-import { SiteLinkAnchor } from "@/website/features/site-chrome/site-link"
+import { HeaderNavItem } from "@/website/components/header-nav-item"
 import type { SiteSharedProps } from "@/website/features/site-chrome/types"
 
 export function SiteHeader() {
@@ -19,11 +19,7 @@ export function SiteHeader() {
 
         <nav className="hidden items-center gap-8 md:flex">
           {site.header.items.map((link) => (
-            <SiteLinkAnchor
-              key={link.id}
-              link={link}
-              className="text-sm tracking-wide text-[#2B3A32] transition-colors hover:text-[#8A6240]"
-            />
+            <HeaderNavItem key={link.id} link={link} />
           ))}
         </nav>
 

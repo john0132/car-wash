@@ -7,6 +7,8 @@ class Service < ApplicationRecord
   include Translatable
 
   belongs_to :service_category
+  has_many :header_items, dependent: :destroy
+  has_many :footer_items, dependent: :destroy
   has_many :service_translations, dependent: :destroy, autosave: true
   has_many :booking_items, as: :itemable, dependent: :restrict_with_error
   has_one_attached :image

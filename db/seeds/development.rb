@@ -359,3 +359,6 @@ unless Blog.exists?(slug: "winter-car-care-tips")
     seo_description: "Simple ways to protect your car in winter.")
   blog.save!
 end
+
+# Header "Services" dropdown: categories, and each category's services.
+HeaderServicesMenu.sync!

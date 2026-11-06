@@ -5,6 +5,8 @@ export interface SiteLink {
   href: string
   /** Leaves the site, or staff asked for a new tab. */
   external: boolean
+  /** Header only: the links in this link's dropdown, to any depth. */
+  children?: SiteLink[]
 }
 
 export interface SiteImage {

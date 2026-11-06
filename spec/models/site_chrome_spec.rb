@@ -29,6 +29,20 @@ RSpec.describe SiteChrome do
     expect(items.first).to include(href: "https://example.com", external: true)
   end
 
+  it "nests header links under their parent, hiding children of hidden parents" do
+    services = create_header_item(label: "Services", position: 0)
+    category = create_service_category("Exterior")
+    category_item = create_header_item(label: "Exterior", link_type: "service_category", service_category: category, parent: services)
+    create_header_item(label: "Full Wash", link_type: "service", service: create_service("Full Wash", service_category: category), parent: category_item)
+    hidden = create_header_item(label: "More", position: 1, is_active: false)
+    create_header_item(label: "Orphan", parent: hidden)
+
+    items = SiteChrome.props[:header][:items]
+    expect(items.pluck(:label)).to eq(%w[Services])
+    expect(items.first[:children].pluck(:label)).to eq(%w[Exterior])
+    expect(items.first[:children].first[:children].pluck(:label, :href)).to eq([ [ "Full Wash", "/services/full-wash" ] ])
+  end
+
   it "builds the footer from its columns, links and socials" do
     footer = Footer.instance
     footer.footer_translations.create!(language: english, title: "Atelier", description: "Care")

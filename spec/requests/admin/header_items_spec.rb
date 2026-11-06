@@ -52,6 +52,38 @@ RSpec.describe "Admin header navigation", type: :request do
       expect(HeaderItem.ordered.map(&:position)).to eq([ 0, 1 ])
     end
 
+    it "saves nested links, moving and deleting against the submitted tree" do
+      category = create_service_category("Exterior")
+      old = create_header_item(label: "Old", position: 0)
+      moved = create_header_item(label: "Moved", parent: old)
+
+      patch admin_header_navigation_path, as: :json, params: { header: { items: [
+        entry(label: "Services", children: [
+          entry(label: "Exterior", link_type: "service_category", service_category_id: category.id, url: nil,
+                children: [ entry(id: moved.id, label: "Moved") ])
+        ])
+      ] } }
+
+      expect(response).to redirect_to(edit_admin_header_navigation_path)
+      expect(HeaderItem.exists?(old.id)).to be(false)
+      services = HeaderItem.top_level.sole
+      exterior = services.children.sole
+      expect(exterior.service_category).to eq(category)
+      expect(exterior.children).to eq([ moved.reload ])
+    end
+
+    it "reports errors on nested links by their path" do
+      patch admin_header_navigation_path, as: :json, params: { header: { items: [
+        entry(children: [ entry(url: "javascript:alert(1)") ])
+      ] } }
+
+      expect(response).to redirect_to(edit_admin_header_navigation_path)
+      expect(HeaderItem.count).to eq(0)
+      follow_redirect!
+      expect(inertia.props[:errors]).to include("items.0.children.0.url")
+      expect(inertia.props[:errors]).not_to include("items.0.url")
+    end
+
     it "updates, reorders and removes links against what was submitted" do
       keep = create_header_item(label: "Keep", position: 0)
       drop = create_header_item(label: "Drop", url: "/drop", position: 1)

@@ -25,7 +25,7 @@ interface HeaderFormData {
 }
 
 /**
- * The website header's links, edited as one ordered list. Posts
+ * The website header's links, edited as an ordered tree. Posts
  * `{ header: { items: [{ id, link_type, …, translations }] } }`; the list order
  * is the display order.
  */
@@ -93,7 +93,7 @@ export function HeaderForm({
 
       <FormSection
         title="Header links"
-        description="Shown in the website header, in this order. Links to disabled pages are hidden automatically."
+        description="Shown in the website header, in this order. Add child links to make a dropdown; they can nest as deep as you like. Links to disabled pages, categories or services are hidden automatically."
       >
         <LinkList
           links={data.items}
@@ -102,6 +102,7 @@ export function HeaderForm({
           options={options}
           errors={errors}
           errorPrefix="items"
+          nested
           idPrefix="header"
           emptyMessage="No header links yet. Add one to get started."
         />

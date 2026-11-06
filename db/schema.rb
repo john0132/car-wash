@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_06_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_06_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -264,8 +264,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_06_150000) do
     t.boolean "open_in_new_tab", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "service_category_id"
+    t.bigint "service_id"
     t.index ["footer_column_id"], name: "index_footer_items_on_footer_column_id"
     t.index ["page_id"], name: "index_footer_items_on_page_id"
+    t.index ["service_category_id"], name: "index_footer_items_on_service_category_id"
+    t.index ["service_id"], name: "index_footer_items_on_service_id"
   end
 
   create_table "footer_social_links", force: :cascade do |t|
@@ -317,8 +321,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_06_150000) do
     t.boolean "open_in_new_tab", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "parent_id"
+    t.bigint "service_category_id"
+    t.bigint "service_id"
     t.index ["page_id"], name: "index_header_items_on_page_id"
+    t.index ["parent_id"], name: "index_header_items_on_parent_id"
     t.index ["position"], name: "index_header_items_on_position"
+    t.index ["service_category_id"], name: "index_header_items_on_service_category_id"
+    t.index ["service_id"], name: "index_header_items_on_service_id"
   end
 
   create_table "languages", force: :cascade do |t|
@@ -591,12 +601,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_06_150000) do
   add_foreign_key "footer_item_translations", "languages"
   add_foreign_key "footer_items", "footer_columns"
   add_foreign_key "footer_items", "pages"
+  add_foreign_key "footer_items", "service_categories"
+  add_foreign_key "footer_items", "services"
   add_foreign_key "footer_social_links", "footers"
   add_foreign_key "footer_translations", "footers"
   add_foreign_key "footer_translations", "languages"
   add_foreign_key "header_item_translations", "header_items"
   add_foreign_key "header_item_translations", "languages"
+  add_foreign_key "header_items", "header_items", column: "parent_id"
   add_foreign_key "header_items", "pages"
+  add_foreign_key "header_items", "service_categories"
+  add_foreign_key "header_items", "services"
   add_foreign_key "membership_translations", "languages"
   add_foreign_key "membership_translations", "memberships"
   add_foreign_key "page_section_translations", "languages"

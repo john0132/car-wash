@@ -1,5 +1,5 @@
 import { cn } from "cn"
-import { ArrowDown, ArrowUp, Link2, Plus, Trash2 } from "lucide-react"
+import { ArrowDown, ArrowUp, Link2, ListTree, Plus, Trash2 } from "lucide-react"
 
 import { TextField, asFieldErrors } from "@/admin/components/form-fields"
 import {
@@ -30,7 +30,8 @@ import { Switch } from "@/shared/components/ui/switch"
 
 /**
  * An ordered, editable list of links (header items, or the links of one footer
- * column). The label is the only per-language input; the target, new-tab and
+ * column). With `nested`, each link can have child links (a dropdown), to any
+ * depth: the children are edited by this same component, one level in. The label is the only per-language input; the target, new-tab and
  * visibility settings are shared by every language.
  *
  * `errors` is the whole form's error bag and `errorPrefix` where this list
@@ -45,6 +46,8 @@ export function LinkList({
   errorPrefix,
   idPrefix,
   emptyMessage,
+  nested = false,
+  depth = 0,
 }: {
   links: LinkState[]
   onChange: (links: LinkState[]) => void
@@ -54,6 +57,8 @@ export function LinkList({
   errorPrefix: string
   idPrefix: string
   emptyMessage: string
+  nested?: boolean
+  depth?: number
 }) {
   const update = (uid: string, patch: Partial<LinkState>) =>
     onChange(
@@ -62,7 +67,7 @@ export function LinkList({
 
   return (
     <div className="space-y-3">
-      {links.length === 0 && (
+      {links.length === 0 && depth === 0 && (
         <p className="text-muted-foreground flex items-center gap-2 rounded-md border border-dashed p-4 text-sm">
           <Link2 className="size-4 shrink-0" /> {emptyMessage}
         </p>
@@ -78,6 +83,14 @@ export function LinkList({
         const id = `${idPrefix}-${link.uid}`
         const label = link.translations[language.id]?.label ?? ""
         const pageMissing = link.link_type === "page" && !link.page_id
+        const categoryDisabled =
+          link.link_type === "service_category" &&
+          options.service_categories.some(
+            (c) => c.id === link.service_category_id && !c.is_active,
+          )
+        const serviceDisabled =
+          link.link_type === "service" &&
+          options.services.some((x) => x.id === link.service_id && !x.is_active)
         const pageDisabled =
           link.link_type === "page" &&
           options.pages.some((p) => p.id === link.page_id && !p.is_active)
@@ -166,6 +179,97 @@ export function LinkList({
                 </Field>
               )}
 
+              {link.link_type === "service_category" && (
+                <Field
+                  data-invalid={
+                    error("service_category") || !link.service_category_id
+                      ? true
+                      : undefined
+                  }
+                >
+                  <FieldLabel htmlFor={`${id}-category`}>
+                    Service category
+                  </FieldLabel>
+                  <Select
+                    value={
+                      link.service_category_id
+                        ? String(link.service_category_id)
+                        : ""
+                    }
+                    onValueChange={(next) =>
+                      update(link.uid, { service_category_id: Number(next) })
+                    }
+                  >
+                    <SelectTrigger id={`${id}-category`} className="w-full">
+                      <SelectValue placeholder="Choose a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {options.service_categories.map((category) => (
+                        <SelectItem
+                          key={category.id}
+                          value={String(category.id)}
+                        >
+                          {category.name}
+                          {!category.is_active && (
+                            <span className="text-muted-foreground">
+                              {" "}
+                              · disabled
+                            </span>
+                          )}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {categoryDisabled && (
+                    <p className="text-muted-foreground text-sm">
+                      This category is disabled, so the link is hidden on the
+                      website until it is enabled.
+                    </p>
+                  )}
+                  <FieldError
+                    errors={asFieldErrors(error("service_category"))}
+                  />
+                </Field>
+              )}
+
+              {link.link_type === "service" && (
+                <Field
+                  data-invalid={
+                    error("service") || !link.service_id ? true : undefined
+                  }
+                >
+                  <FieldLabel htmlFor={`${id}-service`}>Service</FieldLabel>
+                  <Select
+                    value={link.service_id ? String(link.service_id) : ""}
+                    onValueChange={(next) =>
+                      update(link.uid, { service_id: Number(next) })
+                    }
+                  >
+                    <SelectTrigger id={`${id}-service`} className="w-full">
+                      <SelectValue placeholder="Choose a service" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {options.services.map((service) => (
+                        <SelectItem key={service.id} value={String(service.id)}>
+                          {service.name}
+                          <span className="text-muted-foreground">
+                            {service.category && ` · ${service.category}`}
+                            {!service.is_active && " · disabled"}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {serviceDisabled && (
+                    <p className="text-muted-foreground text-sm">
+                      This service (or its category) is disabled, so the link is
+                      hidden on the website until it is enabled.
+                    </p>
+                  )}
+                  <FieldError errors={asFieldErrors(error("service"))} />
+                </Field>
+              )}
+
               {link.link_type === "route" && (
                 <Field data-invalid={error("route_key") ? true : undefined}>
                   <FieldLabel htmlFor={`${id}-route`}>App screen</FieldLabel>
@@ -224,6 +328,21 @@ export function LinkList({
                 {!link.is_active && <Badge variant="secondary">Hidden</Badge>}
 
                 <div className="ml-auto flex items-center gap-1">
+                  {nested && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="h-8"
+                      onClick={() =>
+                        update(link.uid, {
+                          children: [...(link.children ?? []), newLink()],
+                        })
+                      }
+                    >
+                      <ListTree /> Add child
+                    </Button>
+                  )}
                   <span className="text-muted-foreground mr-1 text-xs tabular-nums">
                     {index + 1}
                   </span>
@@ -263,6 +382,23 @@ export function LinkList({
                   </Button>
                 </div>
               </div>
+
+              {nested && link.children && link.children.length > 0 && (
+                <div className="border-l-2 pl-3">
+                  <LinkList
+                    links={link.children}
+                    onChange={(children) => update(link.uid, { children })}
+                    language={language}
+                    options={options}
+                    errors={errors}
+                    errorPrefix={`${errorPrefix}.${index}.children`}
+                    idPrefix={idPrefix}
+                    emptyMessage={emptyMessage}
+                    nested
+                    depth={depth + 1}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         )
@@ -273,7 +409,7 @@ export function LinkList({
         variant="outline"
         onClick={() => onChange([...links, newLink()])}
       >
-        <Plus /> Add link
+        <Plus /> {depth > 0 ? "Add sibling link" : "Add link"}
       </Button>
     </div>
   )

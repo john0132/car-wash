@@ -69,4 +69,51 @@ RSpec.describe HeaderItem, type: :model do
 
     expect { about.destroy! }.to change(HeaderItem, :count).by(-1)
   end
+
+  describe "service links" do
+    it "links a category and a service by slug, hiding them while disabled" do
+      category = create_service_category("Exterior")
+      service = create_service("Full Wash", service_category: category)
+      category_item = create_header_item(link_type: "service_category", service_category: category)
+      service_item = create_header_item(link_type: "service", service: service)
+
+      expect(category_item.href).to eq("/categories/#{category.slug}")
+      expect(service_item.href).to eq("/services/#{service.slug}")
+
+      category.update!(is_active: false)
+      expect(category_item.reload.href).to be_nil
+      expect(service_item.reload.href).to be_nil
+    end
+
+    it "requires the chosen target" do
+      expect(HeaderItem.new(link_type: "service_category").tap(&:valid?).errors[:service_category]).to be_present
+      expect(HeaderItem.new(link_type: "service").tap(&:valid?).errors[:service]).to be_present
+    end
+
+    it "is removed with its category" do
+      category = create_service_category
+      create_header_item(link_type: "service_category", service_category: category)
+
+      expect { category.destroy! }.to change(HeaderItem, :count).by(-1)
+    end
+  end
+
+  describe "nesting" do
+    it "nests to any depth and removes descendants with their parent" do
+      root = create_header_item(label: "Root")
+      child = create_header_item(label: "Child", parent: root)
+      create_header_item(label: "Grandchild", parent: child)
+
+      expect(root.children).to eq([ child ])
+      expect { root.destroy! }.to change(HeaderItem, :count).by(-3)
+    end
+
+    it "can't be its own parent or sit under a descendant" do
+      root = create_header_item
+      child = create_header_item(parent: root)
+
+      expect(root.tap { |r| r.parent = r }).not_to be_valid
+      expect(root.tap { |r| r.parent = child }).not_to be_valid
+    end
+  end
 end

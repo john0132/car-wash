@@ -14,6 +14,8 @@ unless HeaderItem.exists?
   end
 end
 
+HeaderServicesMenu.sync!
+
 unless Footer.exists?
   footer = Footer.new
   footer.footer_translations.build(language: english, title: "Auto Atelier", description: "Hand-finished auto care, by appointment.")

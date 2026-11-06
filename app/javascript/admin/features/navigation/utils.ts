@@ -5,9 +5,10 @@ let counter = 0
 /** A client-side key for a list entry that has no database id yet. */
 export const newUid = () => `new-${++counter}`
 
-export const toLinkState = (link: LinkProps): LinkState => ({
+export const toLinkState = ({ children, ...link }: LinkProps): LinkState => ({
   ...link,
   uid: `link-${link.id}`,
+  ...(children && { children: children.map(toLinkState) }),
 })
 
 export const newLink = (): LinkState => ({
@@ -15,6 +16,8 @@ export const newLink = (): LinkState => ({
   id: null,
   link_type: "page",
   page_id: null,
+  service_category_id: null,
+  service_id: null,
   route_key: "",
   url: "",
   open_in_new_tab: false,
@@ -29,7 +32,10 @@ export const withoutUid = <T extends { uid: string }>(value: T) =>
   ) as Omit<T, "uid">
 
 /** What Admin::NavigationItems#assign_link expects. */
-export const linkPayload = (link: LinkState): LinkProps => withoutUid(link)
+export const linkPayload = ({ children, ...link }: LinkState): LinkProps => ({
+  ...withoutUid(link),
+  ...(children && { children: children.map(linkPayload) }),
+})
 
 /** `list` with the entry at `index` moved by `offset` places. */
 export function moveItem<T>(list: T[], index: number, offset: number) {
