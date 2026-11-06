@@ -12,6 +12,7 @@ Rails.application.routes.draw do
     end
 
     resources :customers, only: %i[index show], concerns: :activatable
+    resources :cars, only: :index
     resources :bookings, only: %i[index show edit update]
     resources :memberships, except: :destroy, concerns: :activatable
     resources :service_categories, concerns: :activatable
@@ -58,7 +59,7 @@ Rails.application.routes.draw do
     namespace :profile do
       resources :bookings, only: :index
       resources :addresses, only: %i[index create update destroy]
-      resources :cars, only: :index
+      resources :cars, only: %i[index create update destroy]
     end
 
     resources :faqs, only: :index

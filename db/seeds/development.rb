@@ -246,6 +246,8 @@ customers = [
   [ "Khaled", "Mansour", :gold, nil, true ]
 ]
 
+car_models = [ %w[Toyota Corolla], %w[Hyundai Elantra], %w[Kia Sportage], %w[Nissan Sunny], %w[BMW X5] ]
+car_colors = %w[White Black Silver Blue Red]
 address_labels = [ "Home", "Work", "Gym", "Parents' house" ]
 statuses_by_age = ->(days_ago) {
   if days_ago.negative? then %w[pending confirmed confirmed]
@@ -259,6 +261,13 @@ customers.each_with_index do |(name, last_name, tier, package, active), index|
   customer = User.find_or_create_by!(email: email) do |u|
     u.assign_attributes(name: name, last_name: last_name, password: demo_password, role: :customer,
       is_active: active, membership: memberships[tier], package: package, created_at: (400 - index * 30).days.ago)
+  end
+  if customer.cars.none?
+    rng.rand(1..2).times do
+      make, model = car_models.sample(random: rng)
+      customer.cars.create!(make: make, model: model, color: car_colors.sample(random: rng),
+        license_plate: "#{Array.new(3) { ("A".."Z").to_a.sample(random: rng) }.join} #{rng.rand(1000..9999)}")
+    end
   end
   next if customer.bookings.any?
 

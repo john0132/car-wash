@@ -37,6 +37,7 @@ class Admin::CustomersController < Admin::BaseController
       customer: customer_props(customer),
       stats: stats.to_h,
       addresses: customer.addresses.map { |address| address_props(address) },
+      cars: customer.cars.order(:created_at, :id).map { |car| car_props(car) },
       bookings: bookings.map { |booking| booking_props(booking) },
       bookings_pagination: pagination,
       transactions: transactions.map { |transaction| transaction_props(transaction) }
@@ -95,6 +96,10 @@ class Admin::CustomersController < Admin::BaseController
       latitude: address.location.y,
       longitude: address.location.x
     }
+  end
+
+  def car_props(car)
+    { id: car.id, make: car.make, model: car.model, license_plate: car.license_plate, color: car.color }
   end
 
   def transaction_props(transaction)

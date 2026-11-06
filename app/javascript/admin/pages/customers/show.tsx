@@ -7,10 +7,12 @@ import { StatCard } from "@/admin/components/stat-card"
 import { BookingsTable } from "@/admin/features/bookings/components/bookings-table"
 import type { BookingRow } from "@/admin/features/bookings/types"
 import { AddressesCard } from "@/admin/features/customers/components/addresses-card"
+import { CarsCard } from "@/admin/features/customers/components/cars-card"
 import { MembershipBadge } from "@/admin/features/customers/components/membership-badge"
 import { TransactionsCard } from "@/admin/features/customers/components/transactions-card"
 import type {
   CustomerAddress,
+  CustomerCar,
   CustomerDetail,
   CustomerStats,
   CustomerTransaction,
@@ -42,6 +44,7 @@ interface Props {
   customer: CustomerDetail
   stats: CustomerStats
   addresses: CustomerAddress[]
+  cars: CustomerCar[]
   bookings: BookingRow[]
   bookings_pagination: PaginationData
   transactions: CustomerTransaction[]
@@ -51,6 +54,7 @@ export default function CustomerShow({
   customer,
   stats,
   addresses,
+  cars,
   bookings,
   bookings_pagination,
   transactions,
@@ -143,7 +147,10 @@ export default function CustomerShow({
               </Detail>
             </AccountCard>
           </div>
-          <AddressesCard addresses={addresses} />
+          <div className="space-y-4">
+            <AddressesCard addresses={addresses} />
+            <CarsCard cars={cars} />
+          </div>
         </div>
 
         <Card>

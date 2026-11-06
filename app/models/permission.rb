@@ -4,6 +4,7 @@ class Permission < ApplicationRecord
   # Every "resource.action" the admin dashboard checks. Seeds sync this into the table.
   CATALOG = {
     "customers" => %w[read update],
+    "cars" => %w[read],
     "bookings" => %w[read update],
     "memberships" => %w[read create update],
     "service_categories" => %w[read create update delete],

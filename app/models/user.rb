@@ -17,6 +17,7 @@ class User < ApplicationRecord
     inverse_of: :employee, dependent: :nullify
   has_many :payment_transactions, dependent: :restrict_with_error
   has_many :addresses, dependent: :destroy
+  has_many :cars, dependent: :destroy
   has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles
   belongs_to :membership, optional: true

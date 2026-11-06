@@ -1,29 +1,51 @@
-import { Car } from "lucide-react"
+import { Plus } from "lucide-react"
 
+import { Button } from "@/shared/components/ui/button"
+import { CarCard } from "@/website/features/cars/components/car-card"
+import { CarDialog } from "@/website/features/cars/components/car-dialog"
+import type { CustomerCar } from "@/website/features/cars/types"
 import {
-  ProfileCard,
   SectionHeading,
+  primaryButtonClass,
 } from "@/website/features/profile/components/profile-card"
 import ProfileLayout from "@/website/layouts/profile-layout"
 
-export default function CarsIndex() {
+interface Props {
+  cars: CustomerCar[]
+}
+
+export default function CarsIndex({ cars }: Props) {
   return (
     <ProfileLayout title="My cars">
-      <ProfileCard id="cars">
-        <div className="flex flex-col gap-8">
-          <SectionHeading
-            title="My cars"
-            description="The cars you book services for."
-          />
-          <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-[#2B3A32]/25 px-6 py-14 text-center">
-            <Car className="size-8 text-[#2B3A32]/50" aria-hidden="true" />
-            <p className="font-medium">No cars yet</p>
-            <p className="max-w-sm text-sm text-[#2B3A32]/65">
-              Saving your cars is coming soon, so booking will be even quicker.
-            </p>
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <SectionHeading
+          title="My cars"
+          description="The cars you book services for."
+        />
+        <CarDialog
+          trigger={
+            <Button type="button" className={primaryButtonClass}>
+              <Plus />
+              Add car
+            </Button>
+          }
+        />
+      </div>
+
+      {cars.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-[#2B3A32]/25 px-6 py-14 text-center">
+          <p className="font-medium">No cars yet</p>
+          <p className="mt-1 text-sm text-[#2B3A32]/65">
+            Add your car to make booking quicker.
+          </p>
         </div>
-      </ProfileCard>
+      ) : (
+        <ul className="flex flex-col gap-4">
+          {cars.map((car) => (
+            <CarCard key={car.id} car={car} />
+          ))}
+        </ul>
+      )}
     </ProfileLayout>
   )
 }

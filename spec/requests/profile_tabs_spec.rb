@@ -51,6 +51,30 @@ RSpec.describe "Profile tabs", type: :request do
       expect { delete profile_address_path(address) }.to change { user.addresses.count }.by(-1)
     end
 
+    it "manages the customer's own cars" do
+      other = users(:two).cars.create!(make: "BMW", model: "X5", license_plate: "XYZ 999", color: "Black")
+
+      expect {
+        post profile_cars_path, params: { make: "Toyota", model: "Corolla", license_plate: "abc 123", color: "White" }
+      }.to change { user.cars.count }.by(1)
+
+      get profile_cars_path
+      expect(inertia.props[:cars].pluck(:license_plate)).to eq([ "ABC 123" ])
+
+      car = user.cars.last
+      patch profile_car_path(car), params: { make: "Honda", model: "Civic", license_plate: "abc 123", color: "Red" }
+      expect(car.reload.make).to eq("Honda")
+
+      expect { delete profile_car_path(car) }.to change { user.cars.count }.by(-1)
+      delete profile_car_path(other)
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "rejects an incomplete car" do
+      expect { post profile_cars_path, params: { make: "Toyota" } }.not_to change(Car, :count)
+      expect(session[:inertia_errors]).to include(:model, :license_plate, :color)
+    end
+
     it "rejects bad coordinates" do
       area = create_area
       expect {

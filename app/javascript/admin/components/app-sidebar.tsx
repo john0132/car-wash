@@ -4,6 +4,7 @@ import {
   BookOpen,
   Building2,
   CalendarCheck,
+  Car,
   CreditCard,
   Crown,
   FileText,
@@ -33,6 +34,7 @@ import {
   adminAreas,
   adminBlogs,
   adminBookings,
+  adminCars,
   adminCities,
   adminComponents,
   adminContactMessages,
@@ -84,6 +86,12 @@ const operationsNavItems: (NavItem & { resource: string })[] = [
     href: adminCustomers.index().url,
     icon: Users,
     resource: "customers",
+  },
+  {
+    title: "Cars",
+    href: adminCars.index().url,
+    icon: Car,
+    resource: "cars",
   },
 ]
 
