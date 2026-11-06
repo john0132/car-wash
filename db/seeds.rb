@@ -24,6 +24,10 @@ load Rails.root.join("db/seeds/contact.rb")
 # Every environment: example blog posts.
 load Rails.root.join("db/seeds/blogs.rb")
 
+# Every environment: Arabic versions of the starter content above (header/footer links, home and
+# about pages, FAQs, blog posts), for the /ar site. Must come after the English content it translates.
+load Rails.root.join("db/seeds/arabic.rb")
+
 # Every environment: payment methods (checkout books with "cash").
 load Rails.root.join("db/seeds/payment_methods.rb")
 

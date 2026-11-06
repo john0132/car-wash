@@ -5,7 +5,7 @@ import { services } from "@/routes"
 import { HeroBlock } from "@/website/features/page-sections/components/hero-block"
 import {
   PageSections,
-  hasHero,
+  hasHeading,
 } from "@/website/features/page-sections/page-sections"
 import type { PageProps } from "@/website/features/page-sections/types"
 import type { SiteSharedProps } from "@/website/features/site-chrome/types"
@@ -55,7 +55,7 @@ export default function MarketingLayout({
     >
       {page ? (
         <>
-          {!hasHero(page) && page.title && (
+          {!hasHeading(page) && page.title && (
             <header className="mx-auto max-w-6xl px-6 pt-16 pb-2 lg:pt-24">
               <h1
                 dir="auto"

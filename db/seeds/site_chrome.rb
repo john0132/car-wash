@@ -38,7 +38,7 @@ unless Footer.exists?
 
   column = footer.footer_columns.build(position: 0)
   column.footer_column_translations.build(language: english, title: "Account")
-  [ [ "Sign in", "sign_in" ], [ "Book your visit", "sign_up" ], [ "FAQ", "faqs" ] ].each_with_index do |(label, route), position|
+  [ [ "Sign in", "sign_in" ], [ "Book your visit", "services" ], [ "FAQ", "faqs" ] ].each_with_index do |(label, route), position|
     item = column.footer_items.build(position: position, link_type: "route", route_key: route)
     item.footer_item_translations.build(language: english, label: label)
   end

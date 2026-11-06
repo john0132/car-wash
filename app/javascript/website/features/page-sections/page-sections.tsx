@@ -44,13 +44,21 @@ function occurrence(sections: PageSectionData[], index: number) {
   return sections.slice(0, index + 1).filter((s) => s.component === key).length
 }
 
-/** Whether the page will render a hero block (its `<h1>`), not the generic fallback. */
-export function hasHero(page: PageProps) {
-  return page.sections.some(
-    (section) =>
-      section.component === "hero" &&
-      hasRequiredFields(page.components.hero ?? [], section.data),
-  )
+/**
+ * Whether the page already renders its own `<h1>`: a hero block, or a rich-text
+ * section whose staff-written HTML starts with a heading.
+ */
+export function hasHeading(page: PageProps) {
+  return page.sections.some((section) => {
+    if (section.component === "hero")
+      return hasRequiredFields(page.components.hero ?? [], section.data)
+    if (section.component === "rich_text")
+      return (
+        typeof section.data.body === "string" &&
+        /<h1[\s>]/i.test(section.data.body)
+      )
+    return false
+  })
 }
 
 export function PageSections({
