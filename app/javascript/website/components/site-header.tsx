@@ -8,6 +8,7 @@ import { useInitials } from "@/shared/hooks/use-initials"
 import { Logo } from "@/website/components/brand-mark"
 import { HeaderNavItem } from "@/website/components/header-nav-item"
 import { LanguageSwitcher } from "@/website/components/language-switcher"
+import { MobileNav } from "@/website/components/mobile-nav"
 import type { SiteSharedProps } from "@/website/features/site-chrome/types"
 import { useI18n } from "@/website/lib/i18n"
 
@@ -21,9 +22,12 @@ export function SiteHeader() {
   return (
     <header className="border-pine/10 bg-ivory/95 sticky top-0 z-40 border-b backdrop-blur-sm">
       <div className="mx-auto flex h-20 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
-        <Link href={root()} className="shrink-0">
-          <Logo compact />
-        </Link>
+        <div className="flex min-w-0 items-center gap-3">
+          <MobileNav />
+          <Link href={root()} className="shrink-0">
+            <Logo compact />
+          </Link>
+        </div>
 
         <nav className="hidden items-center gap-8 md:flex">
           {site.header.items.map((link) => (

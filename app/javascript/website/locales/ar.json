@@ -275,5 +275,9 @@
   "{m} min": "{m} د",
   "{h} h": "{h} س",
   "{h} h {m} min": "{h} س {m} د",
-  "Date to be confirmed": "الموعد سيتم تأكيده"
+  "Date to be confirmed": "الموعد سيتم تأكيده",
+  "Menu": "القائمة",
+  "Open menu": "فتح القائمة",
+  "Site navigation": "التنقل في الموقع",
+  "{name} submenu": "القائمة الفرعية لـ {name}"
 }

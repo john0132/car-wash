@@ -74,7 +74,12 @@ export function localizeHref(href: string, locale: LocaleProps) {
   if (!href.startsWith("/") || href.startsWith("//")) return href
   const prefix = `/${locale.code}`
   if (href === prefix || href.startsWith(`${prefix}/`)) return href
-  return href === "/" ? prefix : `${prefix}${href}`
+  // "/" → "/ar", "/#faq" → "/ar#faq"
+  return href === "/"
+    ? prefix
+    : href.startsWith("/#")
+      ? `${prefix}${href.slice(1)}`
+      : `${prefix}${href}`
 }
 
 /** Everything a component needs to speak the visitor's language. */
