@@ -1,25 +1,27 @@
-import { Head, Link } from "@inertiajs/react"
-
-import { root } from "@/routes"
-import { SiteFooter } from "@/website/components/site-footer"
-import { SiteHeader } from "@/website/components/site-header"
-import { CatalogPagination } from "@/website/features/category-detail/components/catalog-pagination"
+import { serviceCategory } from "@/routes"
+import { Breadcrumbs } from "@/website/components/breadcrumbs"
+import { Pagination } from "@/website/components/pagination"
+import { ServiceCard } from "@/website/components/service-card"
 import { ServiceFilters } from "@/website/features/category-detail/components/service-filters"
 import type {
   CategoryDetail,
   CategoryFacets,
   CategoryFilters,
-  CategoryService,
-  PaginationData,
 } from "@/website/features/category-detail/types"
-import { hasActiveFilters } from "@/website/features/category-detail/utils"
-import { ServiceCard } from "@/website/features/service-detail/components/service-card"
+import {
+  filterQuery,
+  hasActiveFilters,
+} from "@/website/features/category-detail/utils"
+import SiteLayout from "@/website/layouts/site-layout"
+import { useI18n } from "@/website/lib/i18n"
+import type { PaginationData } from "@/website/lib/pagination"
+import type { ServiceSummary } from "@/website/lib/types"
 
 // Filter/search/page visits only reload services, pagination and filters, so the category and
 // facets are kept from the first load (and are optional in the type for that reason).
 interface Props {
   category?: CategoryDetail
-  services: CategoryService[]
+  services: ServiceSummary[]
   pagination: PaginationData
   filters: CategoryFilters
   facets?: CategoryFacets
@@ -32,99 +34,89 @@ export default function ServiceCategoryShow({
   filters,
   facets,
 }: Props) {
+  const { t, tp } = useI18n()
+
   // Kept across partial reloads: Inertia merges the new props over the old ones.
-  const name = category?.name ?? "Services"
+  const name = category?.name ?? t("Services")
   const filtered = hasActiveFilters(filters)
   const first = (pagination.page - 1) * pagination.per_page + 1
 
   return (
-    <>
-      <Head title={category?.seo_title ?? `${name} — Auto Atelier`}>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Italiana&family=Jost:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
-        {category?.seo_description && (
-          <meta name="description" content={category.seo_description} />
-        )}
-      </Head>
+    <SiteLayout
+      title={category?.seo_title ?? name}
+      description={
+        category?.seo_description ??
+        t("Book {name} services: hand-finished care, at your door or ours.", {
+          name,
+        })
+      }
+      image={category?.image}
+      canonicalQuery={["page"]}
+      mainClassName="mx-auto min-h-[70vh] max-w-6xl px-6 pt-10 pb-24 lg:pt-16"
+    >
+      <Breadcrumbs items={[{ label: name }]} />
 
-      <div
-        style={{ fontFamily: "'Jost', system-ui, sans-serif" }}
-        className="bg-[#F6F1E7] text-[#2B3A32]"
+      <h1
+        dir="auto"
+        className="font-display mt-6 text-5xl leading-[1.05] text-balance sm:text-6xl"
       >
-        <SiteHeader />
-        <main className="mx-auto min-h-[70vh] max-w-6xl px-6 pt-10 pb-24 lg:pt-16">
-          <nav aria-label="Breadcrumb" className="text-sm text-[#5B6B5E]">
-            <ol className="flex flex-wrap items-center gap-2">
-              <li>
-                <Link href={root()} className="hover:text-[#2B3A32]">
-                  Home
-                </Link>
-              </li>
-              <li aria-hidden>/</li>
-              <li aria-current="page">{name}</li>
-            </ol>
-          </nav>
+        {name}
+      </h1>
 
-          <h1
-            style={{ fontFamily: "'Italiana', serif" }}
-            className="mt-6 text-5xl leading-[1.05] text-balance sm:text-6xl"
-          >
-            {name}
-          </h1>
-
-          <div className="mt-10">
-            <ServiceFilters
-              slug={category?.slug ?? ""}
-              filters={filters}
-              facets={facets}
-            />
-          </div>
-
-          <p aria-live="polite" className="mt-8 mb-6 text-sm text-[#5B6B5E]">
-            {pagination.total === 0
-              ? "No services found"
-              : `Showing ${first}–${first + services.length - 1} of ${pagination.total} ${pagination.total === 1 ? "service" : "services"}`}
-          </p>
-
-          {services.length > 0 ? (
-            <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {services.map((service) => (
-                <li key={service.id}>
-                  <ServiceCard service={service} />
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="rounded-3xl border border-dashed border-[#2B3A32]/20 bg-white/50 px-6 py-16 text-center">
-              <p className="text-lg">
-                {filtered
-                  ? "Nothing matches those filters."
-                  : "No services in this category yet."}
-              </p>
-              {filtered && (
-                <p className="mt-1 text-sm text-[#5B6B5E]">
-                  Try a different search, or use “Clear all”.
-                </p>
-              )}
-            </div>
-          )}
-
-          <CatalogPagination
-            slug={category?.slug ?? ""}
-            filters={filters}
-            pagination={pagination}
-          />
-        </main>
-        <SiteFooter />
+      <div className="mt-10">
+        <ServiceFilters
+          slug={category?.slug ?? ""}
+          filters={filters}
+          facets={facets}
+        />
       </div>
-    </>
+
+      <p dir="auto" aria-live="polite" className="text-sage mt-8 mb-6 text-sm">
+        {pagination.total === 0
+          ? t("No services found")
+          : tp(
+              pagination.total,
+              "Showing {from}–{to} of {n} service",
+              "Showing {from}–{to} of {n} services",
+              {
+                from: first,
+                to: first + services.length - 1,
+              },
+            )}
+      </p>
+
+      {services.length > 0 ? (
+        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {services.map((service, index) => (
+            <li key={service.id}>
+              <ServiceCard service={service} priority={index < 3} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="border-pine/20 rounded-3xl border border-dashed bg-white/50 px-6 py-16 text-center">
+          <p dir="auto" className="text-lg">
+            {filtered
+              ? t("Nothing matches those filters.")
+              : t("No services in this category yet.")}
+          </p>
+          {filtered && (
+            <p dir="auto" className="text-sage mt-1 text-sm">
+              {t("Try a different search, or use “Clear all”.")}
+            </p>
+          )}
+        </div>
+      )}
+
+      <Pagination
+        pagination={pagination}
+        only={["services", "pagination", "filters"]}
+        hrefFor={(n) =>
+          serviceCategory(category?.slug ?? "", {
+            query: filterQuery(filters, n),
+          }).url
+        }
+      />
+    </SiteLayout>
   )
 }

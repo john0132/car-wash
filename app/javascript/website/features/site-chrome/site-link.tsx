@@ -1,11 +1,7 @@
-import { Link } from "@inertiajs/react"
-
+import { SmartLink } from "@/website/components/smart-link"
 import type { SiteLink } from "@/website/features/site-chrome/types"
 
-/**
- * A header/footer link. Same-site paths go through Inertia; external links,
- * anchors (`/#services`), `mailto:` and `tel:` are plain anchors.
- */
+/** A header/footer link (see SmartLink for how each kind of URL is treated). */
 export function SiteLinkAnchor({
   link,
   className,
@@ -13,23 +9,9 @@ export function SiteLinkAnchor({
   link: SiteLink
   className?: string
 }) {
-  const plain = link.external || /^(mailto:|tel:)|#/.test(link.href)
-
-  if (!plain) {
-    return (
-      <Link href={link.href} className={className}>
-        {link.label}
-      </Link>
-    )
-  }
-
   return (
-    <a
-      href={link.href}
-      className={className}
-      {...(link.external && { target: "_blank", rel: "noopener noreferrer" })}
-    >
+    <SmartLink href={link.href} external={link.external} className={className}>
       {link.label}
-    </a>
+    </SmartLink>
   )
 }

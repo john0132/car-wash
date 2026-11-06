@@ -31,6 +31,15 @@ RSpec.describe "Users", type: :request do
       expect(response).to redirect_to(root_path)
     end
 
+    it "stores the first and last name separately" do
+      post sign_up_path, params: {
+        name: "Sara", last_name: "Hassan", email: "sara@example.com",
+        password: "Secret1*3*5*", password_confirmation: "Secret1*3*5*"
+      }
+
+      expect(User.find_by!(email: "sara@example.com")).to have_attributes(name: "Sara", last_name: "Hassan")
+    end
+
     it "rejects invalid user" do
       expect {
         post sign_up_path, params: {

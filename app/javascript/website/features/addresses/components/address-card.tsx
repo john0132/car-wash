@@ -3,11 +3,13 @@ import { MapPin } from "lucide-react"
 
 import { websiteProfileAddresses } from "@/routes"
 import { Button } from "@/shared/components/ui/button"
+import { ConfirmRemove } from "@/website/components/confirm-remove"
 import { AddressDialog } from "@/website/features/addresses/components/address-dialog"
 import type {
   AreaOption,
   CustomerAddress,
 } from "@/website/features/addresses/types"
+import { useI18n } from "@/website/lib/i18n"
 
 export function AddressCard({
   address,
@@ -16,26 +18,27 @@ export function AddressCard({
   address: CustomerAddress
   areas: AreaOption[]
 }) {
+  const { t } = useI18n()
+
   const remove = () => {
-    if (!window.confirm(`Remove "${address.name}"?`)) return
     router.delete(websiteProfileAddresses.destroy(address.id), {
       preserveScroll: true,
     })
   }
 
   const outline =
-    "h-10 rounded-full border-[#2B3A32]/30 bg-transparent px-5 text-[#2B3A32] hover:bg-[#2B3A32]/5 hover:text-[#2B3A32]"
+    "h-10 rounded-full border-pine/30 bg-transparent px-5 text-pine hover:bg-pine/5 hover:text-pine"
 
   return (
-    <li className="flex flex-wrap items-center justify-between gap-4 rounded-[20px] border border-[#2B3A32]/10 bg-white/60 p-6">
+    <li className="border-pine/10 flex flex-wrap items-center justify-between gap-4 rounded-[20px] border bg-white/60 p-6">
       <div className="flex items-start gap-4">
         <MapPin
-          className="mt-1 size-5 shrink-0 text-[#2B3A32]/60"
+          className="text-pine/60 mt-1 size-5 shrink-0"
           aria-hidden="true"
         />
         <div>
           <p className="text-lg font-medium">{address.name}</p>
-          <p className="text-sm text-[#2B3A32]/65">
+          <p className="text-sage text-sm">
             {[address.area, address.city].filter(Boolean).join(", ")}
           </p>
         </div>
@@ -46,18 +49,24 @@ export function AddressCard({
           areas={areas}
           trigger={
             <Button type="button" variant="outline" className={outline}>
-              Edit
+              {t("Edit")}
             </Button>
           }
         />
-        <Button
-          type="button"
-          variant="outline"
-          onClick={remove}
-          className={`${outline} text-[#B3261E] hover:text-[#B3261E]`}
-        >
-          Remove
-        </Button>
+        <ConfirmRemove
+          title={t("Remove “{name}”?", { name: address.name })}
+          description={t("This address will be removed from your account.")}
+          onConfirm={remove}
+          trigger={
+            <Button
+              type="button"
+              variant="outline"
+              className={`${outline} text-danger hover:text-danger`}
+            >
+              {t("Remove")}
+            </Button>
+          }
+        />
       </div>
     </li>
   )

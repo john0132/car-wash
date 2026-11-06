@@ -1,6 +1,15 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  # Where Rails sends failed requests (config.exceptions_app = routes). Declared first so the
+  # catch-all page slug below never shadows them.
+  match "/404", to: "website/errors#show", via: :all
+  match "/422", to: "website/errors#show", via: :all
+  match "/500", to: "website/errors#show", via: :all
+
+  get "/sitemap.xml", to: "website/sitemaps#show", as: :sitemap, defaults: { format: :xml }
+  get "/robots.txt", to: "website/sitemaps#robots", as: :robots, defaults: { format: :text }
+
   # Admin dashboard — Admin::* controllers, rendered by the `admin.tsx` entrypoint.
   namespace :admin do
     get    "sign_in",  to: "sessions#new", as: :sign_in

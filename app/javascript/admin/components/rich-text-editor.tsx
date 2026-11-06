@@ -1,7 +1,6 @@
 import Image from "@tiptap/extension-image"
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
-import { cn } from "cn"
 import {
   Bold,
   Heading2,
@@ -24,6 +23,7 @@ import { IMAGE_ACCEPT, useDirectUpload } from "@/admin/hooks/use-direct-upload"
 import { Button } from "@/shared/components/ui/button"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
+import { cn } from "@/shared/lib/utils"
 
 /**
  * WYSIWYG editor producing HTML. Rails sanitizes it on save (HtmlSanitizer),

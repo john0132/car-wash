@@ -24,11 +24,20 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select"
 import { Spinner } from "@/shared/components/ui/spinner"
+import {
+  brandButton,
+  brandInput,
+  brandOutlineButton,
+  brandSelect,
+} from "@/website/components/brand"
 import type {
   AreaOption,
   CustomerAddress,
 } from "@/website/features/addresses/types"
+import { LocationPicker } from "@/website/features/locations/components/location-picker"
 import { useGeolocation } from "@/website/hooks/use-geolocation"
+import type { Coordinates } from "@/website/hooks/use-geolocation"
+import { useI18n } from "@/website/lib/i18n"
 
 const toErrors = (messages?: string[]) =>
   messages?.map((message) => ({ message }))
@@ -41,17 +50,26 @@ interface Props {
 }
 
 export function AddressDialog({ trigger, areas, address }: Props) {
+  const { t } = useI18n()
+
   const [open, setOpen] = useState(false)
   const [coords, setCoords] = useState({
     latitude: address ? String(address.latitude) : "",
     longitude: address ? String(address.longitude) : "",
   })
-  const { locate, locating, error } = useGeolocation((c) =>
+  // The map pin and the typed fallback fields are two views of the same two numbers.
+  const setPin = (c: Coordinates) =>
     setCoords({
       latitude: c.latitude.toFixed(6),
       longitude: c.longitude.toFixed(6),
-    }),
-  )
+    })
+  const latitude = Number.parseFloat(coords.latitude)
+  const longitude = Number.parseFloat(coords.longitude)
+  const pin =
+    Number.isFinite(latitude) && Number.isFinite(longitude)
+      ? { latitude, longitude }
+      : null
+  const { locate, locating, error } = useGeolocation(setPin)
 
   const action = address
     ? websiteProfileAddresses.update(address.id)
@@ -61,9 +79,11 @@ export function AddressDialog({ trigger, areas, address }: Props) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
-        <DialogTitle>{address ? "Edit address" : "Add an address"}</DialogTitle>
+        <DialogTitle>
+          {address ? t("Edit address") : t("Add an address")}
+        </DialogTitle>
         <DialogDescription>
-          Where should we come to? Pick your area and pin the location.
+          {t("Where should we come to? Pick your area and pin the location.")}
         </DialogDescription>
         <Form
           action={action}
@@ -74,26 +94,40 @@ export function AddressDialog({ trigger, areas, address }: Props) {
           {({ errors, processing }) => (
             <>
               <Field>
-                <FieldLabel htmlFor="address_name">Label</FieldLabel>
+                <FieldLabel htmlFor="address_name">{t("Label")}</FieldLabel>
                 <Input
+                  className={brandInput}
                   id="address_name"
                   name="name"
                   defaultValue={address?.name}
-                  placeholder="Home, Work…"
+                  placeholder={t("Home, Work…")}
                   required
                 />
                 <FieldError errors={toErrors(errors.name)} />
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="address_area">Area</FieldLabel>
+                <FieldLabel htmlFor="address_area">{t("Area")}</FieldLabel>
                 <Select
                   name="area_id"
                   defaultValue={address ? String(address.area_id) : undefined}
                   required
+                  // With no pin yet, picking an area puts one inside it.
+                  onValueChange={(id) => {
+                    const area = areas.find((a) => String(a.id) === id)
+                    if (
+                      !pin &&
+                      area?.latitude != null &&
+                      area.longitude != null
+                    )
+                      setPin({
+                        latitude: area.latitude,
+                        longitude: area.longitude,
+                      })
+                  }}
                 >
-                  <SelectTrigger id="address_area" className="w-full">
-                    <SelectValue placeholder="Choose an area" />
+                  <SelectTrigger id="address_area" className={brandSelect}>
+                    <SelectValue placeholder={t("Choose an area")} />
                   </SelectTrigger>
                   <SelectContent>
                     {areas.map((area) => (
@@ -107,64 +141,93 @@ export function AddressDialog({ trigger, areas, address }: Props) {
                 <FieldError errors={toErrors(errors.area ?? errors.area_id)} />
               </Field>
 
-              <div className="grid grid-cols-2 gap-4">
-                <Field>
-                  <FieldLabel htmlFor="address_latitude">Latitude</FieldLabel>
-                  <Input
-                    id="address_latitude"
-                    name="latitude"
-                    inputMode="decimal"
-                    value={coords.latitude}
-                    onChange={(e) =>
-                      setCoords((c) => ({ ...c, latitude: e.target.value }))
-                    }
-                    placeholder="30.0444"
-                    required
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="address_longitude">Longitude</FieldLabel>
-                  <Input
-                    id="address_longitude"
-                    name="longitude"
-                    inputMode="decimal"
-                    value={coords.longitude}
-                    onChange={(e) =>
-                      setCoords((c) => ({ ...c, longitude: e.target.value }))
-                    }
-                    placeholder="31.2357"
-                    required
-                  />
-                </Field>
-                <div className="col-span-2 -mt-2">
-                  <FieldError errors={toErrors(errors.latitude)} />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-medium">{t("Location")}</span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className={brandOutlineButton}
+                    onClick={locate}
+                    disabled={locating}
+                  >
+                    {locating ? <Spinner /> : <LocateFixed />}
+                    {t("Use my current location")}
+                  </Button>
                 </div>
-              </div>
+                {error && (
+                  <p role="alert" className="text-danger text-sm">
+                    {error}
+                  </p>
+                )}
+                <LocationPicker position={pin} onChange={setPin} />
+                <FieldError errors={toErrors(errors.latitude)} />
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={locate}
-                disabled={locating}
-              >
-                {locating ? <Spinner /> : <LocateFixed />}
-                Use my current location
-              </Button>
-              {error && (
-                <p role="alert" className="text-destructive -mt-2 text-sm">
-                  {error}
-                </p>
-              )}
+                {/* The pin fills these in; typing is the fallback. */}
+                <details className="text-sm">
+                  <summary className="text-sage hover:text-pine cursor-pointer">
+                    {t("Enter coordinates instead")}
+                  </summary>
+                  <div className="mt-3 grid grid-cols-2 gap-4">
+                    <Field>
+                      <FieldLabel htmlFor="address_latitude">
+                        {t("Latitude")}
+                      </FieldLabel>
+                      <Input
+                        className={brandInput}
+                        id="address_latitude"
+                        name="latitude"
+                        inputMode="decimal"
+                        dir="ltr"
+                        value={coords.latitude}
+                        onChange={(e) =>
+                          setCoords((c) => ({ ...c, latitude: e.target.value }))
+                        }
+                        placeholder="30.0444"
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel htmlFor="address_longitude">
+                        {t("Longitude")}
+                      </FieldLabel>
+                      <Input
+                        className={brandInput}
+                        id="address_longitude"
+                        name="longitude"
+                        inputMode="decimal"
+                        dir="ltr"
+                        value={coords.longitude}
+                        onChange={(e) =>
+                          setCoords((c) => ({
+                            ...c,
+                            longitude: e.target.value,
+                          }))
+                        }
+                        placeholder="31.2357"
+                      />
+                    </Field>
+                  </div>
+                </details>
+              </div>
 
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button type="button" variant="secondary">
-                    Cancel
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={brandOutlineButton}
+                  >
+                    {t("Cancel")}
                   </Button>
                 </DialogClose>
-                <Button type="submit" disabled={processing}>
+                <Button
+                  type="submit"
+                  className={brandButton}
+                  disabled={processing}
+                >
                   {processing && <Spinner />}
-                  {address ? "Save address" : "Add address"}
+                  {address ? t("Save address") : t("Add address")}
                 </Button>
               </DialogFooter>
             </>

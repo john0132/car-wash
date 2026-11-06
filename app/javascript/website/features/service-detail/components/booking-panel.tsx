@@ -2,14 +2,13 @@ import { Link } from "@inertiajs/react"
 import { Check, Clock, X } from "lucide-react"
 
 import { checkout } from "@/routes"
-import { formatMoney } from "@/website/features/home-catalog/utils"
 import { ExtrasDialog } from "@/website/features/service-detail/components/extras-dialog"
 import type {
   ExtraOption,
   ExtrasPage,
   ServiceDetail,
 } from "@/website/features/service-detail/types"
-import { formatDuration } from "@/website/features/service-detail/utils"
+import { useI18n } from "@/website/lib/i18n"
 
 /**
  * Price, duration, the chosen extras and the "Book now" call to action, laid
@@ -27,6 +26,8 @@ export function BookingPanel({
   selectedExtras: ExtraOption[]
   onExtrasChange: (extras: ExtraOption[]) => void
 }) {
+  const { t, formatMoney, formatDuration } = useI18n()
+
   const duration = formatDuration(service.duration_minutes)
   const onSale = service.sale_price !== null
   const savings = onSale
@@ -40,34 +41,34 @@ export function BookingPanel({
   })
 
   return (
-    <div className="relative z-10 mx-4 -mt-20 rounded-3xl border border-[#2B3A32]/10 bg-white p-6 shadow-[0_32px_64px_-32px_rgba(43,58,50,0.45)] sm:mx-10">
-      <div className="flex items-end justify-between gap-6">
+    <div className="border-pine/10 relative z-10 mx-4 -mt-20 rounded-3xl border bg-white p-6 shadow-[0_32px_64px_-32px_rgba(43,58,50,0.45)] sm:mx-10">
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
         <div>
-          <p className="text-sm text-[#5B6B5E]">
-            {onSale ? "Special price" : "Price"}
+          <p className="text-sage text-sm">
+            {onSale ? t("Special price") : t("Price")}
           </p>
-          <p
-            style={{ fontFamily: "'Italiana', serif" }}
-            className="mt-1 text-4xl text-[#2B3A32] tabular-nums"
-          >
+          <p className="font-display text-pine mt-1 text-4xl tabular-nums">
             {formatMoney(onSale ? service.sale_price! : service.price)}
           </p>
           {onSale && (
-            <p className="mt-1 text-sm text-[#5B6B5E] tabular-nums">
-              <s>{formatMoney(service.price)}</s>
-              <span className="ml-2 font-medium text-[#8A6240]">
-                {savings}% off
+            <p className="text-sage relative mt-1 text-sm tabular-nums">
+              <s>
+                <span className="sr-only">{t("Was")} </span>
+                {formatMoney(service.price)}
+              </s>
+              <span className="text-bronze ms-2 font-medium">
+                {t("{savings}% off", { savings })}
               </span>
             </p>
           )}
         </div>
 
         {duration && (
-          <div className="flex items-center gap-2 border-l border-[#2B3A32]/15 pl-6">
-            <Clock className="size-5 text-[#8A6240]" aria-hidden />
+          <div className="sm:border-pine/15 flex items-center gap-2 sm:border-s sm:ps-6">
+            <Clock className="text-bronze size-5" aria-hidden />
             <div>
-              <p className="text-sm text-[#5B6B5E]">Takes about</p>
-              <p className="font-medium text-[#2B3A32]">{duration}</p>
+              <p className="text-sage text-sm">{t("Takes about")}</p>
+              <p className="text-pine font-medium">{duration}</p>
             </div>
           </div>
         )}
@@ -81,15 +82,18 @@ export function BookingPanel({
       />
 
       {selectedExtras.length > 0 && (
-        <ul aria-label="Selected extras" className="mt-4 flex flex-wrap gap-2">
+        <ul
+          aria-label={t("Selected extras")}
+          className="mt-4 flex flex-wrap gap-2"
+        >
           {selectedExtras.map((extra) => (
             <li
               key={extra.id}
-              className="flex items-center gap-1.5 rounded-full border border-[#2B3A32]/20 bg-[#F6F1E7] py-1 pr-1 pl-3 text-sm"
+              className="border-pine/20 bg-ivory flex items-center gap-1.5 rounded-full border py-1 ps-3 pe-1 text-sm"
             >
-              <Check className="size-3.5 text-[#8A6240]" aria-hidden />
+              <Check className="text-bronze size-3.5" aria-hidden />
               {extra.name}
-              <span className="text-[#5B6B5E] tabular-nums">
+              <span className="text-sage tabular-nums">
                 +{formatMoney(extra.price)}
               </span>
               <button
@@ -99,8 +103,10 @@ export function BookingPanel({
                     selectedExtras.filter((e) => e.id !== extra.id),
                   )
                 }
-                aria-label={`Remove ${extra.name ?? "extra"}`}
-                className="rounded-full p-1 text-[#5B6B5E] hover:bg-white hover:text-[#2B3A32] focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:outline-none"
+                aria-label={t("Remove {name}", {
+                  name: extra.name ?? t("extra"),
+                })}
+                className="text-sage hover:text-pine focus-visible:ring-bronze grid size-6 place-items-center rounded-full hover:bg-white focus-visible:ring-2 focus-visible:outline-none"
               >
                 <X className="size-3.5" aria-hidden />
               </button>
@@ -111,9 +117,9 @@ export function BookingPanel({
 
       <Link
         href={bookHref}
-        className="mt-4 block rounded-full bg-[#2B3A32] px-6 py-3.5 text-center font-medium text-[#F6F1E7] transition-colors hover:bg-[#1F2B25] focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:ring-offset-2 focus-visible:outline-none"
+        className="bg-pine text-ivory hover:bg-pine-deep focus-visible:ring-bronze mt-4 block rounded-full px-6 py-3.5 text-center font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
       >
-        Book now
+        {t("Book now")}
       </Link>
     </div>
   )

@@ -115,20 +115,4 @@ class Website::ServiceCategoriesController < Website::BaseController
 
     { min_price: low&.floor, max_price: high&.ceil, on_sale_count: sale_count.to_i, durations: DURATION_STEPS }
   end
-
-  def service_card_props(service)
-    {
-      id: service.id,
-      slug: service.slug,
-      name: service.translated(:name),
-      price: service.price.to_f,
-      sale_price: service.sale_price&.to_f,
-      duration_minutes: service.duration_minutes,
-      image: blob_prop(service.image)
-    }
-  end
-
-  def blob_prop(attachment)
-    attachment.attached? ? { url: rails_blob_path(attachment.blob, only_path: true) } : nil
-  end
 end

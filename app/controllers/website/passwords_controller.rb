@@ -5,7 +5,7 @@ class Website::PasswordsController < Website::BaseController
     user = Current.user
 
     if user.update(user_params)
-      redirect_to profile_path, notice: "Your password has been changed"
+      redirect_to profile_path, notice: t("website.flash.password_changed")
     else
       redirect_to profile_path, inertia: { errors: user.errors.to_hash }
     end

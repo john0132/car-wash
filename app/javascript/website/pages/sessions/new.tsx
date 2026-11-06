@@ -1,4 +1,4 @@
-import { Form, Head } from "@inertiajs/react"
+import { Form } from "@inertiajs/react"
 
 import {
   websiteIdentityPasswordResets,
@@ -15,16 +15,20 @@ import {
 } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
-import { SocialLoginButtons } from "@/website/features/auth/components/social-login-buttons"
+import { brandInput } from "@/website/components/brand"
+import { SeoHead } from "@/website/components/seo-head"
 import AuthLayout from "@/website/layouts/auth-layout"
+import { useI18n } from "@/website/lib/i18n"
 
 export default function Login() {
+  const { t } = useI18n()
+
   return (
     <AuthLayout
-      title="Log in to your account"
-      description="Enter your email and password below to log in"
+      title={t("Log in to your account")}
+      description={t("Enter your email and password below to log in")}
     >
-      <Head title="Log in" />
+      <SeoHead title={t("Log in")} noindex />
       <Form
         action={websiteSessions.create()}
         resetOnSuccess={["password"]}
@@ -34,16 +38,16 @@ export default function Login() {
           <>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="email">Email address</FieldLabel>
+                <FieldLabel htmlFor="email">{t("Email address")}</FieldLabel>
                 <Input
+                  className={brandInput}
                   id="email"
                   name="email"
                   type="email"
                   required
                   autoFocus
-                  tabIndex={1}
                   autoComplete="email"
-                  placeholder="email@example.com"
+                  placeholder={t("email@example.com")}
                 />
                 <FieldError
                   errors={errors.email?.map((message) => ({ message }))}
@@ -52,23 +56,22 @@ export default function Login() {
 
               <Field>
                 <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <FieldLabel htmlFor="password">{t("Password")}</FieldLabel>
                   <TextLink
                     href={websiteIdentityPasswordResets.new()}
-                    className="ml-auto text-sm"
-                    tabIndex={5}
+                    className="ms-auto text-sm"
                   >
-                    Forgot password?
+                    {t("Forgot password?")}
                   </TextLink>
                 </div>
                 <Input
+                  className={brandInput}
                   id="password"
                   type="password"
                   name="password"
                   required
-                  tabIndex={2}
                   autoComplete="current-password"
-                  placeholder="Password"
+                  placeholder={t("Password")}
                 />
                 <FieldError
                   errors={errors.password?.map((message) => ({ message }))}
@@ -77,22 +80,17 @@ export default function Login() {
 
               <Button
                 type="submit"
-                className="mt-4 h-11 w-full rounded-full bg-[#2B3A32] text-[#F6F1E7] hover:bg-[#1F2B25]"
-                tabIndex={4}
+                className="bg-pine text-ivory hover:bg-pine-deep mt-4 h-11 w-full rounded-full"
                 disabled={processing}
               >
                 {processing && <Spinner />}
-                Log in
+                {t("Log in")}
               </Button>
             </FieldGroup>
 
-            <SocialLoginButtons verb="Sign in" />
-
             <div className="text-muted-foreground text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <TextLink href={websiteUsers.new()} tabIndex={5}>
-                Sign up
-              </TextLink>
+              {t("Don't have an account?")}{" "}
+              <TextLink href={websiteUsers.new()}>{t("Sign up")}</TextLink>
             </div>
           </>
         )}

@@ -106,7 +106,7 @@ export default function AdministratorsIndex({
                   name={admin.full_name}
                   action={adminAdministrators.activation(admin.id)}
                   disabled={
-                    !can("admins", "update") || admin.id === auth.user.id
+                    !can("admins", "update") || admin.id === auth.user?.id
                   }
                 />
               </TableCell>

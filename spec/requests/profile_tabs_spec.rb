@@ -35,6 +35,19 @@ RSpec.describe "Profile tabs", type: :request do
       expect(response).to have_http_status(:success)
     end
 
+    it "paginates bookings" do
+      12.times do
+        Booking.create!(user: user, car_description: "Toyota Corolla", subtotal: 100, total_amount: 100)
+      end
+
+      get profile_bookings_path
+      expect(inertia.props[:bookings].size).to eq(10)
+      expect(inertia.props[:pagination]).to include(page: 1, pages: 2, total: 12)
+
+      get profile_bookings_path(page: 2)
+      expect(inertia.props[:bookings].size).to eq(2)
+    end
+
     it "manages addresses" do
       area = create_area
       get profile_addresses_path

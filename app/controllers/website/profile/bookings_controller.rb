@@ -1,11 +1,19 @@
 # frozen_string_literal: true
 
 class Website::Profile::BookingsController < Website::BaseController
-  def index
-    bookings = Current.user.bookings.newest_first
-      .includes(:booking_address, booking_items: :itemable)
+  include Website::Paginates
 
-    render inertia: { bookings: bookings.map { |booking| booking_props(booking) } }
+  PER_PAGE = 10
+
+  def index
+    scope = Current.user.bookings.newest_first
+      .includes(:booking_address, booking_items: :itemable)
+    bookings, pagination = paginate(scope, per_page: PER_PAGE)
+
+    render inertia: {
+      bookings: bookings.map { |booking| booking_props(booking) },
+      pagination: pagination
+    }
   end
 
   private

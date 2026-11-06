@@ -1,21 +1,23 @@
 import { createInertiaApp } from "@inertiajs/react"
 
-import { initializeTheme } from "@/shared/hooks/use-appearance"
-import PersistentLayout from "@/shared/layouts/persistent-layout"
 import {
   type PageModule,
   createPageResolver,
   inertiaAppOptions,
+  titleFor,
 } from "@/shared/lib/inertia"
+import WebsiteShell from "@/website/layouts/website-shell"
 
 void createInertiaApp({
   ...inertiaAppOptions,
+  // Pages pass only their own part ("Our services"); the brand is appended.
+  title: titleFor("Auto Atelier", "—"),
   // SSR entry (see vite.config.ts). Only website pages are bundled into this entrypoint.
   resolve: createPageResolver(
     "website",
     import.meta.glob<PageModule>("../website/pages/**/*.tsx"),
   ),
-  layout: () => PersistentLayout,
+  layout: () => WebsiteShell,
 }).catch((error) => {
   // This ensures this entrypoint is only loaded on Inertia pages
   // by checking for the presence of the root element (#app by default).
@@ -29,6 +31,3 @@ void createInertiaApp({
     )
   }
 })
-
-// This will set light / dark mode on load...
-initializeTheme()

@@ -1,6 +1,8 @@
 import { Field, FieldLabel } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
+import { brandInput } from "@/website/components/brand"
 import { StepCard } from "@/website/features/checkout/components/step-card"
+import { useI18n } from "@/website/lib/i18n"
 
 /** Only shown when the account has no phone yet; saved to the profile on booking. */
 export function PhoneStep({
@@ -14,16 +16,21 @@ export function PhoneStep({
   onChange: (phone: string) => void
   error?: string
 }) {
+  const { t } = useI18n()
+
   return (
     <StepCard
+      field="phone"
       step={step}
-      title="Phone number"
-      description="So our team can reach you on the day. We'll save it to your account."
+      title={t("Phone number")}
+      description={t(
+        "So our team can reach you on the day. We'll save it to your account.",
+      )}
       error={error}
     >
       <Field>
         <FieldLabel htmlFor="checkout_phone" className="sr-only">
-          Phone number
+          {t("Phone number")}
         </FieldLabel>
         <Input
           id="checkout_phone"
@@ -34,7 +41,7 @@ export function PhoneStep({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           aria-invalid={error ? true : undefined}
-          className="h-12 rounded-xl border-[#2B3A32]/25 bg-white px-4 text-[#2B3A32] dark:bg-white"
+          className={`${brandInput} h-12 px-4`}
           required
         />
       </Field>

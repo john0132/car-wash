@@ -49,6 +49,9 @@ jobs:
       - name: Type check
         run: npm run check
 
+      - name: Check Arabic strings
+        run: npm run i18n:check
+
   lint:
     runs-on: ubuntu-latest
     env:
@@ -80,7 +83,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: postgis/postgis:16-3.5
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -112,7 +115,7 @@ jobs:
       - name: Run tests
         env:
           RAILS_ENV: test
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432
+          DATABASE_URL: postgis://postgres:postgres@localhost:5432
         run: bin/rails db:test:prepare spec
 
       - name: Keep screenshots from failed system tests

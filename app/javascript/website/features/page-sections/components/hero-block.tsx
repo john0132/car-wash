@@ -1,7 +1,7 @@
-import { Link } from "@inertiajs/react"
-
 import { Button } from "@/shared/components/ui/button"
 import { BrandMark } from "@/website/components/brand-mark"
+import { SmartLink } from "@/website/components/smart-link"
+import { useI18n } from "@/website/lib/i18n"
 
 export interface HeroData {
   heading: string
@@ -10,15 +10,19 @@ export interface HeroData {
   button_url?: string
   image?: { url: string } | null
   alignment?: string
+  /** Small line above the heading; defaults to the brand tagline. */
+  eyebrow?: string
 }
 
 export function HeroBlock({ data }: { data: HeroData }) {
+  const { t } = useI18n()
+
   const centered = data.alignment === "center"
 
   return (
     <section
       id="top"
-      className="relative overflow-hidden bg-[#F6F1E7] px-6 pt-20 pb-24 lg:pt-28 lg:pb-32"
+      className="bg-ivory relative overflow-hidden px-6 pt-20 pb-24 lg:pt-28 lg:pb-32"
     >
       <div
         className={
@@ -28,18 +32,22 @@ export function HeroBlock({ data }: { data: HeroData }) {
         }
       >
         <div>
-          <p className="text-xs font-medium tracking-[0.3em] text-[#8A6240] uppercase">
-            Hand-Finished Auto Care
+          <p
+            dir="auto"
+            className="text-bronze text-xs font-medium tracking-[0.3em] uppercase"
+          >
+            {data.eyebrow?.trim() ? data.eyebrow : t("Hand-Finished Auto Care")}
           </p>
           <h1
-            style={{ fontFamily: "'Italiana', serif" }}
-            className="mt-5 text-5xl leading-[1.1] text-[#2B3A32] sm:text-6xl lg:text-7xl"
+            dir="auto"
+            className="font-display text-pine mt-5 text-5xl leading-[1.1] sm:text-6xl lg:text-7xl"
           >
             {data.heading}
           </h1>
           {data.subheading && (
             <p
-              className={`mt-6 text-lg leading-relaxed text-[#5B6B5E] ${centered ? "mx-auto max-w-xl" : "max-w-md"}`}
+              dir="auto"
+              className={`text-sage mt-6 text-lg leading-relaxed ${centered ? "mx-auto max-w-xl" : "max-w-md"}`}
             >
               {data.subheading}
             </p>
@@ -51,9 +59,11 @@ export function HeroBlock({ data }: { data: HeroData }) {
               <Button
                 asChild
                 size="lg"
-                className="rounded-full bg-[#2B3A32] px-8 text-base text-[#F6F1E7] hover:bg-[#1F2B25]"
+                className="bg-pine text-ivory hover:bg-pine-deep rounded-full px-8 text-base"
               >
-                <Link href={data.button_url}>{data.button_label}</Link>
+                <SmartLink href={data.button_url}>
+                  {data.button_label}
+                </SmartLink>
               </Button>
             </div>
           )}
@@ -61,12 +71,13 @@ export function HeroBlock({ data }: { data: HeroData }) {
 
         {!centered && (
           <div className="relative mx-auto flex aspect-square w-full max-w-md items-center justify-center">
-            <div className="absolute inset-0 rounded-full border border-[#A97C50]/30" />
+            <div className="border-bronze-light/30 absolute inset-0 rounded-full border" />
             <div className="absolute inset-10 overflow-hidden rounded-full bg-white shadow-[0_30px_60px_-20px_rgba(43,58,50,0.25)]">
               {data.image && (
                 <img
                   src={data.image.url}
                   alt=""
+                  fetchPriority="high"
                   className="h-full w-full object-cover"
                 />
               )}

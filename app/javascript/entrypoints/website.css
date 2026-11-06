@@ -1,0 +1,54 @@
+/* Public-website-only styles. The admin dashboard never loads this file. */
+
+/* Self-hosted fonts (no third-party request). Only the weights the site uses. */
+@import "@fontsource/italiana/400.css";
+@import "@fontsource/jost/400.css";
+@import "@fontsource/jost/500.css";
+@import "@fontsource/jost/600.css";
+
+/* Arabic glyphs: Italiana and Jost have none, so these come next in the font stacks.
+   They are only downloaded when a page actually shows Arabic text. */
+@import "@fontsource/reem-kufi/arabic-400.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-400.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-500.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-600.css";
+
+/*
+ * The website is always light and on-brand: map the shadcn tokens to the
+ * Auto Atelier palette so the shared primitives (inputs, selects, dialogs,
+ * toasts) look right without per-call overrides.
+ */
+:root {
+  color-scheme: light;
+
+  --background: #f6f1e7;
+  --foreground: #2b3a32;
+  --card: #ffffff;
+  --card-foreground: #2b3a32;
+  --popover: #fbf8f2;
+  --popover-foreground: #2b3a32;
+  --primary: #2b3a32;
+  --primary-foreground: #f6f1e7;
+  --secondary: #efe7d6;
+  --secondary-foreground: #2b3a32;
+  --muted: #efe7d6;
+  --muted-foreground: #5b6b5e;
+  --accent: #efe7d6;
+  --accent-foreground: #2b3a32;
+  --destructive: #b3261e;
+  --destructive-foreground: #b3261e;
+  --border: rgb(43 58 50 / 0.15);
+  --input: rgb(43 58 50 / 0.25);
+  --ring: #8a6240;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+/* Emails, phone numbers and passwords are typed left to right even on a right-to-left page. */
+[dir="rtl"]
+  input:where([type="email"], [type="tel"], [type="password"], [type="url"]) {
+  direction: ltr;
+  text-align: right;
+}

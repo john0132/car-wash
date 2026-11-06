@@ -1,11 +1,11 @@
-import type { HomeImage } from "@/website/features/home-catalog/types"
+import type { Image } from "@/website/lib/types"
 
 export interface BlogCardData {
   id: number
   slug: string
   title: string | null
   subtitle: string | null
-  cover_image: HomeImage | null
+  cover_image: Image | null
   published_at: string
 }
 

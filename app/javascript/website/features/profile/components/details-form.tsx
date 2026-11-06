@@ -5,18 +5,20 @@ import { Button } from "@/shared/components/ui/button"
 import { Field, FieldError, FieldLabel } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
+import { brandButton, brandInput } from "@/website/components/brand"
 import {
   ProfileCard,
   SectionHeading,
-  fieldClass,
-  primaryButtonClass,
 } from "@/website/features/profile/components/profile-card"
 import type { ProfileData } from "@/website/features/profile/types"
+import { useI18n } from "@/website/lib/i18n"
 
 const toErrors = (messages?: string[]) =>
   messages?.map((message) => ({ message }))
 
 export function DetailsForm({ profile }: { profile: ProfileData }) {
+  const { t } = useI18n()
+
   return (
     <ProfileCard id="details">
       <Form
@@ -27,39 +29,39 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
         {({ errors, processing, recentlySuccessful }) => (
           <>
             <SectionHeading
-              title="Personal details"
-              description="How we address you and reach you."
+              title={t("Personal details")}
+              description={t("How we address you and reach you.")}
             />
 
             <div className="grid gap-5 sm:grid-cols-2">
               <Field>
-                <FieldLabel htmlFor="name">First name</FieldLabel>
+                <FieldLabel htmlFor="name">{t("First name")}</FieldLabel>
                 <Input
                   id="name"
                   name="name"
                   defaultValue={profile.name}
                   required
                   autoComplete="given-name"
-                  className={fieldClass}
+                  className={brandInput}
                 />
                 <FieldError errors={toErrors(errors.name)} />
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="last_name">Last name</FieldLabel>
+                <FieldLabel htmlFor="last_name">{t("Last name")}</FieldLabel>
                 <Input
                   id="last_name"
                   name="last_name"
                   defaultValue={profile.last_name ?? ""}
                   autoComplete="family-name"
-                  className={fieldClass}
+                  className={brandInput}
                 />
                 <FieldError errors={toErrors(errors.last_name)} />
               </Field>
             </div>
 
             <Field>
-              <FieldLabel htmlFor="email">Email address</FieldLabel>
+              <FieldLabel htmlFor="email">{t("Email address")}</FieldLabel>
               <Input
                 id="email"
                 name="email"
@@ -67,13 +69,13 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
                 defaultValue={profile.email}
                 required
                 autoComplete="email"
-                className={fieldClass}
+                className={brandInput}
               />
               <FieldError errors={toErrors(errors.email)} />
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="phone">Phone number</FieldLabel>
+              <FieldLabel htmlFor="phone">{t("Phone number")}</FieldLabel>
               <Input
                 id="phone"
                 name="phone"
@@ -82,7 +84,7 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
                 autoComplete="tel"
                 inputMode="tel"
                 placeholder="+20 100 123 4567"
-                className={fieldClass}
+                className={brandInput}
               />
               <FieldError errors={toErrors(errors.phone)} />
             </Field>
@@ -91,14 +93,14 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
               <Button
                 type="submit"
                 disabled={processing}
-                className={primaryButtonClass}
+                className={brandButton}
               >
                 {processing && <Spinner />}
-                Save changes
+                {t("Save changes")}
               </Button>
               {recentlySuccessful && (
-                <p className="text-sm text-[#2B3A32]/65" role="status">
-                  Saved
+                <p className="text-sage text-sm" role="status">
+                  {t("Saved")}
                 </p>
               )}
             </div>

@@ -1,5 +1,3 @@
-import { cn } from "cn"
-
 import {
   PAYMENT_STATUSES,
   type PaymentStatus,
@@ -13,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/components/ui/card"
+import { cn } from "@/shared/lib/utils"
 
 // Good/warning/serious/critical, reserved for payment state — distinct from
 // the booking-status hues so the two breakdowns never look interchangeable.

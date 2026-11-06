@@ -16,7 +16,13 @@ import {
 import { Field, FieldError, FieldLabel } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
+import {
+  brandButton,
+  brandInput,
+  brandOutlineButton,
+} from "@/website/components/brand"
 import type { CustomerCar } from "@/website/features/cars/types"
+import { useI18n } from "@/website/lib/i18n"
 
 const toErrors = (messages?: string[]) =>
   messages?.map((message) => ({ message }))
@@ -28,6 +34,8 @@ interface Props {
 }
 
 export function CarDialog({ trigger, car }: Props) {
+  const { t } = useI18n()
+
   const [open, setOpen] = useState(false)
 
   const action = car
@@ -38,9 +46,9 @@ export function CarDialog({ trigger, car }: Props) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
-        <DialogTitle>{car ? "Edit car" : "Add a car"}</DialogTitle>
+        <DialogTitle>{car ? t("Edit car") : t("Add a car")}</DialogTitle>
         <DialogDescription>
-          Tell us about the car you book services for.
+          {t("Tell us about the car you book services for.")}
         </DialogDescription>
         <Form
           action={action}
@@ -52,23 +60,25 @@ export function CarDialog({ trigger, car }: Props) {
             <>
               <div className="grid grid-cols-2 gap-4">
                 <Field>
-                  <FieldLabel htmlFor="car_make">Make</FieldLabel>
+                  <FieldLabel htmlFor="car_make">{t("Make")}</FieldLabel>
                   <Input
+                    className={brandInput}
                     id="car_make"
                     name="make"
                     defaultValue={car?.make}
-                    placeholder="Toyota"
+                    placeholder={t("Toyota")}
                     required
                   />
                   <FieldError errors={toErrors(errors.make)} />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="car_model">Model</FieldLabel>
+                  <FieldLabel htmlFor="car_model">{t("Model")}</FieldLabel>
                   <Input
+                    className={brandInput}
                     id="car_model"
                     name="model"
                     defaultValue={car?.model}
-                    placeholder="Corolla"
+                    placeholder={t("Corolla")}
                     required
                   />
                   <FieldError errors={toErrors(errors.model)} />
@@ -77,25 +87,27 @@ export function CarDialog({ trigger, car }: Props) {
 
               <Field>
                 <FieldLabel htmlFor="car_license_plate">
-                  License plate
+                  {t("License plate")}
                 </FieldLabel>
                 <Input
+                  className={brandInput}
                   id="car_license_plate"
                   name="license_plate"
                   defaultValue={car?.license_plate}
-                  placeholder="ABC 1234"
+                  placeholder={t("ABC 1234")}
                   required
                 />
                 <FieldError errors={toErrors(errors.license_plate)} />
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="car_color">Color</FieldLabel>
+                <FieldLabel htmlFor="car_color">{t("Color")}</FieldLabel>
                 <Input
+                  className={brandInput}
                   id="car_color"
                   name="color"
                   defaultValue={car?.color}
-                  placeholder="White"
+                  placeholder={t("White")}
                   required
                 />
                 <FieldError errors={toErrors(errors.color)} />
@@ -103,13 +115,21 @@ export function CarDialog({ trigger, car }: Props) {
 
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button type="button" variant="secondary">
-                    Cancel
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={brandOutlineButton}
+                  >
+                    {t("Cancel")}
                   </Button>
                 </DialogClose>
-                <Button type="submit" disabled={processing}>
+                <Button
+                  type="submit"
+                  className={brandButton}
+                  disabled={processing}
+                >
                   {processing && <Spinner />}
-                  {car ? "Save car" : "Add car"}
+                  {car ? t("Save car") : t("Add car")}
                 </Button>
               </DialogFooter>
             </>

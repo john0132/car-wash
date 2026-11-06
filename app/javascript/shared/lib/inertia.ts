@@ -1,10 +1,21 @@
 import type { ComponentType } from "react"
 
-const appName = import.meta.env.VITE_APP_NAME ?? "Car Wash"
+/**
+ * Builds the document title: "Page - App", or just the app name. A title that
+ * already names the app (e.g. a staff-written SEO title) is left as written.
+ */
+export const titleFor =
+  (appName: string, separator = "-") =>
+  (title?: string) =>
+    !title
+      ? appName
+      : title.includes(appName)
+        ? title
+        : `${title} ${separator} ${appName}`
 
 /** createInertiaApp options common to every frontend app (admin, website). */
 export const inertiaAppOptions = {
-  title: (title?: string) => (title ? `${title} - ${appName}` : appName),
+  title: titleFor(import.meta.env.VITE_APP_NAME ?? "Car Wash"),
   strictMode: true,
   defaults: {
     form: {

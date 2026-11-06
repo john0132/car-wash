@@ -33,8 +33,8 @@ class Checkout
   attribute :phone, :string
 
   # Attribute names for full messages are in config/locales/en.yml.
-  validates :service, presence: { message: "is no longer available" }
-  validates :car_id, presence: { message: "must be chosen" }
+  validates :service, presence: { message: ->(*) { I18n.t("website.checkout.service_gone") } }
+  validates :car_id, presence: { message: ->(*) { I18n.t("website.checkout.car_blank") } }
   validate :car_belongs_to_user
   validate :location_is_covered
   validate :scheduled_at_is_a_slot
@@ -154,32 +154,32 @@ class Checkout
   end
 
   def car_belongs_to_user
-    errors.add(:car_id, "is not one of your cars") if car_id && car.nil?
+    errors.add(:car_id, I18n.t("website.checkout.car_foreign")) if car_id && car.nil?
   end
 
   def location_is_covered
     if point.nil?
-      errors.add(:location, "must be chosen")
+      errors.add(:location, I18n.t("website.checkout.location_blank"))
     elsif area.nil?
-      errors.add(:location, "is outside our service area")
+      errors.add(:location, I18n.t("website.checkout.location_outside"))
     end
   end
 
   def scheduled_at_is_a_slot
-    errors.add(:scheduled_at, "must be one of the available times") unless BookingSlots.include?(scheduled_at)
+    errors.add(:scheduled_at, I18n.t("website.checkout.slot_invalid")) unless BookingSlots.include?(scheduled_at)
   end
 
   def phone_is_set
     return unless needs_phone?
 
     if phone.blank?
-      errors.add(:phone, "is required to book")
+      errors.add(:phone, I18n.t("website.checkout.phone_required"))
     elsif !phone.squish.match?(User::PHONE_FORMAT)
-      errors.add(:phone, "must be a valid phone number")
+      errors.add(:phone, I18n.t("website.errors.phone_invalid"))
     end
   end
 
   def payment_method_available
-    errors.add(:base, "Bookings are not available right now") unless payment_method
+    errors.add(:base, I18n.t("website.checkout.unavailable")) unless payment_method
   end
 end

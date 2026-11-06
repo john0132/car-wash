@@ -1,4 +1,4 @@
-import { Form, Head } from "@inertiajs/react"
+import { Form } from "@inertiajs/react"
 
 import { websiteIdentityPasswordResets } from "@/routes"
 import { Button } from "@/shared/components/ui/button"
@@ -10,7 +10,10 @@ import {
 } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
+import { brandInput } from "@/website/components/brand"
+import { SeoHead } from "@/website/components/seo-head"
 import AuthLayout from "@/website/layouts/auth-layout"
+import { useI18n } from "@/website/lib/i18n"
 
 interface ResetPasswordProps {
   sid: string
@@ -18,12 +21,14 @@ interface ResetPasswordProps {
 }
 
 export default function ResetPassword({ sid, email }: ResetPasswordProps) {
+  const { t } = useI18n()
+
   return (
     <AuthLayout
-      title="Reset password"
-      description="Please enter your new password below"
+      title={t("Reset password")}
+      description={t("Please enter your new password below")}
     >
-      <Head title="Reset password" />
+      <SeoHead title={t("Reset password")} noindex />
       <Form
         action={websiteIdentityPasswordResets.update()}
         transform={(data) => ({ ...data, sid, email })}
@@ -32,8 +37,9 @@ export default function ResetPassword({ sid, email }: ResetPasswordProps) {
         {({ processing, errors }) => (
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <FieldLabel htmlFor="email">{t("Email")}</FieldLabel>
               <Input
+                className={brandInput}
                 id="email"
                 type="email"
                 name="email"
@@ -47,14 +53,16 @@ export default function ResetPassword({ sid, email }: ResetPasswordProps) {
             </Field>
 
             <Field>
-              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <FieldLabel htmlFor="password">{t("Password")}</FieldLabel>
               <Input
+                className={brandInput}
                 id="password"
                 type="password"
                 name="password"
                 autoComplete="new-password"
+                required
                 autoFocus
-                placeholder="Password"
+                placeholder={t("Password")}
               />
               <FieldError
                 errors={errors.password?.map((message) => ({ message }))}
@@ -63,14 +71,16 @@ export default function ResetPassword({ sid, email }: ResetPasswordProps) {
 
             <Field>
               <FieldLabel htmlFor="password_confirmation">
-                Confirm password
+                {t("Confirm password")}
               </FieldLabel>
               <Input
+                className={brandInput}
                 id="password_confirmation"
                 type="password"
                 name="password_confirmation"
                 autoComplete="new-password"
-                placeholder="Confirm password"
+                required
+                placeholder={t("Confirm password")}
               />
               <FieldError
                 errors={errors.password_confirmation?.map((message) => ({
@@ -81,7 +91,7 @@ export default function ResetPassword({ sid, email }: ResetPasswordProps) {
 
             <Button type="submit" className="mt-4 w-full" disabled={processing}>
               {processing && <Spinner />}
-              Reset password
+              {t("Reset password")}
             </Button>
           </FieldGroup>
         )}

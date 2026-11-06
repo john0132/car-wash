@@ -1,6 +1,5 @@
-import { Link } from "@inertiajs/react"
-
 import { Button } from "@/shared/components/ui/button"
+import { SmartLink } from "@/website/components/smart-link"
 
 export interface CtaData {
   heading: string
@@ -18,21 +17,19 @@ export function CtaBlock({ data, id }: { data: CtaData; id?: string }) {
       id={id}
       className={
         primary
-          ? "bg-[#2B3A32] px-6 py-20 text-[#F6F1E7]"
-          : "bg-white px-6 py-20 text-[#2B3A32]"
+          ? "bg-pine text-ivory px-6 py-20"
+          : "text-pine bg-white px-6 py-20"
       }
     >
       <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
         <div className="max-w-lg">
-          <h2
-            style={{ fontFamily: "'Italiana', serif" }}
-            className="text-4xl sm:text-5xl"
-          >
+          <h2 dir="auto" className="font-display text-4xl sm:text-5xl">
             {data.heading}
           </h2>
           {data.text && (
             <p
-              className={`mt-4 text-base leading-relaxed ${primary ? "text-[#E3E6DC]" : "text-[#5B6B5E]"}`}
+              dir="auto"
+              className={`mt-4 text-base leading-relaxed ${primary ? "text-mist" : "text-sage"}`}
             >
               {data.text}
             </p>
@@ -43,11 +40,11 @@ export function CtaBlock({ data, id }: { data: CtaData; id?: string }) {
           size="lg"
           className={
             primary
-              ? "shrink-0 rounded-full bg-[#F6F1E7] px-8 text-base text-[#2B3A32] hover:bg-white"
-              : "shrink-0 rounded-full bg-[#2B3A32] px-8 text-base text-[#F6F1E7] hover:bg-[#1F2B25]"
+              ? "bg-ivory text-pine shrink-0 rounded-full px-8 text-base hover:bg-white"
+              : "bg-pine text-ivory hover:bg-pine-deep shrink-0 rounded-full px-8 text-base"
           }
         >
-          <Link href={data.button_url}>{data.button_label}</Link>
+          <SmartLink href={data.button_url}>{data.button_label}</SmartLink>
         </Button>
       </div>
     </section>

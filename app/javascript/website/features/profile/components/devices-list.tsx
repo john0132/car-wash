@@ -7,52 +7,57 @@ import {
   SectionHeading,
 } from "@/website/features/profile/components/profile-card"
 import type { DeviceSession } from "@/website/features/profile/types"
-import { describeDevice, formatDate } from "@/website/features/profile/utils"
+import { describeDevice } from "@/website/features/profile/utils"
+import { useI18n } from "@/website/lib/i18n"
 
 export function DevicesList({ sessions }: { sessions: DeviceSession[] }) {
-  const { auth } = usePage<{ auth: { session: { id: number } } }>().props
+  const { t, formatDate } = useI18n()
+
+  const { auth } = usePage().props
 
   return (
     <ProfileCard id="devices">
       <div className="flex flex-col gap-5">
         <SectionHeading
-          title="Devices"
-          description="Where you are signed in right now."
+          title={t("Devices")}
+          description={t("Where you are signed in right now.")}
         />
 
         <ul className="flex flex-col">
           {sessions.map((session) => {
-            const current = session.id === auth.session.id
+            const current = session.id === auth.session?.id
             return (
               <li
                 key={session.id}
-                className="flex flex-wrap items-center justify-between gap-3 border-t border-[#2B3A32]/10 py-4"
+                className="border-pine/10 flex flex-wrap items-center justify-between gap-3 border-t py-4"
               >
                 <div>
                   <p className="font-medium">
-                    {describeDevice(session.user_agent)}
+                    {describeDevice(session.user_agent, t)}
                     {current && (
-                      <span className="ml-2 rounded-full bg-[#2B3A32]/10 px-2.5 py-0.5 text-xs font-normal">
-                        This device
+                      <span className="bg-pine/10 ms-2 rounded-full px-2.5 py-0.5 text-xs font-normal">
+                        {t("This device")}
                       </span>
                     )}
                   </p>
-                  <p className="text-sm text-[#2B3A32]/65">
-                    {session.ip_address} · Signed in{" "}
-                    {formatDate(session.created_at)}
+                  <p className="text-sage text-sm">
+                    {t("{ip} · Signed in {date}", {
+                      ip: session.ip_address,
+                      date: formatDate(session.created_at, "medium"),
+                    })}
                   </p>
                 </div>
                 {!current && (
                   <Button
                     asChild
                     variant="outline"
-                    className="h-10 rounded-full border-[#2B3A32]/30 bg-transparent px-5 text-[#2B3A32] hover:bg-[#2B3A32]/5 hover:text-[#2B3A32]"
+                    className="border-pine/30 text-pine hover:bg-pine/5 hover:text-pine h-10 rounded-full bg-transparent px-5"
                   >
                     <Link
                       href={websiteSessions.destroy(session.id)}
                       as="button"
                     >
-                      Sign out
+                      {t("Sign out")}
                     </Link>
                   </Button>
                 )}

@@ -86,32 +86,6 @@ class Website::ServicesController < Website::BaseController
     Service.where(is_active: true, service_category_id: service.service_category_id)
       .where.not(id: service.id).ordered_by_name.limit(3)
       .includes(:service_translations, image_attachment: :blob)
-      .map do |other|
-        {
-          id: other.id,
-          slug: other.slug,
-          name: other.translation&.name,
-          price: other.price.to_f,
-          sale_price: other.sale_price&.to_f,
-          duration_minutes: other.duration_minutes,
-          image: blob_prop(other.image)
-        }
-      end
-  end
-
-  def service_card_props(service)
-    {
-      id: service.id,
-      slug: service.slug,
-      name: service.translation&.name,
-      price: service.price.to_f,
-      sale_price: service.sale_price&.to_f,
-      duration_minutes: service.duration_minutes,
-      image: blob_prop(service.image)
-    }
-  end
-
-  def blob_prop(attachment)
-    attachment.attached? ? { url: rails_blob_path(attachment.blob, only_path: true) } : nil
+      .map { |other| service_card_props(other) }
   end
 end

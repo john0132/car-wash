@@ -16,10 +16,10 @@ export function OptionCard({
 }) {
   return (
     <label
-      className={`flex cursor-pointer items-center gap-3 rounded-2xl border p-4 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[#8A6240] ${
+      className={`has-[:focus-visible]:ring-bronze flex cursor-pointer items-center gap-3 rounded-2xl border p-4 transition-colors has-[:focus-visible]:ring-2 ${
         checked
-          ? "border-[#2B3A32] bg-white"
-          : "border-[#2B3A32]/15 bg-white/60 hover:bg-white"
+          ? "border-pine bg-white"
+          : "border-pine/15 bg-white/60 hover:bg-white"
       } ${className}`}
     >
       <input

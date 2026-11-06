@@ -13,19 +13,25 @@ import {
 } from "@/shared/components/ui/dialog"
 import { Field, FieldError, FieldLabel } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
+import { brandInput, brandOutlineButton } from "@/website/components/brand"
 import {
   ProfileCard,
   SectionHeading,
 } from "@/website/features/profile/components/profile-card"
+import { useI18n } from "@/website/lib/i18n"
 
 export function DeleteAccount() {
+  const { t } = useI18n()
+
   return (
     <ProfileCard id="delete" tone="danger">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="min-w-72 flex-1">
           <SectionHeading
-            title="Delete account"
-            description="Permanently removes your account and data. This cannot be undone."
+            title={t("Delete account")}
+            description={t(
+              "Permanently removes your account and data. This cannot be undone.",
+            )}
           />
         </div>
 
@@ -33,18 +39,19 @@ export function DeleteAccount() {
           <DialogTrigger asChild>
             <Button
               variant="destructive"
-              className="h-11 rounded-full bg-[#B3261E] px-6 text-white hover:bg-[#8E1F19]"
+              className="bg-danger hover:bg-danger/90 h-11 rounded-full px-6 text-white"
             >
-              Delete account
+              {t("Delete account")}
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogTitle>
-              Are you sure you want to delete your account?
+              {t("Are you sure you want to delete your account?")}
             </DialogTitle>
             <DialogDescription>
-              Once your account is deleted, all of its data is permanently
-              removed. Enter your password to confirm.
+              {t(
+                "Once your account is deleted, all of its data is permanently removed. Enter your password to confirm.",
+              )}
             </DialogDescription>
             <Form
               action={websiteUsers.destroy()}
@@ -56,13 +63,14 @@ export function DeleteAccount() {
                 <>
                   <Field>
                     <FieldLabel htmlFor="delete_password" className="sr-only">
-                      Password
+                      {t("Password")}
                     </FieldLabel>
                     <Input
+                      className={brandInput}
                       id="delete_password"
                       type="password"
                       name="delete_password"
-                      placeholder="Password"
+                      placeholder={t("Password")}
                       autoComplete="current-password"
                       autoFocus
                     />
@@ -77,18 +85,20 @@ export function DeleteAccount() {
                     <DialogClose asChild>
                       <Button
                         type="button"
-                        variant="secondary"
+                        variant="outline"
+                        className={brandOutlineButton}
                         onClick={() => resetAndClearErrors()}
                       >
-                        Cancel
+                        {t("Cancel")}
                       </Button>
                     </DialogClose>
                     <Button
                       type="submit"
                       variant="destructive"
+                      className="bg-danger hover:bg-danger/90 h-11 rounded-full px-6 text-white"
                       disabled={processing}
                     >
-                      Delete account
+                      {t("Delete account")}
                     </Button>
                   </DialogFooter>
                 </>

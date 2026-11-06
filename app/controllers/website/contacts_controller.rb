@@ -13,7 +13,7 @@ class Website::ContactsController < Website::BaseController
 
   # Public, unauthenticated write endpoint: throttle per IP to limit spam.
   rate_limit to: 5, within: 10.minutes, only: :create,
-             with: -> { redirect_to contact_path, inertia: { errors: { message: [ "Too many messages sent. Please try again later." ] } } }
+             with: -> { redirect_to contact_path, inertia: { errors: { message: [ t("website.errors.too_many_messages") ] } } }
 
   def show
     render inertia: {

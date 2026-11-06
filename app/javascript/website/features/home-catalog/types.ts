@@ -1,17 +1,4 @@
-export interface HomeImage {
-  url: string
-}
-
-/** Website::HomeController#home_services */
-export interface HomeService {
-  id: number
-  slug: string
-  name: string | null
-  price: number
-  sale_price: number | null
-  category: string | null
-  image: HomeImage | null
-}
+import type { Image } from "@/website/lib/types"
 
 /** Website::HomeController#home_categories */
 export interface HomeCategory {
@@ -19,5 +6,5 @@ export interface HomeCategory {
   slug: string
   name: string | null
   services_count: number
-  image: HomeImage | null
+  image: Image | null
 }

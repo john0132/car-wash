@@ -1,3 +1,5 @@
+import type { AreaOption } from "@/website/features/addresses/types"
+
 /** Website::CheckoutsController#summary_props: priced by the server. */
 export interface CheckoutSummary {
   service: {
@@ -43,6 +45,7 @@ export interface CheckoutProps {
   cars: CheckoutCar[]
   addresses: CheckoutAddress[]
   slots: SlotDay[]
+  areas: AreaOption[]
   needs_phone: boolean
   coverage: Coverage | null
 }

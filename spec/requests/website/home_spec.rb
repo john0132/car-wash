@@ -12,6 +12,15 @@ RSpec.describe "Website home", type: :request do
     expect(response.body).not_to match(%r{assets/admin-[\w-]+\.js})
   end
 
+  it "does not block older browsers from the public site" do
+    old_safari = "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 " \
+                 "(KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1"
+
+    get root_path, headers: { "User-Agent" => old_safari }
+
+    expect(response).to have_http_status(:success)
+  end
+
   it "shares the header and footer content with every website page" do
     english
     create_header_item(label: "Services", url: "/#services")

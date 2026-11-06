@@ -23,15 +23,15 @@ export function FeaturesBlock({
     <section
       id={id}
       className={
-        tone === "white" ? "bg-white px-6 py-24" : "bg-[#F6F1E7] px-6 py-24"
+        tone === "white" ? "bg-white px-6 py-24" : "bg-ivory px-6 py-24"
       }
     >
       <div className="mx-auto max-w-6xl">
         {data.heading && (
           <div className="max-w-xl">
             <h2
-              style={{ fontFamily: "'Italiana', serif" }}
-              className="text-4xl text-[#2B3A32] sm:text-5xl"
+              dir="auto"
+              className="font-display text-pine text-4xl sm:text-5xl"
             >
               {data.heading}
             </h2>
@@ -46,18 +46,21 @@ export function FeaturesBlock({
               key={item.id}
               className={
                 tone === "white"
-                  ? "rounded-3xl border border-[#2B3A32]/10 bg-[#F6F1E7] p-7"
-                  : "rounded-3xl border border-[#2B3A32]/10 bg-white p-7"
+                  ? "border-pine/10 bg-ivory rounded-3xl border p-7"
+                  : "border-pine/10 rounded-3xl border bg-white p-7"
               }
             >
               {item.icon && (
                 <img src={item.icon.url} alt="" className="mb-4 h-10 w-10" />
               )}
-              <h3 className="text-lg font-medium text-[#2B3A32]">
+              <h3 dir="auto" className="text-pine text-lg font-medium">
                 {item.title}
               </h3>
               {item.text && (
-                <p className="mt-3 text-sm leading-relaxed text-[#5B6B5E]">
+                <p
+                  dir="auto"
+                  className="text-sage mt-3 text-sm leading-relaxed"
+                >
                   {item.text}
                 </p>
               )}

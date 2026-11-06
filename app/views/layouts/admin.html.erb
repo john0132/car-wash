@@ -1,9 +1,20 @@
 <%# Admin dashboard layout: loads the client-only admin.tsx Inertia entrypoint (no SSR). %>
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <%= render "layouts/head" %>
+    <title data-inertia>Car Wash</title>
+    <meta name="application-name" content="Car Wash">
     <meta name="robots" content="noindex, nofollow">
+
+    <script nonce="<%= content_security_policy_nonce %>">
+      <%# Enable dark mode based on localStorage or system preference. Inline to avoid FOUC. %>
+      document.documentElement.classList.toggle(
+        "dark",
+        localStorage.appearance === "dark" ||
+          (!("appearance" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches),
+      );
+    </script>
 
     <%= vite_tags "application.css", "admin.tsx" %>
   </head>

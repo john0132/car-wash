@@ -8,6 +8,7 @@ import type {
   ProfileData,
 } from "@/website/features/profile/types"
 import ProfileLayout from "@/website/layouts/profile-layout"
+import { useI18n } from "@/website/lib/i18n"
 
 interface Props {
   profile: ProfileData
@@ -15,8 +16,10 @@ interface Props {
 }
 
 export default function ProfileShow({ profile, sessions }: Props) {
+  const { t } = useI18n()
+
   return (
-    <ProfileLayout title="My profile">
+    <ProfileLayout title={t("My profile")}>
       <ProfileStats profile={profile} />
       <DetailsForm profile={profile} />
       <PasswordForm />

@@ -25,6 +25,16 @@ RSpec.describe "Website checkout", type: :request do
   context "when signed in" do
     before { sign_in user }
 
+    it "offers the areas we serve, each with a point inside it to start the map from" do
+      get checkout_path(query)
+
+      expect(inertia.props[:areas]).to contain_exactly(
+        include(id: area.id, name: "Maadi", city: "Cairo", latitude: be_within(0.011).of(30.0444), longitude: be_within(0.011).of(31.2357))
+      )
+      point = Area::GEO_FACTORY.point(inertia.props[:areas].first[:longitude], inertia.props[:areas].first[:latitude])
+      expect(Area.covering(point)).to include(area)
+    end
+
     it "renders the summary priced by the server" do
       car
 

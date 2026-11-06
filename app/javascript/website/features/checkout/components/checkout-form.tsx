@@ -19,6 +19,23 @@ import {
   clearSessionState,
   useSessionState,
 } from "@/website/hooks/use-session-state"
+import { useI18n } from "@/website/lib/i18n"
+
+/** Moves focus to the heading of the first checkout step that has an error. */
+function focusFirstError(errors: Record<string, unknown>) {
+  const stepFor = (field: string) =>
+    document.querySelector<HTMLElement>(
+      `[data-error-field="${field}"] [id^="checkout-step-"]`,
+    )
+  for (const field of ["phone", "car_id", "location", "scheduled_at"]) {
+    if (!(field in errors)) continue
+    const heading = stepFor(field)
+    if (!heading) continue
+    heading.scrollIntoView({ block: "center", behavior: "smooth" })
+    heading.focus({ preventScroll: true })
+    return
+  }
+}
 
 const EMPTY_DRAFT: CheckoutFormData = {
   car_id: null,
@@ -39,9 +56,12 @@ export function CheckoutForm({
   cars,
   addresses,
   slots,
+  areas,
   needs_phone,
   coverage,
 }: CheckoutProps) {
+  const { t } = useI18n()
+
   const draftKey = `checkout:${summary.service.slug}`
   const [draft, setDraft] = useSessionState(draftKey, EMPTY_DRAFT)
   const update = (changes: Partial<CheckoutFormData>) =>
@@ -54,14 +74,27 @@ export function CheckoutForm({
     return Array.isArray(messages) ? messages[0] : messages
   }
 
+  // The draft can outlive what it points at (a car deleted in another tab, a slot that has
+  // passed, an address removed), so only values that still exist count.
+  const chosenCar = cars.some((car) => car.id === draft.car_id)
+    ? draft.car_id
+    : null
   // With a single car there is nothing to choose.
-  const carId = draft.car_id ?? (cars.length === 1 ? cars[0].id : null)
+  const carId = chosenCar ?? (cars.length === 1 ? cars[0].id : null)
+  const scheduledAt = slots.some((day) =>
+    day.slots.some((slot) => slot.value === draft.scheduled_at),
+  )
+    ? draft.scheduled_at
+    : ""
+  const addressId = addresses.some((address) => address.id === draft.address_id)
+    ? draft.address_id
+    : null
   const location =
     draft.latitude !== null && draft.longitude !== null
       ? {
           latitude: draft.latitude,
           longitude: draft.longitude,
-          addressId: draft.address_id,
+          addressId,
         }
       : null
   const outOfReach = coverage?.covered === false
@@ -74,12 +107,17 @@ export function CheckoutForm({
       {
         ...draft,
         car_id: carId,
+        address_id: addressId,
+        scheduled_at: scheduledAt,
         service: summary.service.slug,
         extras: summary.extras.map((extra) => extra.id),
       },
       {
         // Stay put on validation errors; the booking page opens at the top.
         preserveScroll: "errors",
+        // The summary and the button sit below the steps on a phone, so bring the
+        // first step with a problem into view and focus it.
+        onError: (errors) => focusFirstError(errors),
         onStart: () => setProcessing(true),
         onFinish: () => setProcessing(false),
         // Booked: start the next booking from scratch.
@@ -121,6 +159,7 @@ export function CheckoutForm({
         <LocationStep
           step={first + 1}
           addresses={addresses}
+          areas={areas}
           value={location}
           coverage={coverage}
           onChange={(picked) =>
@@ -135,7 +174,7 @@ export function CheckoutForm({
         <ScheduleStep
           step={first + 2}
           days={slots}
-          value={draft.scheduled_at}
+          value={scheduledAt}
           onChange={(slot) => update({ scheduled_at: slot })}
           error={errorFor("scheduled_at")}
         />
@@ -144,21 +183,21 @@ export function CheckoutForm({
       <div className="lg:sticky lg:top-28">
         <OrderSummary summary={summary}>
           {formError && (
-            <p role="alert" className="mb-3 text-sm text-[#B3261E]">
+            <p role="alert" className="text-danger mb-3 text-sm">
               {formError}
             </p>
           )}
           <Button
             type="submit"
             disabled={processing || outOfReach}
-            className="h-12 w-full rounded-full bg-[#2B3A32] text-base text-[#F6F1E7] hover:bg-[#1F2B25]"
+            className="bg-pine text-ivory hover:bg-pine-deep h-12 w-full rounded-full text-base"
           >
             {processing && <Spinner />}
-            Confirm booking
+            {t("Confirm booking")}
           </Button>
           {outOfReach && (
-            <p className="mt-2 text-center text-sm text-[#5B6B5E]">
-              Pick a location we serve to continue.
+            <p className="text-sage mt-2 text-center text-sm">
+              {t("Pick a location we serve to continue.")}
             </p>
           )}
         </OrderSummary>

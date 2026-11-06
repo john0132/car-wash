@@ -6,13 +6,14 @@
 class Website::CheckoutsController < Website::BaseController
   def show
     checkout = build_checkout
-    return redirect_to services_path, alert: "That service is not available to book" unless checkout.service
+    return redirect_to services_path, alert: t("website.flash.service_unavailable") unless checkout.service
 
     render inertia: {
       summary: summary_props(checkout),
       cars: Current.user.cars.order(:created_at, :id).map { |car| car_props(car) },
       addresses: Current.user.addresses.order(:created_at, :id).map { |address| address_props(address) },
       slots: BookingSlots.grouped,
+      areas: area_options,
       needs_phone: checkout.needs_phone?,
       # Refreshed by a partial reload whenever the customer moves the pin.
       coverage: -> { checkout.coverage }

@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select"
+import { brandInput, brandSelect } from "@/website/components/brand"
 import type {
   CategoryFacets,
   CategoryFilters,
@@ -22,7 +23,7 @@ import {
   hasActiveFilters,
   parsePrice,
 } from "@/website/features/category-detail/utils"
-import { formatDuration } from "@/website/features/service-detail/utils"
+import { useI18n } from "@/website/lib/i18n"
 
 const DEBOUNCE_MS = 350
 const ANY = "any"
@@ -42,6 +43,8 @@ export function ServiceFilters({
   filters: CategoryFilters
   facets: CategoryFacets | undefined
 }) {
+  const { t, formatDuration } = useI18n()
+
   const [search, setSearch] = useState(filters.q ?? "")
   const [minPrice, setMinPrice] = useState(filters.min_price?.toString() ?? "")
   const [maxPrice, setMaxPrice] = useState(filters.max_price?.toString() ?? "")
@@ -68,19 +71,21 @@ export function ServiceFilters({
       setMaxPrice(filters.max_price?.toString() ?? "")
   }
 
-  const visit = (next: CategoryFilters) =>
+  // Debounced typing replaces the history entry (no one Back-clicks through
+  // every keystroke); discrete choices push one, so Back undoes them.
+  const visit = (next: CategoryFilters, replace = false) =>
     router.get(serviceCategory(slug).url, filterQuery(next), {
       only: ["services", "pagination", "filters"],
       preserveState: true,
       preserveScroll: true,
-      replace: true,
+      replace,
     })
 
   const apply = (patch: Partial<CategoryFilters>, delay = 0) => {
     clearTimeout(timer.current)
     pending.current = { ...pending.current, ...patch }
     const run = () => {
-      visit({ ...latest.current, ...pending.current })
+      visit({ ...latest.current, ...pending.current }, delay > 0)
       pending.current = {}
     }
     if (delay) timer.current = setTimeout(run, delay)
@@ -107,23 +112,21 @@ export function ServiceFilters({
     value === null || value === undefined ? "" : String(value)
 
   const labelClass =
-    "text-[11px] font-medium tracking-[0.14em] text-[#5B6B5E] uppercase"
-  const fieldClass =
-    "h-11 rounded-xl border-[#2B3A32]/15 bg-[#F6F1E7]/60 dark:bg-[#F6F1E7]/60 dark:hover:bg-[#F6F1E7]/60 text-sm shadow-none focus-visible:border-[#8A6240] focus-visible:ring-[#8A6240]/25 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-  const triggerClass =
-    "!h-11 w-full rounded-xl border-[#2B3A32]/15 bg-[#F6F1E7]/60 dark:bg-[#F6F1E7]/60 dark:hover:bg-[#F6F1E7]/60 text-sm shadow-none focus-visible:border-[#8A6240] focus-visible:ring-[#8A6240]/25"
+    "text-[11px] font-medium tracking-[0.14em] text-sage uppercase"
+  const fieldClass = `${brandInput} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`
+  const triggerClass = brandSelect
 
   const showOnSale = facets === undefined || facets.on_sale_count > 0
 
   return (
     <div
       role="search"
-      className="rounded-3xl border border-[#2B3A32]/10 bg-white p-4 sm:p-6"
+      className="border-pine/10 rounded-3xl border bg-white p-4 sm:p-6"
     >
       <div className="relative">
         <Search
           aria-hidden
-          className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-[#8A6240]"
+          className="text-bronze pointer-events-none absolute start-4 top-1/2 size-5 -translate-y-1/2"
         />
         <Input
           type="search"
@@ -132,24 +135,24 @@ export function ServiceFilters({
             setSearch(event.target.value)
             apply({ q: event.target.value.trim() || null }, DEBOUNCE_MS)
           }}
-          placeholder="Search services"
-          aria-label="Search services"
+          placeholder={t("Search services")}
+          aria-label={t("Search services")}
           maxLength={100}
-          className="h-12 rounded-xl border-[#2B3A32]/15 bg-[#F6F1E7]/60 pl-12 text-base shadow-none focus-visible:border-[#8A6240] focus-visible:ring-[#8A6240]/25 dark:bg-[#F6F1E7]/60 dark:hover:bg-[#F6F1E7]/60"
+          className={`${brandInput} h-12 ps-12 text-base`}
         />
       </div>
 
       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
         <div className="grid gap-2">
-          <span className={labelClass}>Price (EGP)</span>
+          <span className={labelClass}>{t("Price (EGP)")}</span>
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
             <Input
               type="number"
               inputMode="decimal"
               min={0}
               value={minPrice}
-              placeholder={priceHint(facets?.min_price) || "Min"}
-              aria-label="Minimum price"
+              placeholder={priceHint(facets?.min_price) || t("Min")}
+              aria-label={t("Minimum price")}
               onChange={(event) => {
                 setMinPrice(event.target.value)
                 apply(
@@ -159,7 +162,7 @@ export function ServiceFilters({
               }}
               className={fieldClass}
             />
-            <span aria-hidden className="text-[#5B6B5E]">
+            <span aria-hidden className="text-sage">
               –
             </span>
             <Input
@@ -167,8 +170,8 @@ export function ServiceFilters({
               inputMode="decimal"
               min={0}
               value={maxPrice}
-              placeholder={priceHint(facets?.max_price) || "Max"}
-              aria-label="Maximum price"
+              placeholder={priceHint(facets?.max_price) || t("Max")}
+              aria-label={t("Maximum price")}
               onChange={(event) => {
                 setMaxPrice(event.target.value)
                 apply(
@@ -183,7 +186,7 @@ export function ServiceFilters({
 
         <div className="grid gap-2">
           <span id="duration-label" className={labelClass}>
-            Duration
+            {t("Duration")}
           </span>
           <Select
             value={filters.max_duration?.toString() ?? ANY}
@@ -195,13 +198,21 @@ export function ServiceFilters({
               aria-labelledby="duration-label"
               className={triggerClass}
             >
-              <SelectValue />
+              <SelectValue>
+                {filters.max_duration
+                  ? t("Up to {duration}", {
+                      duration: formatDuration(filters.max_duration) ?? "",
+                    })
+                  : t("Any length")}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={ANY}>Any length</SelectItem>
+              <SelectItem value={ANY}>{t("Any length")}</SelectItem>
               {(facets?.durations ?? []).map((minutes) => (
                 <SelectItem key={minutes} value={String(minutes)}>
-                  Up to {formatDuration(minutes)}
+                  {t("Up to {duration}", {
+                    duration: formatDuration(minutes) ?? "",
+                  })}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -210,7 +221,7 @@ export function ServiceFilters({
 
         <div className="grid gap-2">
           <span id="sort-label" className={labelClass}>
-            Sort by
+            {t("Sort by")}
           </span>
           <Select
             value={filters.sort}
@@ -220,12 +231,12 @@ export function ServiceFilters({
               aria-labelledby="sort-label"
               className={triggerClass}
             >
-              <SelectValue />
+              <SelectValue>{t(SORT_LABELS[filters.sort])}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               {(Object.keys(SORT_LABELS) as SortOption[]).map((option) => (
                 <SelectItem key={option} value={option}>
-                  {SORT_LABELS[option]}
+                  {t(SORT_LABELS[option])}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -234,19 +245,19 @@ export function ServiceFilters({
       </div>
 
       {(showOnSale || hasActiveFilters(filters)) && (
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#2B3A32]/10 pt-4">
+        <div className="border-pine/10 mt-5 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
           {showOnSale ? (
             <button
               type="button"
               aria-pressed={filters.on_sale}
               onClick={() => apply({ on_sale: !filters.on_sale })}
-              className={`h-9 rounded-full border px-4 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:outline-none ${
+              className={`focus-visible:ring-bronze h-9 rounded-full border px-4 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none ${
                 filters.on_sale
-                  ? "border-[#2B3A32] bg-[#2B3A32] text-[#F6F1E7]"
-                  : "border-[#2B3A32]/15 bg-white text-[#2B3A32] hover:border-[#2B3A32]/40"
+                  ? "border-pine bg-pine text-ivory"
+                  : "border-pine/15 text-pine hover:border-pine/40 bg-white"
               }`}
             >
-              On sale
+              {t("On sale")}
             </button>
           ) : (
             <span />
@@ -256,10 +267,10 @@ export function ServiceFilters({
             <button
               type="button"
               onClick={clearAll}
-              className="flex h-9 items-center gap-1.5 text-sm text-[#8A6240] underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
+              className="text-bronze flex h-9 items-center gap-1.5 text-sm underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
             >
               <X aria-hidden className="size-4" />
-              Clear all
+              {t("Clear all")}
             </button>
           )}
         </div>

@@ -1,8 +1,9 @@
 import { Link } from "@inertiajs/react"
 
 import { serviceCategory } from "@/routes"
-import { ImageOrMark } from "@/website/features/home-catalog/components/image-or-mark"
+import { ImageOrMark } from "@/website/components/image-or-mark"
 import type { HomeCategory } from "@/website/features/home-catalog/types"
+import { useI18n } from "@/website/lib/i18n"
 
 /**
  * Categories as arch-framed portraits (echoing the hero's round frame) on a
@@ -13,6 +14,8 @@ export function ServiceCategoriesSection({
 }: {
   categories: HomeCategory[]
 }) {
+  const { t, tp } = useI18n()
+
   if (categories.length === 0) return null
 
   return (
@@ -23,15 +26,18 @@ export function ServiceCategoriesSection({
     >
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-xl text-center">
-          <p className="text-xs font-medium tracking-[0.3em] text-[#8A6240] uppercase">
-            The collections
+          <p
+            dir="auto"
+            className="text-bronze text-xs font-medium tracking-[0.3em] uppercase"
+          >
+            {t("The collections")}
           </p>
           <h2
+            dir="auto"
             id="service-categories-heading"
-            style={{ fontFamily: "'Italiana', serif" }}
-            className="mt-4 text-4xl text-[#2B3A32] sm:text-5xl"
+            className="font-display text-pine mt-4 text-4xl sm:text-5xl"
           >
-            Care for every corner
+            {t("Care for every corner")}
           </h2>
         </div>
 
@@ -43,24 +49,24 @@ export function ServiceCategoriesSection({
             >
               <Link
                 href={serviceCategory(category.slug)}
-                className="group block focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:ring-offset-4 focus-visible:outline-none"
+                className="group focus-visible:ring-bronze block focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:outline-none"
               >
-                <div className="aspect-[3/4] overflow-hidden rounded-t-full border border-[#A97C50]/30 bg-[#F6F1E7] p-2">
+                <div className="border-bronze-light/30 bg-ivory aspect-[3/4] overflow-hidden rounded-t-full border p-2">
                   <div className="h-full w-full overflow-hidden rounded-t-full">
                     <ImageOrMark image={category.image} />
                   </div>
                 </div>
                 <div className="mt-5 text-center">
-                  <h3
-                    style={{ fontFamily: "'Italiana', serif" }}
-                    className="text-2xl text-[#2B3A32]"
-                  >
+                  <h3 dir="auto" className="font-display text-pine text-2xl">
                     {category.name}
                   </h3>
                   {category.services_count > 0 && (
-                    <p className="mt-1 text-sm text-[#5B6B5E]">
-                      {category.services_count}{" "}
-                      {category.services_count === 1 ? "service" : "services"}
+                    <p dir="auto" className="text-sage mt-1 text-sm">
+                      {tp(
+                        category.services_count,
+                        "{n} service",
+                        "{n} services",
+                      )}
                     </p>
                   )}
                 </div>

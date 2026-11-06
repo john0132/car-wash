@@ -6,7 +6,7 @@ class ContactMessage < ApplicationRecord
   validates :first_name, :last_name, :email, :phone, :message, presence: true
   validates :first_name, :last_name, :email, :phone, length: { maximum: 255 }
   validates :message, length: { minimum: 10, maximum: 5000 }
-  validates :phone, format: { with: /\A\+?[0-9\s\-().]{7,25}\z/, message: "is not a valid phone number" }, allow_blank: true
+  validates :phone, format: { with: /\A\+?[0-9\s\-().]{7,25}\z/, message: ->(*) { I18n.t("website.errors.contact_phone_invalid") } }, allow_blank: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
 
   # Strip control characters (keeping newlines/tabs in the message) and

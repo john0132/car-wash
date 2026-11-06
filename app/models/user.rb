@@ -31,7 +31,7 @@ class User < ApplicationRecord
   validates :password, allow_nil: true, length: { minimum: 12 }
   validates :role, presence: true
   validates :wallet, :points, :lifetime_points, numericality: { greater_than_or_equal_to: 0 }
-  validates :phone, format: { with: PHONE_FORMAT, message: "must be a valid phone number" }, allow_blank: true
+  validates :phone, format: { with: PHONE_FORMAT, message: ->(*) { I18n.t("website.errors.phone_invalid") } }, allow_blank: true
 
   normalizes :email, with: -> { _1.strip.downcase }
   normalizes :phone, with: -> { _1.squish.presence }

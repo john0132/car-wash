@@ -1,15 +1,21 @@
 <%# Public website layout: loads the SSR-enabled website.tsx Inertia entrypoint. %>
 <%# Also used by `inertia` routes (InertiaRails::StaticController inherits InertiaController). %>
 <!DOCTYPE html>
-<html>
+<html lang="<%= I18n.locale %>" dir="<%= respond_to?(:rtl_locale?) && rtl_locale? ? "rtl" : "ltr" %>">
   <head>
     <%= render "layouts/head" %>
+    <meta name="application-name" content="Auto Atelier">
 
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
-    <%= vite_tags "application.css", "website.tsx" %>
-    <%= inertia_ssr_head %>
+    <%= vite_tags "application.css", "website.css", "website.tsx" %>
+    <%# With SSR the page's own <title> arrives in the head; fall back only without it. %>
+    <% if inertia_ssr_head.present? %>
+      <%= inertia_ssr_head %>
+    <% else %>
+      <title data-inertia>Auto Atelier</title>
+    <% end %>
   </head>
 
   <body>

@@ -14,11 +14,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/shared/components/ui/dialog"
-import { formatMoney } from "@/website/features/home-catalog/utils"
 import type {
   ExtraOption,
   ExtrasPage,
 } from "@/website/features/service-detail/types"
+import { useI18n } from "@/website/lib/i18n"
 
 interface ExtrasDialogProps {
   serviceSlug: string
@@ -40,6 +40,8 @@ export function ExtrasDialog({
   selected,
   onConfirm,
 }: ExtrasDialogProps) {
+  const { t, formatMoney, tp } = useI18n()
+
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState<ExtraOption[]>(selected)
   const [loading, setLoading] = useState(false)
@@ -84,26 +86,20 @@ export function ExtrasDialog({
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="mt-6 h-auto w-full rounded-full border-[#2B3A32]/25 bg-transparent px-6 py-3.5 font-medium text-[#2B3A32] hover:bg-[#F6F1E7] hover:text-[#2B3A32] dark:border-[#2B3A32]/25 dark:bg-transparent dark:hover:bg-[#F6F1E7]"
+          className="border-pine/25 text-pine hover:bg-ivory hover:text-pine mt-6 h-auto w-full rounded-full bg-transparent px-6 py-3.5 font-medium"
         >
           <Plus aria-hidden />
-          {selected.length === 0 ? "Add extras" : "Change extras"}
+          {selected.length === 0 ? t("Add extras") : t("Change extras")}
         </Button>
       </DialogTrigger>
 
-      <DialogContent
-        style={{ fontFamily: "'Jost', system-ui, sans-serif" }}
-        className="flex max-h-[90dvh] flex-col gap-0 overflow-hidden border-[#2B3A32]/10 bg-[#F6F1E7] p-0 text-[#2B3A32] sm:max-w-md"
-      >
-        <DialogHeader className="border-b border-[#2B3A32]/10 p-6 text-left">
-          <DialogTitle
-            style={{ fontFamily: "'Italiana', serif" }}
-            className="text-3xl font-normal"
-          >
-            Add extras
+      <DialogContent className="border-pine/10 bg-ivory text-pine flex max-h-[90dvh] flex-col gap-0 overflow-hidden p-0 sm:max-w-md">
+        <DialogHeader className="border-pine/10 border-b p-6 text-start">
+          <DialogTitle className="font-display text-3xl font-normal">
+            {t("Add extras")}
           </DialogTitle>
-          <DialogDescription className="text-[#5B6B5E]">
-            Optional finishing touches for this service.
+          <DialogDescription className="text-sage">
+            {t("Optional finishing touches for this service.")}
           </DialogDescription>
         </DialogHeader>
 
@@ -113,9 +109,11 @@ export function ExtrasDialog({
           aria-live="polite"
         >
           {!extras ? (
-            <p className="text-[#5B6B5E]">Loading extras…</p>
+            <p className="text-sage">{t("Loading extras…")}</p>
           ) : extras.items.length === 0 ? (
-            <p className="text-[#5B6B5E]">No extras are available right now.</p>
+            <p className="text-sage">
+              {t("No extras are available right now.")}
+            </p>
           ) : (
             <ul
               className={`space-y-3 transition-opacity ${loading ? "opacity-50" : ""}`}
@@ -128,15 +126,15 @@ export function ExtrasDialog({
                       type="button"
                       aria-pressed={on}
                       onClick={() => toggle(extra)}
-                      className={`flex w-full items-center justify-between gap-4 rounded-2xl border p-4 text-left transition-colors focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:outline-none ${
+                      className={`focus-visible:ring-bronze flex w-full items-center justify-between gap-4 rounded-2xl border p-4 text-start transition-colors focus-visible:ring-2 focus-visible:outline-none ${
                         on
-                          ? "border-[#2B3A32] bg-white"
-                          : "border-[#2B3A32]/15 bg-white/60 hover:bg-white"
+                          ? "border-pine bg-white"
+                          : "border-pine/15 bg-white/60 hover:bg-white"
                       }`}
                     >
                       <span>
                         <span className="block font-medium">{extra.name}</span>
-                        <span className="text-sm text-[#5B6B5E] tabular-nums">
+                        <span className="text-sage text-sm tabular-nums">
                           + {formatMoney(extra.price)}
                         </span>
                       </span>
@@ -144,8 +142,8 @@ export function ExtrasDialog({
                         aria-hidden
                         className={`flex size-6 shrink-0 items-center justify-center rounded-full border ${
                           on
-                            ? "border-[#2B3A32] bg-[#2B3A32] text-[#F6F1E7]"
-                            : "border-[#2B3A32]/30"
+                            ? "border-pine bg-pine text-ivory"
+                            : "border-pine/30"
                         }`}
                       >
                         {on && <Check className="size-3.5" />}
@@ -158,10 +156,10 @@ export function ExtrasDialog({
           )}
         </div>
 
-        <DialogFooter className="flex-col gap-4 border-t border-[#2B3A32]/10 p-6 sm:flex-col">
+        <DialogFooter className="border-pine/10 flex-col gap-4 border-t p-6 sm:flex-col">
           {extras && extras.pages > 1 && (
             <nav
-              aria-label="Extras pages"
+              aria-label={t("Extras pages")}
               className="flex items-center justify-between"
             >
               <Button
@@ -170,10 +168,14 @@ export function ExtrasDialog({
                 disabled={loading || extras.page <= 1}
                 onClick={() => load(extras.page - 1)}
               >
-                <ChevronLeft aria-hidden /> Previous
+                <ChevronLeft aria-hidden className="rtl:rotate-180" />{" "}
+                {t("Previous")}
               </Button>
-              <span className="text-sm text-[#5B6B5E] tabular-nums">
-                Page {extras.page} of {extras.pages}
+              <span className="text-sage text-sm tabular-nums">
+                {t("Page {page} of {pages}", {
+                  page: extras.page,
+                  pages: extras.pages,
+                })}
               </span>
               <Button
                 variant="ghost"
@@ -181,7 +183,8 @@ export function ExtrasDialog({
                 disabled={loading || extras.page >= extras.pages}
                 onClick={() => load(extras.page + 1)}
               >
-                Next <ChevronRight aria-hidden />
+                {t("Next")}{" "}
+                <ChevronRight aria-hidden className="rtl:rotate-180" />
               </Button>
             </nav>
           )}
@@ -189,18 +192,18 @@ export function ExtrasDialog({
             <DialogClose asChild>
               <Button
                 variant="ghost"
-                className="rounded-full text-[#2B3A32] hover:bg-white"
+                className="text-pine rounded-full hover:bg-white"
               >
-                Cancel
+                {t("Cancel")}
               </Button>
             </DialogClose>
             <Button
               onClick={confirm}
-              className="rounded-full bg-[#2B3A32] px-6 text-[#F6F1E7] hover:bg-[#1F2B25]"
+              className="bg-pine text-ivory hover:bg-pine-deep rounded-full px-6"
             >
               {draft.length === 0
-                ? "Continue without extras"
-                : `Add ${draft.length} ${draft.length === 1 ? "extra" : "extras"}`}
+                ? t("Continue without extras")
+                : tp(draft.length, "Add {n} extra", "Add {n} extras")}
             </Button>
           </div>
         </DialogFooter>
