@@ -1,4 +1,4 @@
-import type { HomeImage } from "@/website/features/home-catalog/types"
+import type { Image } from "@/website/lib/types"
 
 /** Website::ServicesController#service_props */
 export interface ServiceDetail {
@@ -14,18 +14,7 @@ export interface ServiceDetail {
   duration_minutes: number | null
   category: string | null
   category_slug: string
-  image: HomeImage | null
-}
-
-/** Website::ServicesController#related_props */
-export interface RelatedService {
-  id: number
-  slug: string
-  name: string | null
-  price: number
-  sale_price: number | null
-  duration_minutes: number | null
-  image: HomeImage | null
+  image: Image | null
 }
 
 /** Website::ServicesController#extras_props: one page of add-on extras. */

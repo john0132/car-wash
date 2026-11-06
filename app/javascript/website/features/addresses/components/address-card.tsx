@@ -24,18 +24,18 @@ export function AddressCard({
   }
 
   const outline =
-    "h-10 rounded-full border-[#2B3A32]/30 bg-transparent px-5 text-[#2B3A32] hover:bg-[#2B3A32]/5 hover:text-[#2B3A32]"
+    "h-10 rounded-full border-pine/30 bg-transparent px-5 text-pine hover:bg-pine/5 hover:text-pine"
 
   return (
-    <li className="flex flex-wrap items-center justify-between gap-4 rounded-[20px] border border-[#2B3A32]/10 bg-white/60 p-6">
+    <li className="border-pine/10 flex flex-wrap items-center justify-between gap-4 rounded-[20px] border bg-white/60 p-6">
       <div className="flex items-start gap-4">
         <MapPin
-          className="mt-1 size-5 shrink-0 text-[#2B3A32]/60"
+          className="text-pine/60 mt-1 size-5 shrink-0"
           aria-hidden="true"
         />
         <div>
           <p className="text-lg font-medium">{address.name}</p>
-          <p className="text-sm text-[#5B6B5E]">
+          <p className="text-sage text-sm">
             {[address.area, address.city].filter(Boolean).join(", ")}
           </p>
         </div>
@@ -58,7 +58,7 @@ export function AddressCard({
             <Button
               type="button"
               variant="outline"
-              className={`${outline} text-[#B3261E] hover:text-[#B3261E]`}
+              className={`${outline} text-danger hover:text-danger`}
             >
               Remove
             </Button>

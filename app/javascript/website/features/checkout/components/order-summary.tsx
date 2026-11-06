@@ -4,8 +4,8 @@ import type { ReactNode } from "react"
 
 import { service as serviceRoute } from "@/routes"
 import type { CheckoutSummary } from "@/website/features/checkout/types"
-import { formatMoney } from "@/website/features/home-catalog/utils"
-import { formatDuration } from "@/website/features/service-detail/utils"
+import { formatMoney } from "@/website/lib/format"
+import { formatDuration } from "@/website/lib/format"
 
 /**
  * The read-only booking summary priced by the server. Changing the service or
@@ -23,18 +23,13 @@ export function OrderSummary({
   return (
     <aside
       aria-label="Booking summary"
-      className="rounded-3xl border border-[#2B3A32]/10 bg-white p-6 shadow-[0_32px_64px_-40px_rgba(43,58,50,0.45)] sm:p-7"
+      className="border-pine/10 rounded-3xl border bg-white p-6 shadow-[0_32px_64px_-40px_rgba(43,58,50,0.45)] sm:p-7"
     >
       <div className="flex items-baseline justify-between gap-4">
-        <h2
-          style={{ fontFamily: "'Italiana', serif" }}
-          className="text-2xl leading-tight"
-        >
-          Your booking
-        </h2>
+        <h2 className="font-display text-2xl leading-tight">Your booking</h2>
         <Link
           href={serviceRoute(summary.service.slug)}
-          className="text-sm text-[#8A6240] underline-offset-4 hover:underline"
+          className="text-bronze text-sm underline-offset-4 hover:underline"
         >
           Change
         </Link>
@@ -45,7 +40,7 @@ export function OrderSummary({
           <dt>
             <span className="font-medium">{summary.service.name}</span>
             {duration && (
-              <span className="block text-sm text-[#5B6B5E]">{duration}</span>
+              <span className="text-sage block text-sm">{duration}</span>
             )}
           </dt>
           <dd>{formatMoney(summary.service.price)}</dd>
@@ -53,19 +48,19 @@ export function OrderSummary({
 
         {summary.extras.map((extra) => (
           <div key={extra.id} className="flex justify-between gap-4">
-            <dt className="text-[#5B6B5E]">+ {extra.name}</dt>
+            <dt className="text-sage">+ {extra.name}</dt>
             <dd>{formatMoney(extra.price)}</dd>
           </div>
         ))}
 
-        <div className="flex justify-between gap-4 border-t border-[#2B3A32]/10 pt-3 text-lg font-medium">
+        <div className="border-pine/10 flex justify-between gap-4 border-t pt-3 text-lg font-medium">
           <dt>Total</dt>
           <dd>{formatMoney(summary.total)}</dd>
         </div>
       </dl>
 
-      <p className="mt-4 flex items-center gap-2 rounded-2xl bg-[#F6F1E7] px-4 py-3 text-sm text-[#3F4F45]">
-        <Banknote className="size-4 shrink-0 text-[#8A6240]" aria-hidden />
+      <p className="bg-ivory text-moss mt-4 flex items-center gap-2 rounded-2xl px-4 py-3 text-sm">
+        <Banknote className="text-bronze size-4 shrink-0" aria-hidden />
         Pay in cash when we arrive.
       </p>
 

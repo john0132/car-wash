@@ -11,7 +11,7 @@ export function SiteFooter() {
   const brand = footer?.title ?? "Auto Atelier"
 
   return (
-    <footer className="bg-white px-6 py-14 text-[#5B6B5E]">
+    <footer className="text-sage bg-white px-6 py-14">
       <div className="mx-auto flex max-w-6xl flex-col gap-10 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-xs">
           {footer?.image ? (
@@ -24,7 +24,7 @@ export function SiteFooter() {
             <Logo />
           )}
           {footer?.title && (
-            <p className="mt-4 font-medium text-[#2B3A32]">{footer.title}</p>
+            <p className="text-pine mt-4 font-medium">{footer.title}</p>
           )}
           {footer?.description && (
             <p className="mt-2 text-sm leading-relaxed whitespace-pre-line">
@@ -41,7 +41,7 @@ export function SiteFooter() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={social.name}
-                    className="block text-sm transition-colors hover:text-[#8A6240]"
+                    className="hover:text-bronze block text-sm transition-colors"
                   >
                     {social.icon ? (
                       <img
@@ -63,13 +63,13 @@ export function SiteFooter() {
           <div className="grid grid-cols-2 gap-10 text-sm sm:grid-cols-3">
             {columns.map((column) => (
               <div key={column.id}>
-                <p className="font-medium text-[#2B3A32]">{column.title}</p>
+                <p className="text-pine font-medium">{column.title}</p>
                 <ul className="mt-3 flex flex-col gap-2">
                   {column.items.map((link) => (
                     <li key={link.id}>
                       <SiteLinkAnchor
                         link={link}
-                        className="hover:text-[#8A6240]"
+                        className="hover:text-bronze"
                       />
                     </li>
                   ))}
@@ -80,7 +80,7 @@ export function SiteFooter() {
         )}
       </div>
 
-      <div className="mx-auto mt-12 max-w-6xl border-t border-[#2B3A32]/10 pt-6 text-xs text-[#5E5D59]">
+      <div className="border-pine/10 text-sage mx-auto mt-12 max-w-6xl border-t pt-6 text-xs">
         © {new Date().getFullYear()} {brand}
       </div>
     </footer>

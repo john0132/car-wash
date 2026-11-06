@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { type PaginationData, pageWindow } from "@/website/lib/pagination"
 
 const base =
-  "flex size-10 items-center justify-center rounded-full border text-sm tabular-nums transition-colors focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:outline-none"
+  "flex size-10 items-center justify-center rounded-full border text-sm tabular-nums transition-colors focus-visible:ring-2 focus-visible:ring-bronze focus-visible:outline-none"
 
 /**
  * Numbered page links. `hrefFor` builds each page's URL (so callers keep their
@@ -35,7 +35,7 @@ export function Pagination({
           href={hrefFor(page - 1)}
           {...linkProps}
           aria-label="Previous page"
-          className={`${base} border-[#2B3A32]/15 bg-white text-[#2B3A32] hover:border-[#2B3A32]/40`}
+          className={`${base} border-pine/15 text-pine hover:border-pine/40 bg-white`}
         >
           <ChevronLeft aria-hidden className="size-4 rtl:rotate-180" />
         </Link>
@@ -47,11 +47,7 @@ export function Pagination({
 
       {pageWindow(page, pages).map((entry, index) =>
         entry === null ? (
-          <span
-            key={`gap-${index}`}
-            aria-hidden
-            className="px-1 text-[#5B6B5E]"
-          >
+          <span key={`gap-${index}`} aria-hidden className="text-sage px-1">
             …
           </span>
         ) : (
@@ -63,8 +59,8 @@ export function Pagination({
             aria-current={entry === page ? "page" : undefined}
             className={`${base} ${
               entry === page
-                ? "border-[#2B3A32] bg-[#2B3A32] text-[#F6F1E7]"
-                : "border-[#2B3A32]/15 bg-white text-[#2B3A32] hover:border-[#2B3A32]/40"
+                ? "border-pine bg-pine text-ivory"
+                : "border-pine/15 text-pine hover:border-pine/40 bg-white"
             }`}
           >
             {entry}
@@ -77,7 +73,7 @@ export function Pagination({
           href={hrefFor(page + 1)}
           {...linkProps}
           aria-label="Next page"
-          className={`${base} border-[#2B3A32]/15 bg-white text-[#2B3A32] hover:border-[#2B3A32]/40`}
+          className={`${base} border-pine/15 text-pine hover:border-pine/40 bg-white`}
         >
           <ChevronRight aria-hidden className="size-4 rtl:rotate-180" />
         </Link>

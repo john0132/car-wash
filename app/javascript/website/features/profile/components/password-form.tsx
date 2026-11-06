@@ -16,9 +16,13 @@ import { Field, FieldError, FieldLabel } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
 import {
+  brandButton,
+  brandInput,
+  brandOutlineButton,
+} from "@/website/components/brand"
+import {
   ProfileCard,
   SectionHeading,
-  outlineButtonClass,
 } from "@/website/features/profile/components/profile-card"
 
 const toErrors = (messages?: string[]) =>
@@ -56,7 +60,7 @@ export function PasswordForm() {
             <Button
               type="button"
               variant="outline"
-              className={outlineButtonClass}
+              className={brandOutlineButton}
             >
               Change password
             </Button>
@@ -81,6 +85,7 @@ export function PasswordForm() {
                     <Field key={name}>
                       <FieldLabel htmlFor={name}>{label}</FieldLabel>
                       <Input
+                        className={brandInput}
                         id={name}
                         name={name}
                         type="password"
@@ -95,13 +100,18 @@ export function PasswordForm() {
                     <DialogClose asChild>
                       <Button
                         type="button"
-                        variant="secondary"
+                        variant="outline"
+                        className={brandOutlineButton}
                         onClick={() => resetAndClearErrors()}
                       >
                         Cancel
                       </Button>
                     </DialogClose>
-                    <Button type="submit" disabled={processing}>
+                    <Button
+                      type="submit"
+                      className={brandButton}
+                      disabled={processing}
+                    >
                       {processing && <Spinner />}
                       Update password
                     </Button>

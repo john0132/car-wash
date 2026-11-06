@@ -19,25 +19,21 @@ export function StepCard({
   return (
     <section
       aria-labelledby={headingId}
-      className="rounded-3xl border border-[#2B3A32]/10 bg-white/70 p-6 sm:p-7"
+      className="border-pine/10 rounded-3xl border bg-white/70 p-6 sm:p-7"
     >
       <div className="flex items-start gap-4">
         <span
           aria-hidden
-          className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#2B3A32] text-sm font-medium text-[#F6F1E7]"
+          className="bg-pine text-ivory flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-medium"
         >
           {step}
         </span>
         <div>
-          <h2
-            id={headingId}
-            style={{ fontFamily: "'Italiana', serif" }}
-            className="text-2xl leading-tight"
-          >
+          <h2 id={headingId} className="font-display text-2xl leading-tight">
             {title}
           </h2>
           {description && (
-            <p className="mt-1 text-sm text-[#5B6B5E]">{description}</p>
+            <p className="text-sage mt-1 text-sm">{description}</p>
           )}
         </div>
       </div>
@@ -45,7 +41,7 @@ export function StepCard({
       <div className="mt-5">{children}</div>
 
       {error && (
-        <p role="alert" className="mt-3 text-sm text-[#B3261E]">
+        <p role="alert" className="text-danger mt-3 text-sm">
           {error}
         </p>
       )}

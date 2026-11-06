@@ -8,13 +8,10 @@ export default function CheckoutShow(props: CheckoutProps) {
   return (
     <BookingLayout title={`Book ${name}`}>
       <header className="mb-8 lg:mb-10">
-        <p className="text-sm tracking-[0.2em] text-[#8A6240] uppercase">
+        <p className="text-bronze text-sm tracking-[0.2em] uppercase">
           Checkout
         </p>
-        <h1
-          style={{ fontFamily: "'Italiana', serif" }}
-          className="mt-2 text-4xl leading-tight sm:text-5xl"
-        >
+        <h1 className="font-display mt-2 text-4xl leading-tight sm:text-5xl">
           Book {name}
         </h1>
       </header>

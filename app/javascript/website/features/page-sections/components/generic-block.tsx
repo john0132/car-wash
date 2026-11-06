@@ -23,7 +23,7 @@ function GenericValue({
         {items.map((item, index) => (
           <div
             key={(item.id as string) ?? index}
-            className="rounded-2xl border border-[#2B3A32]/10 p-5"
+            className="border-pine/10 rounded-2xl border p-5"
           >
             {field.fields.map((sub) => (
               <div key={sub.key} className="mt-2">
@@ -44,7 +44,7 @@ function GenericValue({
     typeof value === "string" || typeof value === "number" ? value : null
   if (text === null) return null
 
-  return <p className="text-sm leading-relaxed text-[#5B6B5E]">{text}</p>
+  return <p className="text-sage text-sm leading-relaxed">{text}</p>
 }
 
 // Renders a section whose component key has no dedicated React component —
@@ -63,7 +63,7 @@ export function GenericBlock({
       <div className="mx-auto max-w-3xl space-y-8">
         {schema.map((field) => (
           <div key={field.key}>
-            <p className="text-xs font-medium tracking-[0.2em] text-[#8A6240] uppercase">
+            <p className="text-bronze text-xs font-medium tracking-[0.2em] uppercase">
               {field.label}
             </p>
             <div className="mt-2">

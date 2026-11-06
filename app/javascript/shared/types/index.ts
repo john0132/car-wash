@@ -1,8 +1,9 @@
 import type { LucideIcon } from "lucide-react"
 
+/** Signed-out visitors get nulls (the website is public); the admin is always signed in. */
 export interface Auth {
-  user: User
-  session: Pick<Session, "id">
+  user: User | null
+  session: Pick<Session, "id"> | null
 }
 
 export interface BreadcrumbItem {
@@ -26,14 +27,14 @@ export interface SharedProps {
   auth: Auth
 }
 
+/** The fields InertiaController shares for the signed-in user. */
 export interface User {
   id: number
   name: string
+  last_name: string | null
   email: string
-  avatar?: string
   created_at: string
   updated_at: string
-  [key: string]: unknown // This allows for additional properties...
 }
 
 export interface Session {

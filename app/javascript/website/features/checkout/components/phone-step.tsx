@@ -1,5 +1,6 @@
 import { Field, FieldLabel } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
+import { brandInput } from "@/website/components/brand"
 import { StepCard } from "@/website/features/checkout/components/step-card"
 
 /** Only shown when the account has no phone yet; saved to the profile on booking. */
@@ -34,7 +35,7 @@ export function PhoneStep({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           aria-invalid={error ? true : undefined}
-          className="h-12 rounded-xl border-[#2B3A32]/25 bg-white px-4 text-[#2B3A32] dark:bg-white"
+          className={`${brandInput} h-12 px-4`}
           required
         />
       </Field>

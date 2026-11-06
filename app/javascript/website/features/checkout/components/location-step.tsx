@@ -79,7 +79,7 @@ export function LocationStep({
           type="button"
           onClick={gps.locate}
           disabled={gps.locating}
-          className="rounded-full bg-[#2B3A32] text-[#F6F1E7] hover:bg-[#1F2B25]"
+          className="bg-pine text-ivory hover:bg-pine-deep rounded-full"
         >
           {gps.locating ? <Spinner /> : <LocateFixed aria-hidden />}
           Use my current location
@@ -97,10 +97,10 @@ export function LocationStep({
                 addressId: address.id,
               })
             }
-            className={`rounded-full border-[#2B3A32]/25 text-[#2B3A32] hover:bg-white hover:text-[#2B3A32] dark:border-[#2B3A32]/25 dark:hover:bg-white ${
+            className={`border-pine/25 text-pine hover:text-pine rounded-full hover:bg-white ${
               value?.addressId === address.id
-                ? "border-[#2B3A32] bg-white dark:border-[#2B3A32] dark:bg-white"
-                : "bg-transparent dark:bg-transparent"
+                ? "border-pine bg-white"
+                : "bg-transparent"
             }`}
           >
             <MapPin aria-hidden />
@@ -109,7 +109,7 @@ export function LocationStep({
         ))}
       </div>
       {gps.error && (
-        <p role="alert" className="mt-2 text-sm text-[#B3261E]">
+        <p role="alert" className="text-danger mt-2 text-sm">
           {gps.error} Drop a pin on the map instead.
         </p>
       )}
@@ -129,7 +129,7 @@ export function LocationStep({
 
       <div aria-live="polite" className="mt-4 min-h-6 text-[15px]">
         {checking ? (
-          <span className="flex items-center gap-2 text-[#5B6B5E]">
+          <span className="text-sage flex items-center gap-2">
             <Spinner /> Checking we serve this spot…
           </span>
         ) : coverage?.covered ? (
@@ -139,7 +139,7 @@ export function LocationStep({
             .
           </span>
         ) : coverage ? (
-          <span className="flex items-center gap-2 text-[#B3261E]">
+          <span className="text-danger flex items-center gap-2">
             <CircleAlert className="size-4" aria-hidden />
             Sorry, this location is outside our service reach.
           </span>
@@ -151,6 +151,6 @@ export function LocationStep({
 
 function MapPlaceholder() {
   return (
-    <div className="h-72 animate-pulse rounded-2xl border border-[#2B3A32]/15 bg-[#EFE7D6] sm:h-80" />
+    <div className="border-pine/15 bg-sand h-72 animate-pulse rounded-2xl border sm:h-80" />
   )
 }

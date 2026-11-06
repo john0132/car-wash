@@ -1,4 +1,4 @@
-import { Form, Head } from "@inertiajs/react"
+import { Form } from "@inertiajs/react"
 
 import {
   websiteIdentityPasswordResets,
@@ -15,6 +15,8 @@ import {
 } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
+import { brandInput } from "@/website/components/brand"
+import { SeoHead } from "@/website/components/seo-head"
 import AuthLayout from "@/website/layouts/auth-layout"
 
 export default function Login() {
@@ -23,7 +25,7 @@ export default function Login() {
       title="Log in to your account"
       description="Enter your email and password below to log in"
     >
-      <Head title="Log in" />
+      <SeoHead title="Log in" noindex />
       <Form
         action={websiteSessions.create()}
         resetOnSuccess={["password"]}
@@ -35,6 +37,7 @@ export default function Login() {
               <Field>
                 <FieldLabel htmlFor="email">Email address</FieldLabel>
                 <Input
+                  className={brandInput}
                   id="email"
                   name="email"
                   type="email"
@@ -59,6 +62,7 @@ export default function Login() {
                   </TextLink>
                 </div>
                 <Input
+                  className={brandInput}
                   id="password"
                   type="password"
                   name="password"
@@ -73,7 +77,7 @@ export default function Login() {
 
               <Button
                 type="submit"
-                className="mt-4 h-11 w-full rounded-full bg-[#2B3A32] text-[#F6F1E7] hover:bg-[#1F2B25]"
+                className="bg-pine text-ivory hover:bg-pine-deep mt-4 h-11 w-full rounded-full"
                 disabled={processing}
               >
                 {processing && <Spinner />}

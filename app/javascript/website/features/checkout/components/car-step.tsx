@@ -40,7 +40,7 @@ export function CarStep({
               checked={value === car.id}
               onSelect={() => onChange(car.id)}
             >
-              <Car className="size-5 shrink-0 text-[#8A6240]" aria-hidden />
+              <Car className="text-bronze size-5 shrink-0" aria-hidden />
               <span className="min-w-0 text-[15px]">{car.description}</span>
             </OptionCard>
           ))}
@@ -52,7 +52,7 @@ export function CarStep({
           <Button
             type="button"
             variant="outline"
-            className="mt-3 rounded-full border-dashed border-[#2B3A32]/30 bg-transparent text-[#2B3A32] hover:bg-white hover:text-[#2B3A32] dark:border-[#2B3A32]/30 dark:bg-transparent dark:hover:bg-white"
+            className="border-pine/30 text-pine hover:text-pine mt-3 rounded-full border-dashed bg-transparent hover:bg-white"
           >
             <Plus aria-hidden />
             {cars.length === 0 ? "Add your car" : "Add another car"}

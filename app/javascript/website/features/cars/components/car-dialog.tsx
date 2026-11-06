@@ -16,6 +16,11 @@ import {
 import { Field, FieldError, FieldLabel } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
+import {
+  brandButton,
+  brandInput,
+  brandOutlineButton,
+} from "@/website/components/brand"
 import type { CustomerCar } from "@/website/features/cars/types"
 
 const toErrors = (messages?: string[]) =>
@@ -54,6 +59,7 @@ export function CarDialog({ trigger, car }: Props) {
                 <Field>
                   <FieldLabel htmlFor="car_make">Make</FieldLabel>
                   <Input
+                    className={brandInput}
                     id="car_make"
                     name="make"
                     defaultValue={car?.make}
@@ -65,6 +71,7 @@ export function CarDialog({ trigger, car }: Props) {
                 <Field>
                   <FieldLabel htmlFor="car_model">Model</FieldLabel>
                   <Input
+                    className={brandInput}
                     id="car_model"
                     name="model"
                     defaultValue={car?.model}
@@ -80,6 +87,7 @@ export function CarDialog({ trigger, car }: Props) {
                   License plate
                 </FieldLabel>
                 <Input
+                  className={brandInput}
                   id="car_license_plate"
                   name="license_plate"
                   defaultValue={car?.license_plate}
@@ -92,6 +100,7 @@ export function CarDialog({ trigger, car }: Props) {
               <Field>
                 <FieldLabel htmlFor="car_color">Color</FieldLabel>
                 <Input
+                  className={brandInput}
                   id="car_color"
                   name="color"
                   defaultValue={car?.color}
@@ -103,11 +112,19 @@ export function CarDialog({ trigger, car }: Props) {
 
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button type="button" variant="secondary">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={brandOutlineButton}
+                  >
                     Cancel
                   </Button>
                 </DialogClose>
-                <Button type="submit" disabled={processing}>
+                <Button
+                  type="submit"
+                  className={brandButton}
+                  disabled={processing}
+                >
                   {processing && <Spinner />}
                   {car ? "Save car" : "Add car"}
                 </Button>

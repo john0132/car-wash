@@ -33,7 +33,7 @@ export default function AdministratorShow({
 }: Props) {
   const can = useCan()
   const { auth } = usePage().props
-  const isSelf = administrator.id === auth.user.id
+  const isSelf = administrator.id === auth.user?.id
 
   return (
     <AdminLayout

@@ -24,6 +24,12 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select"
 import { Spinner } from "@/shared/components/ui/spinner"
+import {
+  brandButton,
+  brandInput,
+  brandOutlineButton,
+  brandSelect,
+} from "@/website/components/brand"
 import type {
   AreaOption,
   CustomerAddress,
@@ -76,6 +82,7 @@ export function AddressDialog({ trigger, areas, address }: Props) {
               <Field>
                 <FieldLabel htmlFor="address_name">Label</FieldLabel>
                 <Input
+                  className={brandInput}
                   id="address_name"
                   name="name"
                   defaultValue={address?.name}
@@ -92,7 +99,7 @@ export function AddressDialog({ trigger, areas, address }: Props) {
                   defaultValue={address ? String(address.area_id) : undefined}
                   required
                 >
-                  <SelectTrigger id="address_area" className="w-full">
+                  <SelectTrigger id="address_area" className={brandSelect}>
                     <SelectValue placeholder="Choose an area" />
                   </SelectTrigger>
                   <SelectContent>
@@ -111,6 +118,7 @@ export function AddressDialog({ trigger, areas, address }: Props) {
                 <Field>
                   <FieldLabel htmlFor="address_latitude">Latitude</FieldLabel>
                   <Input
+                    className={brandInput}
                     id="address_latitude"
                     name="latitude"
                     inputMode="decimal"
@@ -125,6 +133,7 @@ export function AddressDialog({ trigger, areas, address }: Props) {
                 <Field>
                   <FieldLabel htmlFor="address_longitude">Longitude</FieldLabel>
                   <Input
+                    className={brandInput}
                     id="address_longitude"
                     name="longitude"
                     inputMode="decimal"
@@ -158,11 +167,19 @@ export function AddressDialog({ trigger, areas, address }: Props) {
 
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button type="button" variant="secondary">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={brandOutlineButton}
+                  >
                     Cancel
                   </Button>
                 </DialogClose>
-                <Button type="submit" disabled={processing}>
+                <Button
+                  type="submit"
+                  className={brandButton}
+                  disabled={processing}
+                >
                   {processing && <Spinner />}
                   {address ? "Save address" : "Add address"}
                 </Button>

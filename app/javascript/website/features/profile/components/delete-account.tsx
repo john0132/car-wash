@@ -13,6 +13,7 @@ import {
 } from "@/shared/components/ui/dialog"
 import { Field, FieldError, FieldLabel } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
+import { brandInput, brandOutlineButton } from "@/website/components/brand"
 import {
   ProfileCard,
   SectionHeading,
@@ -33,7 +34,7 @@ export function DeleteAccount() {
           <DialogTrigger asChild>
             <Button
               variant="destructive"
-              className="h-11 rounded-full bg-[#B3261E] px-6 text-white hover:bg-[#8E1F19]"
+              className="bg-danger hover:bg-danger/90 h-11 rounded-full px-6 text-white"
             >
               Delete account
             </Button>
@@ -59,6 +60,7 @@ export function DeleteAccount() {
                       Password
                     </FieldLabel>
                     <Input
+                      className={brandInput}
                       id="delete_password"
                       type="password"
                       name="delete_password"
@@ -77,7 +79,8 @@ export function DeleteAccount() {
                     <DialogClose asChild>
                       <Button
                         type="button"
-                        variant="secondary"
+                        variant="outline"
+                        className={brandOutlineButton}
                         onClick={() => resetAndClearErrors()}
                       >
                         Cancel
@@ -86,6 +89,7 @@ export function DeleteAccount() {
                     <Button
                       type="submit"
                       variant="destructive"
+                      className="bg-danger hover:bg-danger/90 h-11 rounded-full px-6 text-white"
                       disabled={processing}
                     >
                       Delete account

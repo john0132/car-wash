@@ -22,17 +22,7 @@ class Website::HomeController < Website::BaseController
   def home_services
     Service.on_home_page.ordered_by_name
       .includes(:service_translations, image_attachment: :blob, service_category: :service_category_translations)
-      .map do |service|
-        {
-          id: service.id,
-          slug: service.slug,
-          name: service.translation&.name,
-          price: service.price.to_f,
-          sale_price: service.sale_price&.to_f,
-          category: service.service_category.translation&.name,
-          image: blob_prop(service.image)
-        }
-      end
+      .map { |service| service_card_props(service, category: service.service_category.translated(:name)) }
   end
 
   # Categories flagged "Display on Homepage", with how many active services each offers.
@@ -67,9 +57,5 @@ class Website::HomeController < Website::BaseController
           published_at: blog.created_at.iso8601
         }
       end
-  end
-
-  def blob_prop(attachment)
-    attachment.attached? ? { url: rails_blob_path(attachment.blob, only_path: true) } : nil
   end
 end

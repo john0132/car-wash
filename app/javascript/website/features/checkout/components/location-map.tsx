@@ -23,7 +23,7 @@ const PIN_ZOOM = 16
 // A CSS pin, so no marker image has to be bundled.
 const pinIcon = L.divIcon({
   className: "",
-  html: '<span class="block size-6 rounded-full border-[3px] border-white bg-[#8A6240] shadow-[0_2px_8px_rgba(0,0,0,0.35)]"></span>',
+  html: '<span class="block size-6 rounded-full border-[3px] border-white bg-bronze shadow-[0_2px_8px_rgba(0,0,0,0.35)]"></span>',
   iconSize: [24, 24],
   iconAnchor: [12, 12],
 })
@@ -40,7 +40,7 @@ export default function LocationMap({
   onChange: (coords: Coordinates) => void
 }) {
   return (
-    <div className="isolate z-0 h-72 overflow-hidden rounded-2xl border border-[#2B3A32]/15 sm:h-80">
+    <div className="border-pine/15 isolate z-0 h-72 overflow-hidden rounded-2xl border sm:h-80">
       <MapContainer
         center={
           position ? [position.latitude, position.longitude] : DEFAULT_CENTER

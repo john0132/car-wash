@@ -1,4 +1,3 @@
-import { cn } from "cn"
 import { ChevronDown, ChevronRight, LayoutTemplate, Plus } from "lucide-react"
 import { useState } from "react"
 
@@ -27,6 +26,7 @@ import {
 } from "@/shared/components/ui/dropdown-menu"
 import { FieldError } from "@/shared/components/ui/field"
 import { Switch } from "@/shared/components/ui/switch"
+import { cn } from "@/shared/lib/utils"
 
 /** The page's ordered sections: each one a component instance with its own editor. */
 export function SectionList({

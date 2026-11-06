@@ -54,8 +54,4 @@ class Website::BlogsController < Website::BaseController
       .includes(:blog_translations, cover_image_attachment: :blob)
       .map { |other| card_props(other) }
   end
-
-  def blob_prop(attachment)
-    attachment.attached? ? { url: rails_blob_path(attachment.blob, only_path: true) } : nil
-  end
 end

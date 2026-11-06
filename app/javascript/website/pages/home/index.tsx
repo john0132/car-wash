@@ -2,16 +2,14 @@ import { BlogsSection } from "@/website/features/blogs/components/blogs-section"
 import type { BlogCardData } from "@/website/features/blogs/types"
 import { ServiceCategoriesSection } from "@/website/features/home-catalog/components/service-categories-section"
 import { ServicesSection } from "@/website/features/home-catalog/components/services-section"
-import type {
-  HomeCategory,
-  HomeService,
-} from "@/website/features/home-catalog/types"
+import type { HomeCategory } from "@/website/features/home-catalog/types"
 import type { PageProps } from "@/website/features/page-sections/types"
 import MarketingLayout from "@/website/layouts/marketing-layout"
+import type { ServiceSummary } from "@/website/lib/types"
 
 interface Props {
   page: PageProps | null
-  home_services: HomeService[]
+  home_services: ServiceSummary[]
   home_categories: HomeCategory[]
   home_blogs: BlogCardData[]
 }

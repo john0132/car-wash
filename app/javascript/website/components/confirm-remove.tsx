@@ -36,7 +36,7 @@ export function ConfirmRemove({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
-            className="bg-[#B3261E] text-white hover:bg-[#B3261E]/90"
+            className="bg-danger hover:bg-danger/90 text-white"
           >
             Remove
           </AlertDialogAction>

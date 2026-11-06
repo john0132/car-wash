@@ -1,4 +1,4 @@
-import { Form, Head } from "@inertiajs/react"
+import { Form } from "@inertiajs/react"
 
 import { websiteSessions, websiteUsers } from "@/routes"
 import TextLink from "@/shared/components/text-link"
@@ -11,6 +11,8 @@ import {
 } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
+import { brandInput } from "@/website/components/brand"
+import { SeoHead } from "@/website/components/seo-head"
 import AuthLayout from "@/website/layouts/auth-layout"
 
 export default function Register() {
@@ -19,7 +21,7 @@ export default function Register() {
       title="Create an account"
       description="Enter your details below to create your account"
     >
-      <Head title="Register" />
+      <SeoHead title="Register" noindex />
       <Form
         action={websiteUsers.create()}
         resetOnSuccess={["password", "password_confirmation"]}
@@ -33,6 +35,7 @@ export default function Register() {
                 <Field>
                   <FieldLabel htmlFor="name">First name</FieldLabel>
                   <Input
+                    className={brandInput}
                     id="name"
                     type="text"
                     name="name"
@@ -49,6 +52,7 @@ export default function Register() {
                 <Field>
                   <FieldLabel htmlFor="last_name">Last name</FieldLabel>
                   <Input
+                    className={brandInput}
                     id="last_name"
                     type="text"
                     name="last_name"
@@ -64,6 +68,7 @@ export default function Register() {
               <Field>
                 <FieldLabel htmlFor="email">Email address</FieldLabel>
                 <Input
+                  className={brandInput}
                   id="email"
                   type="email"
                   name="email"
@@ -79,6 +84,7 @@ export default function Register() {
               <Field>
                 <FieldLabel htmlFor="password">Password</FieldLabel>
                 <Input
+                  className={brandInput}
                   id="password"
                   type="password"
                   name="password"
@@ -96,6 +102,7 @@ export default function Register() {
                   Confirm password
                 </FieldLabel>
                 <Input
+                  className={brandInput}
                   id="password_confirmation"
                   type="password"
                   name="password_confirmation"
@@ -112,7 +119,7 @@ export default function Register() {
 
               <Button
                 type="submit"
-                className="mt-2 h-11 w-full rounded-full bg-[#2B3A32] text-[#F6F1E7] hover:bg-[#1F2B25]"
+                className="bg-pine text-ivory hover:bg-pine-deep mt-2 h-11 w-full rounded-full"
               >
                 {processing && <Spinner />}
                 Create account

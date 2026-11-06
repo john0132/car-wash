@@ -4,23 +4,21 @@ import { SiteLinkAnchor } from "@/website/features/site-chrome/site-link"
 import type { SiteLink } from "@/website/features/site-chrome/types"
 
 const topLinkClass =
-  "text-sm tracking-wide text-[#2B3A32] transition-colors hover:text-[#8A6240]"
+  "text-sm tracking-wide text-pine transition-colors hover:text-bronze"
 
 /** Nested links, indented one step per level. */
 function SubLinks({ links, depth = 0 }: { links: SiteLink[]; depth?: number }) {
   return (
     <ul
       className={
-        depth > 0
-          ? "mt-1 space-y-1 border-l border-[#2B3A32]/10 pl-3"
-          : "space-y-1"
+        depth > 0 ? "border-pine/10 mt-1 space-y-1 border-l pl-3" : "space-y-1"
       }
     >
       {links.map((link) => (
         <li key={link.id}>
           <SiteLinkAnchor
             link={link}
-            className="block py-0.5 text-sm text-[#2B3A32]/80 transition-colors hover:text-[#8A6240]"
+            className="text-pine/80 hover:text-bronze block py-0.5 text-sm transition-colors"
           />
           {link.children && link.children.length > 0 && (
             <SubLinks links={link.children} depth={depth + 1} />
@@ -50,13 +48,13 @@ export function HeaderNavItem({ link }: { link: SiteLink }) {
         <SiteLinkAnchor link={link} className={topLinkClass} />
         <ChevronDown
           aria-hidden
-          className="size-3.5 text-[#2B3A32]/60 transition-transform group-focus-within:rotate-180 group-hover:rotate-180"
+          className="text-pine/60 size-3.5 transition-transform group-focus-within:rotate-180 group-hover:rotate-180"
         />
       </span>
 
       {/* pt-4 bridges the gap so the pointer can travel into the panel. */}
       <div className="invisible absolute top-full left-1/2 z-50 -translate-x-1/2 pt-4 opacity-0 transition-opacity group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
-        <div className="rounded-xl border border-[#2B3A32]/10 bg-[#F6F1E7] p-5 shadow-lg">
+        <div className="border-pine/10 bg-ivory rounded-xl border p-5 shadow-lg">
           {grouped ? (
             <div
               className="grid gap-x-8 gap-y-5"
@@ -68,7 +66,7 @@ export function HeaderNavItem({ link }: { link: SiteLink }) {
                 <div key={child.id}>
                   <SiteLinkAnchor
                     link={child}
-                    className="mb-2 block text-sm font-semibold text-[#2B3A32] transition-colors hover:text-[#8A6240]"
+                    className="text-pine hover:text-bronze mb-2 block text-sm font-semibold transition-colors"
                   />
                   {child.children && child.children.length > 0 && (
                     <SubLinks links={child.children} />

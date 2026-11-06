@@ -1,6 +1,5 @@
 import { createInertiaApp } from "@inertiajs/react"
 
-import { initializeTheme } from "@/shared/hooks/use-appearance"
 import PersistentLayout from "@/shared/layouts/persistent-layout"
 import {
   type PageModule,
@@ -32,6 +31,3 @@ void createInertiaApp({
     )
   }
 })
-
-// This will set light / dark mode on load...
-initializeTheme()

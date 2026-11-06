@@ -45,14 +45,11 @@ interface LogoProps {
 }
 
 export function Logo({ className, tone = "pine", compact }: LogoProps) {
-  const textColor = tone === "pine" ? "#2B3A32" : "#F6F1E7"
-
   return (
     <span className={`inline-flex items-center gap-2.5 ${className ?? ""}`}>
       <BrandMark tone={tone} className="h-7 w-7" />
       <span
-        style={{ fontFamily: "'Italiana', serif", color: textColor }}
-        className={`text-sm tracking-[0.2em] uppercase ${compact ? "max-[360px]:sr-only" : ""}`}
+        className={`font-display text-sm ${tone === "pine" ? "text-pine" : "text-ivory"} tracking-[0.2em] uppercase ${compact ? "max-[360px]:sr-only" : ""}`}
       >
         Auto Atelier
       </span>

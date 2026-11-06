@@ -1,7 +1,6 @@
-import { cn } from "cn"
-
 import type { AdminLanguage } from "@/admin/types"
 import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
+import { cn } from "@/shared/lib/utils"
 
 /**
  * Picks the language a multilingual form is editing. Translatable inputs show

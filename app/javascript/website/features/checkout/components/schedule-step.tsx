@@ -34,7 +34,7 @@ export function ScheduleStep({
       error={error}
     >
       {!day ? (
-        <p className="text-[#5B6B5E]">No times are available right now.</p>
+        <p className="text-sage">No times are available right now.</p>
       ) : (
         <>
           <div
@@ -48,10 +48,10 @@ export function ScheduleStep({
                 type="button"
                 aria-pressed={d.date === day.date}
                 onClick={() => setDate(d.date)}
-                className={`shrink-0 rounded-2xl border px-4 py-2.5 text-sm whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:outline-none ${
+                className={`focus-visible:ring-bronze shrink-0 rounded-2xl border px-4 py-2.5 text-sm whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:outline-none ${
                   d.date === day.date
-                    ? "border-[#2B3A32] bg-[#2B3A32] text-[#F6F1E7]"
-                    : "border-[#2B3A32]/15 bg-white/60 hover:bg-white"
+                    ? "border-pine bg-pine text-ivory"
+                    : "border-pine/15 bg-white/60 hover:bg-white"
                 }`}
               >
                 {d.label}

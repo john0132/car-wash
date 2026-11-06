@@ -15,7 +15,7 @@ export function SiteHeader() {
   const getInitials = useInitials()
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[#2B3A32]/10 bg-[#F6F1E7]/95 backdrop-blur-sm">
+    <header className="border-pine/10 bg-ivory/95 sticky top-0 z-40 border-b backdrop-blur-sm">
       <div className="mx-auto flex h-20 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
         <Link href={root()} className="shrink-0">
           <Logo compact />
@@ -33,10 +33,10 @@ export function SiteHeader() {
               href={profile()}
               aria-label="My profile"
               title={auth.user.name}
-              className="rounded-full focus-visible:ring-2 focus-visible:ring-[#2B3A32]/40 focus-visible:outline-none"
+              className="focus-visible:ring-pine/40 rounded-full focus-visible:ring-2 focus-visible:outline-none"
             >
-              <Avatar className="size-10 border border-[#2B3A32]/15">
-                <AvatarFallback className="bg-[#2B3A32] text-sm text-[#F6F1E7]">
+              <Avatar className="border-pine/15 size-10 border">
+                <AvatarFallback className="bg-pine text-ivory text-sm">
                   {getInitials(auth.user.name)}
                 </AvatarFallback>
               </Avatar>
@@ -46,7 +46,7 @@ export function SiteHeader() {
               asChild
               variant="ghost"
               size="icon"
-              className="size-10 rounded-full text-[#2B3A32] hover:bg-[#2B3A32]/5 hover:text-[#2B3A32]"
+              className="text-pine hover:bg-pine/5 hover:text-pine size-10 rounded-full"
             >
               <Link href={signIn()} aria-label="Log in or register">
                 <User className="size-5" />
@@ -55,7 +55,7 @@ export function SiteHeader() {
           )}
           <Button
             asChild
-            className="rounded-full bg-[#2B3A32] px-4 text-[#F6F1E7] hover:bg-[#1F2B25] sm:px-5"
+            className="bg-pine text-ivory hover:bg-pine-deep rounded-full px-4 sm:px-5"
           >
             <Link href={services()} aria-label="Book your visit">
               Book<span className="max-sm:hidden">&nbsp;your visit</span>

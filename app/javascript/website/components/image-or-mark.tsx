@@ -1,5 +1,5 @@
 import { BrandMark } from "@/website/components/brand-mark"
-import type { HomeImage } from "@/website/features/home-catalog/types"
+import type { Image } from "@/website/lib/types"
 
 /** The record's uploaded image, or the brand mark on a sand tile when it has none. */
 export function ImageOrMark({
@@ -7,7 +7,7 @@ export function ImageOrMark({
   className = "",
   priority = false,
 }: {
-  image: HomeImage | null
+  image: Image | null
   className?: string
   /** Above-the-fold image (the likely LCP): fetched eagerly with high priority. */
   priority?: boolean
@@ -26,7 +26,7 @@ export function ImageOrMark({
   }
 
   return (
-    <div className="flex h-full w-full items-center justify-center bg-[#E9E0CC]">
+    <div className="bg-sand-deep flex h-full w-full items-center justify-center">
       <BrandMark className="h-14 w-14 opacity-40" />
     </div>
   )

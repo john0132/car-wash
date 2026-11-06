@@ -1,4 +1,3 @@
-import { cn } from "cn"
 import { Link2, ListTree, Plus } from "lucide-react"
 
 import { TextField, asFieldErrors } from "@/admin/components/form-fields"
@@ -25,6 +24,7 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select"
 import { Switch } from "@/shared/components/ui/switch"
+import { cn } from "@/shared/lib/utils"
 
 /**
  * An ordered, editable list of links (header items, or the links of one footer

@@ -144,20 +144,20 @@ export function CheckoutForm({
       <div className="lg:sticky lg:top-28">
         <OrderSummary summary={summary}>
           {formError && (
-            <p role="alert" className="mb-3 text-sm text-[#B3261E]">
+            <p role="alert" className="text-danger mb-3 text-sm">
               {formError}
             </p>
           )}
           <Button
             type="submit"
             disabled={processing || outOfReach}
-            className="h-12 w-full rounded-full bg-[#2B3A32] text-base text-[#F6F1E7] hover:bg-[#1F2B25]"
+            className="bg-pine text-ivory hover:bg-pine-deep h-12 w-full rounded-full text-base"
           >
             {processing && <Spinner />}
             Confirm booking
           </Button>
           {outOfReach && (
-            <p className="mt-2 text-center text-sm text-[#5B6B5E]">
+            <p className="text-sage mt-2 text-center text-sm">
               Pick a location we serve to continue.
             </p>
           )}

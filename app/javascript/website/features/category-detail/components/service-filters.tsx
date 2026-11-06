@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select"
+import { brandInput, brandSelect } from "@/website/components/brand"
 import type {
   CategoryFacets,
   CategoryFilters,
@@ -22,7 +23,7 @@ import {
   hasActiveFilters,
   parsePrice,
 } from "@/website/features/category-detail/utils"
-import { formatDuration } from "@/website/features/service-detail/utils"
+import { formatDuration } from "@/website/lib/format"
 
 const DEBOUNCE_MS = 350
 const ANY = "any"
@@ -109,23 +110,21 @@ export function ServiceFilters({
     value === null || value === undefined ? "" : String(value)
 
   const labelClass =
-    "text-[11px] font-medium tracking-[0.14em] text-[#5B6B5E] uppercase"
-  const fieldClass =
-    "h-11 rounded-xl border-[#2B3A32]/15 bg-[#F6F1E7]/60 dark:bg-[#F6F1E7]/60 dark:hover:bg-[#F6F1E7]/60 text-sm shadow-none focus-visible:border-[#8A6240] focus-visible:ring-[#8A6240]/25 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-  const triggerClass =
-    "!h-11 w-full rounded-xl border-[#2B3A32]/15 bg-[#F6F1E7]/60 dark:bg-[#F6F1E7]/60 dark:hover:bg-[#F6F1E7]/60 text-sm shadow-none focus-visible:border-[#8A6240] focus-visible:ring-[#8A6240]/25"
+    "text-[11px] font-medium tracking-[0.14em] text-sage uppercase"
+  const fieldClass = `${brandInput} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`
+  const triggerClass = brandSelect
 
   const showOnSale = facets === undefined || facets.on_sale_count > 0
 
   return (
     <div
       role="search"
-      className="rounded-3xl border border-[#2B3A32]/10 bg-white p-4 sm:p-6"
+      className="border-pine/10 rounded-3xl border bg-white p-4 sm:p-6"
     >
       <div className="relative">
         <Search
           aria-hidden
-          className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-[#8A6240]"
+          className="text-bronze pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2"
         />
         <Input
           type="search"
@@ -137,7 +136,7 @@ export function ServiceFilters({
           placeholder="Search services"
           aria-label="Search services"
           maxLength={100}
-          className="h-12 rounded-xl border-[#2B3A32]/15 bg-[#F6F1E7]/60 pl-12 text-base shadow-none focus-visible:border-[#8A6240] focus-visible:ring-[#8A6240]/25 dark:bg-[#F6F1E7]/60 dark:hover:bg-[#F6F1E7]/60"
+          className={`${brandInput} h-12 ps-12 text-base`}
         />
       </div>
 
@@ -161,7 +160,7 @@ export function ServiceFilters({
               }}
               className={fieldClass}
             />
-            <span aria-hidden className="text-[#5B6B5E]">
+            <span aria-hidden className="text-sage">
               –
             </span>
             <Input
@@ -240,16 +239,16 @@ export function ServiceFilters({
       </div>
 
       {(showOnSale || hasActiveFilters(filters)) && (
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#2B3A32]/10 pt-4">
+        <div className="border-pine/10 mt-5 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
           {showOnSale ? (
             <button
               type="button"
               aria-pressed={filters.on_sale}
               onClick={() => apply({ on_sale: !filters.on_sale })}
-              className={`h-9 rounded-full border px-4 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:outline-none ${
+              className={`focus-visible:ring-bronze h-9 rounded-full border px-4 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none ${
                 filters.on_sale
-                  ? "border-[#2B3A32] bg-[#2B3A32] text-[#F6F1E7]"
-                  : "border-[#2B3A32]/15 bg-white text-[#2B3A32] hover:border-[#2B3A32]/40"
+                  ? "border-pine bg-pine text-ivory"
+                  : "border-pine/15 text-pine hover:border-pine/40 bg-white"
               }`}
             >
               On sale
@@ -262,7 +261,7 @@ export function ServiceFilters({
             <button
               type="button"
               onClick={clearAll}
-              className="flex h-9 items-center gap-1.5 text-sm text-[#8A6240] underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
+              className="text-bronze flex h-9 items-center gap-1.5 text-sm underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
             >
               <X aria-hidden className="size-4" />
               Clear all

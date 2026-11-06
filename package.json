@@ -10,6 +10,8 @@
     "format:fix": "prettier --write 'app/javascript' '*.{js,mjs,cjs,ts}'"
   },
   "dependencies": {
+    "@fontsource/italiana": "^5.3.0",
+    "@fontsource/jost": "^5.3.0",
     "@geoman-io/leaflet-geoman-free": "^2.20.6",
     "@headlessui/react": "^2.2.10",
     "@inertiajs/react": "^3.7.1",
@@ -18,9 +20,7 @@
     "@tiptap/pm": "^3.32.3",
     "@tiptap/react": "^3.32.3",
     "@tiptap/starter-kit": "^3.32.3",
-    "cn": "^0.4.0",
     "leaflet": "^1.9.4",
-    "next-themes": "^0.4.6",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-leaflet": "^5.0.0",

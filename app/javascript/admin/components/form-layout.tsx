@@ -1,9 +1,9 @@
 import { Link } from "@inertiajs/react"
-import { cn } from "cn"
 import type { ReactNode } from "react"
 
 import { Button } from "@/shared/components/ui/button"
 import { Spinner } from "@/shared/components/ui/spinner"
+import { cn } from "@/shared/lib/utils"
 
 const WIDTHS = {
   "3xl": "max-w-3xl",

@@ -1,5 +1,5 @@
-import { ServiceCard } from "@/website/features/service-detail/components/service-card"
-import type { RelatedService } from "@/website/features/service-detail/types"
+import { ServiceCard } from "@/website/components/service-card"
+import type { ServiceSummary } from "@/website/lib/types"
 
 /** Other services in the same category. Renders nothing when there are none. */
 export function RelatedServices({
@@ -7,7 +7,7 @@ export function RelatedServices({
   services,
 }: {
   category: string | null
-  services: RelatedService[]
+  services: ServiceSummary[]
 }) {
   if (services.length === 0) return null
 
@@ -16,8 +16,7 @@ export function RelatedServices({
       <div className="mx-auto max-w-6xl">
         <h2
           id="related-heading"
-          style={{ fontFamily: "'Italiana', serif" }}
-          className="text-3xl text-[#2B3A32] sm:text-4xl"
+          className="font-display text-pine text-3xl sm:text-4xl"
         >
           {category ? `More in ${category}` : "More services"}
         </h2>

@@ -10,7 +10,7 @@ export function RichTextBlock({ data }: { data: RichTextData }) {
   return (
     <section className="bg-white px-6 py-16">
       <div
-        className="prose mx-auto max-w-3xl text-[#2B3A32] [&_a]:text-[#8A6240]"
+        className="prose text-pine [&_a]:text-bronze mx-auto max-w-3xl"
         dangerouslySetInnerHTML={{ __html: data.body }}
       />
     </section>

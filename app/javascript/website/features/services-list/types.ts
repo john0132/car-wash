@@ -1,9 +1,9 @@
-import type { CategoryService } from "@/website/features/category-detail/types"
+import type { ServiceSummary } from "@/website/lib/types"
 
 /** Website::ServicesController#index */
 export interface ServicesListCategory {
   id: number
   slug: string
   name: string | null
-  services: CategoryService[]
+  services: ServiceSummary[]
 }

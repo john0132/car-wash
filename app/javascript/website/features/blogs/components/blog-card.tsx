@@ -1,9 +1,9 @@
 import { Link } from "@inertiajs/react"
 
 import { blog as blogRoute } from "@/routes"
+import { ImageOrMark } from "@/website/components/image-or-mark"
 import type { BlogCardData } from "@/website/features/blogs/types"
 import { formatDate } from "@/website/features/blogs/utils"
-import { ImageOrMark } from "@/website/features/home-catalog/components/image-or-mark"
 
 /** Image-topped card linking to a blog; the whole card is the link. */
 export function BlogCard({
@@ -14,18 +14,18 @@ export function BlogCard({
   priority?: boolean
 }) {
   return (
-    <li className="group relative overflow-hidden rounded-3xl border border-[#2B3A32]/10 bg-white transition-shadow duration-300 hover:shadow-[0_24px_48px_-24px_rgba(43,58,50,0.3)]">
+    <li className="group border-pine/10 relative overflow-hidden rounded-3xl border bg-white transition-shadow duration-300 hover:shadow-[0_24px_48px_-24px_rgba(43,58,50,0.3)]">
       <div className="aspect-[16/10] overflow-hidden">
         <ImageOrMark image={blog.cover_image} priority={priority} />
       </div>
       <div className="p-6">
         <time
           dateTime={blog.published_at}
-          className="text-xs font-medium tracking-[0.2em] text-[#8A6240] uppercase"
+          className="text-bronze text-xs font-medium tracking-[0.2em] uppercase"
         >
           {formatDate(blog.published_at)}
         </time>
-        <h3 className="mt-2 text-lg font-medium text-[#2B3A32]">
+        <h3 className="text-pine mt-2 text-lg font-medium">
           <Link
             href={blogRoute(blog.slug)}
             className="after:absolute after:inset-0 focus-visible:outline-none"
@@ -34,9 +34,7 @@ export function BlogCard({
           </Link>
         </h3>
         {blog.subtitle && (
-          <p className="mt-2 line-clamp-3 text-sm text-[#5B6B5E]">
-            {blog.subtitle}
-          </p>
+          <p className="text-sage mt-2 line-clamp-3 text-sm">{blog.subtitle}</p>
         )}
       </div>
     </li>

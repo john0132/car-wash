@@ -1,4 +1,3 @@
-import { cn } from "cn"
 import { Lock, Plus } from "lucide-react"
 
 import { ReorderButtons } from "@/admin/components/reorder-buttons"
@@ -27,6 +26,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/shared/components/ui/tooltip"
+import { cn } from "@/shared/lib/utils"
 
 /**
  * Edits a component's field schema: label, key, type, whether it's

@@ -7,16 +7,16 @@ import {
   PAYMENT_STATUS,
   formatWhen,
 } from "@/website/features/bookings/utils"
-import { formatMoney } from "@/website/features/home-catalog/utils"
+import { formatMoney } from "@/website/lib/format"
 
 /** Everything about one booking: when, where, which car, what and how much. */
 export function BookingSummary({ booking }: { booking: BookingDetail }) {
   const status = BOOKING_STATUS[booking.status]
 
   return (
-    <div className="rounded-3xl border border-[#2B3A32]/10 bg-white p-6 shadow-[0_32px_64px_-40px_rgba(43,58,50,0.45)] sm:p-8">
+    <div className="border-pine/10 rounded-3xl border bg-white p-6 shadow-[0_32px_64px_-40px_rgba(43,58,50,0.45)] sm:p-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-[#5B6B5E]">Booking #{booking.id}</p>
+        <p className="text-sage text-sm">Booking #{booking.id}</p>
         <span
           className={`rounded-full px-3 py-1 text-xs font-medium ${status.tone}`}
         >
@@ -43,13 +43,11 @@ export function BookingSummary({ booking }: { booking: BookingDetail }) {
         </Detail>
       </dl>
 
-      <dl className="mt-8 space-y-3 border-t border-[#2B3A32]/10 pt-6 text-[15px] tabular-nums">
+      <dl className="border-pine/10 mt-8 space-y-3 border-t pt-6 text-[15px] tabular-nums">
         {booking.items.map((item) => (
           <div key={item.id} className="flex justify-between gap-4">
             <dt
-              className={
-                item.kind === "service" ? "font-medium" : "text-[#5B6B5E]"
-              }
+              className={item.kind === "service" ? "font-medium" : "text-sage"}
             >
               {item.kind === "service" ? "" : "+ "}
               {item.name ?? "Item"}
@@ -58,7 +56,7 @@ export function BookingSummary({ booking }: { booking: BookingDetail }) {
             <dd>{formatMoney(item.price * item.quantity)}</dd>
           </div>
         ))}
-        <div className="flex justify-between gap-4 border-t border-[#2B3A32]/10 pt-3 text-lg font-medium">
+        <div className="border-pine/10 flex justify-between gap-4 border-t pt-3 text-lg font-medium">
           <dt>Total</dt>
           <dd>{formatMoney(booking.total_amount)}</dd>
         </div>
@@ -78,11 +76,11 @@ function Detail({
 }) {
   return (
     <div className="flex gap-3">
-      <span aria-hidden className="mt-0.5 text-[#8A6240] [&_svg]:size-5">
+      <span aria-hidden className="text-bronze mt-0.5 [&_svg]:size-5">
         {icon}
       </span>
       <div>
-        <dt className="text-sm text-[#5B6B5E]">{label}</dt>
+        <dt className="text-sage text-sm">{label}</dt>
         <dd className="mt-0.5">{children}</dd>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { Form, Head } from "@inertiajs/react"
+import { Form } from "@inertiajs/react"
 
 import { websiteIdentityPasswordResets } from "@/routes"
 import { Button } from "@/shared/components/ui/button"
@@ -10,6 +10,8 @@ import {
 } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
+import { brandInput } from "@/website/components/brand"
+import { SeoHead } from "@/website/components/seo-head"
 import AuthLayout from "@/website/layouts/auth-layout"
 
 interface ResetPasswordProps {
@@ -23,7 +25,7 @@ export default function ResetPassword({ sid, email }: ResetPasswordProps) {
       title="Reset password"
       description="Please enter your new password below"
     >
-      <Head title="Reset password" />
+      <SeoHead title="Reset password" noindex />
       <Form
         action={websiteIdentityPasswordResets.update()}
         transform={(data) => ({ ...data, sid, email })}
@@ -34,6 +36,7 @@ export default function ResetPassword({ sid, email }: ResetPasswordProps) {
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
               <Input
+                className={brandInput}
                 id="email"
                 type="email"
                 name="email"
@@ -49,6 +52,7 @@ export default function ResetPassword({ sid, email }: ResetPasswordProps) {
             <Field>
               <FieldLabel htmlFor="password">Password</FieldLabel>
               <Input
+                className={brandInput}
                 id="password"
                 type="password"
                 name="password"
@@ -67,6 +71,7 @@ export default function ResetPassword({ sid, email }: ResetPasswordProps) {
                 Confirm password
               </FieldLabel>
               <Input
+                className={brandInput}
                 id="password_confirmation"
                 type="password"
                 name="password_confirmation"

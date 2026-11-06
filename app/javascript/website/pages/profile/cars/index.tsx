@@ -1,13 +1,11 @@
 import { Plus } from "lucide-react"
 
 import { Button } from "@/shared/components/ui/button"
+import { brandButton } from "@/website/components/brand"
 import { CarCard } from "@/website/features/cars/components/car-card"
 import { CarDialog } from "@/website/features/cars/components/car-dialog"
 import type { CustomerCar } from "@/website/features/cars/types"
-import {
-  SectionHeading,
-  primaryButtonClass,
-} from "@/website/features/profile/components/profile-card"
+import { SectionHeading } from "@/website/features/profile/components/profile-card"
 import ProfileLayout from "@/website/layouts/profile-layout"
 
 interface Props {
@@ -24,7 +22,7 @@ export default function CarsIndex({ cars }: Props) {
         />
         <CarDialog
           trigger={
-            <Button type="button" className={primaryButtonClass}>
+            <Button type="button" className={brandButton}>
               <Plus />
               Add car
             </Button>
@@ -33,9 +31,9 @@ export default function CarsIndex({ cars }: Props) {
       </div>
 
       {cars.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#2B3A32]/25 px-6 py-14 text-center">
+        <div className="border-pine/25 rounded-2xl border border-dashed px-6 py-14 text-center">
           <p className="font-medium">No cars yet</p>
-          <p className="mt-1 text-sm text-[#5B6B5E]">
+          <p className="text-sage mt-1 text-sm">
             Add your car to make booking quicker.
           </p>
         </div>

@@ -26,18 +26,15 @@ export default function BookingShow({
         <header className="mb-8 text-center">
           {just_placed && (
             <CircleCheck
-              className="mx-auto mb-4 size-12 text-[#8A6240]"
+              className="text-bronze mx-auto mb-4 size-12"
               aria-hidden
             />
           )}
-          <h1
-            style={{ fontFamily: "'Italiana', serif" }}
-            className="text-4xl leading-tight sm:text-5xl"
-          >
+          <h1 className="font-display text-4xl leading-tight sm:text-5xl">
             {just_placed ? "Thank you!" : `Booking #${booking.id}`}
           </h1>
           {just_placed && (
-            <p className="mx-auto mt-3 max-w-md text-[#5B6B5E]">
+            <p className="text-sage mx-auto mt-3 max-w-md">
               Your booking is placed. We&apos;ll confirm it shortly and see you
               at the time below.
             </p>
@@ -49,13 +46,13 @@ export default function BookingShow({
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             href={profileBookings()}
-            className="rounded-full bg-[#2B3A32] px-6 py-3 font-medium text-[#F6F1E7] hover:bg-[#1F2B25] focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:ring-offset-2 focus-visible:outline-none"
+            className="bg-pine text-ivory hover:bg-pine-deep focus-visible:ring-bronze rounded-full px-6 py-3 font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             My bookings
           </Link>
           <Link
             href={services()}
-            className="rounded-full border border-[#2B3A32]/30 px-6 py-3 font-medium hover:bg-[#2B3A32]/5 focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:ring-offset-2 focus-visible:outline-none"
+            className="border-pine/30 hover:bg-pine/5 focus-visible:ring-bronze rounded-full border px-6 py-3 font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             Book another service
           </Link>

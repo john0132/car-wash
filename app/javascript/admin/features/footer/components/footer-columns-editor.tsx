@@ -1,4 +1,3 @@
-import { cn } from "cn"
 import { Plus } from "lucide-react"
 
 import { TextField, asFieldErrors } from "@/admin/components/form-fields"
@@ -15,6 +14,7 @@ import { Button } from "@/shared/components/ui/button"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import { FieldError } from "@/shared/components/ui/field"
 import { Switch } from "@/shared/components/ui/switch"
+import { cn } from "@/shared/lib/utils"
 
 /**
  * The footer's columns, each with a per-language title and its own list of

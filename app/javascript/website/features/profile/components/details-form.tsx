@@ -5,11 +5,10 @@ import { Button } from "@/shared/components/ui/button"
 import { Field, FieldError, FieldLabel } from "@/shared/components/ui/field"
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
+import { brandButton, brandInput } from "@/website/components/brand"
 import {
   ProfileCard,
   SectionHeading,
-  fieldClass,
-  primaryButtonClass,
 } from "@/website/features/profile/components/profile-card"
 import type { ProfileData } from "@/website/features/profile/types"
 
@@ -40,7 +39,7 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
                   defaultValue={profile.name}
                   required
                   autoComplete="given-name"
-                  className={fieldClass}
+                  className={brandInput}
                 />
                 <FieldError errors={toErrors(errors.name)} />
               </Field>
@@ -52,7 +51,7 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
                   name="last_name"
                   defaultValue={profile.last_name ?? ""}
                   autoComplete="family-name"
-                  className={fieldClass}
+                  className={brandInput}
                 />
                 <FieldError errors={toErrors(errors.last_name)} />
               </Field>
@@ -67,7 +66,7 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
                 defaultValue={profile.email}
                 required
                 autoComplete="email"
-                className={fieldClass}
+                className={brandInput}
               />
               <FieldError errors={toErrors(errors.email)} />
             </Field>
@@ -82,7 +81,7 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
                 autoComplete="tel"
                 inputMode="tel"
                 placeholder="+20 100 123 4567"
-                className={fieldClass}
+                className={brandInput}
               />
               <FieldError errors={toErrors(errors.phone)} />
             </Field>
@@ -91,13 +90,13 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
               <Button
                 type="submit"
                 disabled={processing}
-                className={primaryButtonClass}
+                className={brandButton}
               >
                 {processing && <Spinner />}
                 Save changes
               </Button>
               {recentlySuccessful && (
-                <p className="text-sm text-[#5B6B5E]" role="status">
+                <p className="text-sage text-sm" role="status">
                   Saved
                 </p>
               )}

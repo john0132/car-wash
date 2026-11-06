@@ -1,4 +1,4 @@
-import type { HomeImage } from "@/website/features/home-catalog/types"
+import type { Image } from "@/website/lib/types"
 
 /** Website::ServiceCategoriesController#category_props */
 export interface CategoryDetail {
@@ -7,18 +7,7 @@ export interface CategoryDetail {
   name: string | null
   seo_title: string | null
   seo_description: string | null
-  image: HomeImage | null
-}
-
-/** Website::ServiceCategoriesController#service_card_props */
-export interface CategoryService {
-  id: number
-  slug: string
-  name: string | null
-  price: number
-  sale_price: number | null
-  duration_minutes: number | null
-  image: HomeImage | null
+  image: Image | null
 }
 
 export type SortOption = "name" | "price_asc" | "price_desc"

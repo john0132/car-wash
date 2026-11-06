@@ -1,5 +1,3 @@
-import { cn } from "cn"
-
 import {
   bookingStatusFill,
   bookingStatusIcon,
@@ -16,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/components/ui/card"
+import { cn } from "@/shared/lib/utils"
 
 /** Proportional bars for each booking status, icon + label so color is never the only cue. */
 export function StatusBreakdownCard({
