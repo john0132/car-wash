@@ -10,6 +10,7 @@ import {
   FolderTree,
   Gift,
   HardHat,
+  HelpCircle,
   KeyRound,
   LayoutGrid,
   Map,
@@ -35,6 +36,7 @@ import {
   adminDashboard,
   adminEmployees,
   adminExtras,
+  adminFaqs,
   adminMemberships,
   adminPages,
   adminPaymentMethods,
@@ -160,6 +162,12 @@ const contentNavItems: (NavItem & { resource: string })[] = [
     href: adminComponents.index().url,
     icon: Blocks,
     resource: "components",
+  },
+  {
+    title: "FAQs",
+    href: adminFaqs.index().url,
+    icon: HelpCircle,
+    resource: "faqs",
   },
 ]
 

@@ -18,7 +18,8 @@ class Permission < ApplicationRecord
     "areas" => %w[read create update delete],
     "pages" => %w[read create update delete],
     "blogs" => %w[read create update delete],
-    "components" => %w[read create update delete]
+    "components" => %w[read create update delete],
+    "faqs" => %w[read create update delete]
   }.freeze
 
   has_many :role_permissions, dependent: :destroy

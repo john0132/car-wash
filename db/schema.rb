@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_05_180002) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_06_085519) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -200,6 +200,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_180002) do
     t.boolean "is_active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "faq_translations", force: :cascade do |t|
+    t.bigint "faq_id", null: false
+    t.bigint "language_id", null: false
+    t.string "question", null: false
+    t.text "answer", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["faq_id", "language_id"], name: "index_faq_translations_on_faq_and_language", unique: true
+    t.index ["faq_id"], name: "index_faq_translations_on_faq_id"
+    t.index ["language_id"], name: "index_faq_translations_on_language_id"
+  end
+
+  create_table "faqs", force: :cascade do |t|
+    t.integer "sort_order", default: 0, null: false
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sort_order"], name: "index_faqs_on_sort_order"
   end
 
   create_table "languages", force: :cascade do |t|
@@ -452,6 +472,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_05_180002) do
   add_foreign_key "component_translations", "languages"
   add_foreign_key "extra_translations", "extras"
   add_foreign_key "extra_translations", "languages"
+  add_foreign_key "faq_translations", "faqs"
+  add_foreign_key "faq_translations", "languages"
   add_foreign_key "membership_translations", "languages"
   add_foreign_key "membership_translations", "memberships"
   add_foreign_key "page_section_translations", "languages"

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Builders for ServiceCategory/Service/Extra, which require a default-language (English) name.
+# Builders for ServiceCategory/Service/Extra/Faq, which require a default-language (English) name.
 # Uses LocationHelpers#english.
 module CatalogHelpers
   def create_service_category(name = "Exterior", **attrs)
@@ -24,6 +24,13 @@ module CatalogHelpers
     Extra.new(price: price, **attrs).tap do |extra|
       extra.extra_translations.build(language: english, name: name)
       extra.save!
+    end
+  end
+
+  def create_faq(question = "Do you offer home service?", answer: "Yes, everywhere we operate.", **attrs)
+    Faq.new(**attrs).tap do |faq|
+      faq.faq_translations.build(language: english, question: question, answer: answer)
+      faq.save!
     end
   end
 end

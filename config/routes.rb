@@ -27,6 +27,7 @@ Rails.application.routes.draw do
     resources :pages, except: :show, concerns: :activatable
     resources :blogs, except: :show, concerns: :activatable
     resources :components, except: :show, concerns: :activatable
+    resources :faqs, except: :show, concerns: :activatable
     resources :direct_uploads, only: :create
 
     root "dashboard#index"
