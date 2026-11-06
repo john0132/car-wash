@@ -7,7 +7,7 @@ class Website::Profile::AddressesController < Website::BaseController
     render inertia: {
       addresses: Current.user.addresses.includes(area: [ :area_translations, { city: :city_translations } ])
         .order(:created_at).map { |address| address_props(address) },
-      areas: area_options
+      areas: area_options(Area.where(is_active: true))
     }
   end
 
@@ -53,11 +53,5 @@ class Website::Profile::AddressesController < Website::BaseController
       latitude: address.latitude,
       longitude: address.longitude
     }
-  end
-
-  def area_options
-    Area.where(is_active: true).includes(:area_translations, city: :city_translations)
-      .map { |area| { id: area.id, name: area.translated(:name), city: area.city.translated(:name) } }
-      .sort_by { |area| [ area[:city].to_s, area[:name].to_s ] }
   end
 end

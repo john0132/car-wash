@@ -90,7 +90,6 @@
   "Confirm booking": "تأكيد الحجز",
   "Pick a location we serve to continue.": "اختر موقعًا نخدمه للمتابعة.",
   "Location": "الموقع",
-  "Where is the car parked? Use your location or drop a pin on the map.": "أين تقف السيارة؟ استخدم موقعك أو ضع دبوسًا على الخريطة.",
   "Drop a pin on the map instead.": "ضع دبوسًا على الخريطة بدلًا من ذلك.",
   "Checking we serve this spot…": "جارٍ التحقق من تغطيتنا لهذا الموقع…",
   "We serve {place}.": "نخدم {place}.",
@@ -163,7 +162,7 @@
   "Your browser can't share its location.": "متصفحك لا يستطيع مشاركة موقعك.",
   "Location access was denied.": "تم رفض الوصول إلى الموقع.",
   "We couldn't find your location.": "تعذّر علينا تحديد موقعك.",
-  "Auto Atelier home": "الصفحة الرئيسية لأوتو أتيليه",
+  "Auto Atelier home": "الصفحة الرئيسية لـ Auto Atelier",
   "Profile": "الملف الشخصي",
   "My bookings": "حجوزاتي",
   "My addresses": "عناويني",
@@ -286,5 +285,11 @@
   "The page you were looking for doesn't exist or may have moved.": "الصفحة التي تبحث عنها غير موجودة أو ربما تم نقلها.",
   "We're sorry, something broke on our side. Please try again in a moment.": "نعتذر، حدث عطل من جانبنا. يرجى المحاولة مرة أخرى بعد قليل.",
   "Back to the homepage": "العودة إلى الصفحة الرئيسية",
-  "Browse our services": "تصفّح خدماتنا"
+  "Browse our services": "تصفّح خدماتنا",
+  "Where is the car parked? Use your location, pick your area, or drop a pin on the map.": "أين تقف السيارة؟ استخدم موقعك أو اختر منطقتك أو ضع دبوسًا على الخريطة.",
+  "Or choose your area": "أو اختر منطقتك",
+  "Map. Press Enter to place the pin, then the arrow keys to move it.": "الخريطة. اضغط Enter لوضع الدبوس ثم استخدم مفاتيح الأسهم لتحريكه.",
+  "Pin at {latitude}, {longitude}": "الدبوس عند {latitude}، {longitude}",
+  "Tap the map to drop a pin, or use your location or area above.": "اضغط على الخريطة لوضع دبوس، أو استخدم موقعك أو منطقتك أعلاه.",
+  "Enter coordinates instead": "إدخال الإحداثيات يدويًا"
 }

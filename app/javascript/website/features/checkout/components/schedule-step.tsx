@@ -31,6 +31,7 @@ export function ScheduleStep({
 
   return (
     <StepCard
+      field="scheduled_at"
       step={step}
       title={t("Date & time")}
       description={t("When should we come?")}

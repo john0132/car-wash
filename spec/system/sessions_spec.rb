@@ -13,7 +13,7 @@ RSpec.describe "Sessions", type: :system do
     click_on "Log in"
 
     expect(page).to have_current_path(root_path)
-    expect(page).to have_css("a[aria-label=\"My profile\"]")
+    expect(page).to have_link("My profile")
   end
 
   it "signs staff in to the admin dashboard" do

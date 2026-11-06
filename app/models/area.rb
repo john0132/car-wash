@@ -18,6 +18,13 @@ class Area < ApplicationRecord
 
   # Uses ST_Covers (not ST_Contains with a ::geometry cast) so the geofence GiST index is used.
   scope :covering, ->(point) { where("ST_Covers(geofence, ?)", point) }
+  # Adds `center_latitude` / `center_longitude`: a point guaranteed to lie inside the geofence
+  # (ST_PointOnSurface, unlike a centroid, which can fall outside a concave shape), for centering maps.
+  scope :with_center, -> {
+    select("areas.*",
+           "ST_Y(ST_PointOnSurface(areas.geofence::geometry)) AS center_latitude",
+           "ST_X(ST_PointOnSurface(areas.geofence::geometry)) AS center_longitude")
+  }
   # Areas we currently take bookings in: active, in an active city.
   scope :serviceable, -> { where(is_active: true).joins(:city).where(cities: { is_active: true }) }
 

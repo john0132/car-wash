@@ -6,12 +6,15 @@ export function StepCard({
   title,
   description,
   error,
+  field,
   children,
 }: {
   step: number
   title: string
   description?: string
   error?: string
+  /** The server error key this step reports on, so a failed submit can focus it. */
+  field?: string
   children: ReactNode
 }) {
   const headingId = `checkout-step-${step}`
@@ -19,6 +22,7 @@ export function StepCard({
   return (
     <section
       aria-labelledby={headingId}
+      data-error-field={field}
       className="border-pine/10 rounded-3xl border bg-white/70 p-6 sm:p-7"
     >
       <div className="flex items-start gap-4">
@@ -29,7 +33,11 @@ export function StepCard({
           {step}
         </span>
         <div>
-          <h2 id={headingId} className="font-display text-2xl leading-tight">
+          <h2
+            id={headingId}
+            tabIndex={-1}
+            className="font-display text-2xl leading-tight focus:outline-none"
+          >
             {title}
           </h2>
           {description && (

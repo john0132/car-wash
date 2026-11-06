@@ -8,6 +8,10 @@
 # What the site loads: its own scripts and styles (the Vite bundles), uploaded
 # images from Active Storage, OpenStreetMap tiles on the checkout/address map,
 # and nothing from third parties (fonts are self-hosted).
+# Map tile servers; list your provider's hosts in MAP_TILE_HOSTS (space separated) when you
+# change VITE_MAP_TILE_URL.
+TILE_HOSTS = ENV.fetch("MAP_TILE_HOSTS", "https://tile.openstreetmap.org").split.freeze
+
 Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src :self
@@ -16,7 +20,7 @@ Rails.application.configure do
     policy.frame_ancestors :self
     policy.object_src  :none
     policy.font_src    :self, :data
-    policy.img_src     :self, :data, :blob, "https://tile.openstreetmap.org"
+    policy.img_src     :self, :data, :blob, *TILE_HOSTS
     policy.style_src   :self, :unsafe_inline # Radix/Leaflet set inline styles
     policy.script_src  :self
     policy.connect_src :self
@@ -27,7 +31,7 @@ Rails.application.configure do
       policy.style_src   :self, :unsafe_inline, "http://localhost:*", "http://127.0.0.1:*"
       policy.connect_src :self, "http://localhost:*", "http://127.0.0.1:*", "ws://localhost:*", "ws://127.0.0.1:*"
       policy.font_src    :self, :data, "http://localhost:*", "http://127.0.0.1:*"
-      policy.img_src     :self, :data, :blob, "https://tile.openstreetmap.org", "http://localhost:*", "http://127.0.0.1:*"
+      policy.img_src     :self, :data, :blob, *TILE_HOSTS, "http://localhost:*", "http://127.0.0.1:*"
     end
   end
 

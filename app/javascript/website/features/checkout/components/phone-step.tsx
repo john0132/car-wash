@@ -20,6 +20,7 @@ export function PhoneStep({
 
   return (
     <StepCard
+      field="phone"
       step={step}
       title={t("Phone number")}
       description={t(

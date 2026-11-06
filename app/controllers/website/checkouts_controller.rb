@@ -13,6 +13,7 @@ class Website::CheckoutsController < Website::BaseController
       cars: Current.user.cars.order(:created_at, :id).map { |car| car_props(car) },
       addresses: Current.user.addresses.order(:created_at, :id).map { |address| address_props(address) },
       slots: BookingSlots.grouped,
+      areas: area_options,
       needs_phone: checkout.needs_phone?,
       # Refreshed by a partial reload whenever the customer moves the pin.
       coverage: -> { checkout.coverage }

@@ -25,6 +25,7 @@ export function CarStep({
 
   return (
     <StepCard
+      field="car_id"
       step={step}
       title={t("Your car")}
       description={t("Which car are we washing?")}

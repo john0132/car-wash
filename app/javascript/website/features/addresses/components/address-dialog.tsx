@@ -34,7 +34,9 @@ import type {
   AreaOption,
   CustomerAddress,
 } from "@/website/features/addresses/types"
+import { LocationPicker } from "@/website/features/locations/components/location-picker"
 import { useGeolocation } from "@/website/hooks/use-geolocation"
+import type { Coordinates } from "@/website/hooks/use-geolocation"
 import { useI18n } from "@/website/lib/i18n"
 
 const toErrors = (messages?: string[]) =>
@@ -55,12 +57,19 @@ export function AddressDialog({ trigger, areas, address }: Props) {
     latitude: address ? String(address.latitude) : "",
     longitude: address ? String(address.longitude) : "",
   })
-  const { locate, locating, error } = useGeolocation((c) =>
+  // The map pin and the typed fallback fields are two views of the same two numbers.
+  const setPin = (c: Coordinates) =>
     setCoords({
       latitude: c.latitude.toFixed(6),
       longitude: c.longitude.toFixed(6),
-    }),
-  )
+    })
+  const latitude = Number.parseFloat(coords.latitude)
+  const longitude = Number.parseFloat(coords.longitude)
+  const pin =
+    Number.isFinite(latitude) && Number.isFinite(longitude)
+      ? { latitude, longitude }
+      : null
+  const { locate, locating, error } = useGeolocation(setPin)
 
   const action = address
     ? websiteProfileAddresses.update(address.id)
@@ -103,6 +112,19 @@ export function AddressDialog({ trigger, areas, address }: Props) {
                   name="area_id"
                   defaultValue={address ? String(address.area_id) : undefined}
                   required
+                  // With no pin yet, picking an area puts one inside it.
+                  onValueChange={(id) => {
+                    const area = areas.find((a) => String(a.id) === id)
+                    if (
+                      !pin &&
+                      area?.latitude != null &&
+                      area.longitude != null
+                    )
+                      setPin({
+                        latitude: area.latitude,
+                        longitude: area.longitude,
+                      })
+                  }}
                 >
                   <SelectTrigger id="address_area" className={brandSelect}>
                     <SelectValue placeholder={t("Choose an area")} />
@@ -119,60 +141,75 @@ export function AddressDialog({ trigger, areas, address }: Props) {
                 <FieldError errors={toErrors(errors.area ?? errors.area_id)} />
               </Field>
 
-              <div className="grid grid-cols-2 gap-4">
-                <Field>
-                  <FieldLabel htmlFor="address_latitude">
-                    {t("Latitude")}
-                  </FieldLabel>
-                  <Input
-                    className={brandInput}
-                    id="address_latitude"
-                    name="latitude"
-                    inputMode="decimal"
-                    value={coords.latitude}
-                    onChange={(e) =>
-                      setCoords((c) => ({ ...c, latitude: e.target.value }))
-                    }
-                    placeholder="30.0444"
-                    required
-                  />
-                </Field>
-                <Field>
-                  <FieldLabel htmlFor="address_longitude">
-                    {t("Longitude")}
-                  </FieldLabel>
-                  <Input
-                    className={brandInput}
-                    id="address_longitude"
-                    name="longitude"
-                    inputMode="decimal"
-                    value={coords.longitude}
-                    onChange={(e) =>
-                      setCoords((c) => ({ ...c, longitude: e.target.value }))
-                    }
-                    placeholder="31.2357"
-                    required
-                  />
-                </Field>
-                <div className="col-span-2 -mt-2">
-                  <FieldError errors={toErrors(errors.latitude)} />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-medium">{t("Location")}</span>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className={brandOutlineButton}
+                    onClick={locate}
+                    disabled={locating}
+                  >
+                    {locating ? <Spinner /> : <LocateFixed />}
+                    {t("Use my current location")}
+                  </Button>
                 </div>
-              </div>
+                {error && (
+                  <p role="alert" className="text-danger text-sm">
+                    {error}
+                  </p>
+                )}
+                <LocationPicker position={pin} onChange={setPin} />
+                <FieldError errors={toErrors(errors.latitude)} />
 
-              <Button
-                type="button"
-                variant="outline"
-                onClick={locate}
-                disabled={locating}
-              >
-                {locating ? <Spinner /> : <LocateFixed />}
-                {t("Use my current location")}
-              </Button>
-              {error && (
-                <p role="alert" className="text-destructive -mt-2 text-sm">
-                  {error}
-                </p>
-              )}
+                {/* The pin fills these in; typing is the fallback. */}
+                <details className="text-sm">
+                  <summary className="text-sage hover:text-pine cursor-pointer">
+                    {t("Enter coordinates instead")}
+                  </summary>
+                  <div className="mt-3 grid grid-cols-2 gap-4">
+                    <Field>
+                      <FieldLabel htmlFor="address_latitude">
+                        {t("Latitude")}
+                      </FieldLabel>
+                      <Input
+                        className={brandInput}
+                        id="address_latitude"
+                        name="latitude"
+                        inputMode="decimal"
+                        dir="ltr"
+                        value={coords.latitude}
+                        onChange={(e) =>
+                          setCoords((c) => ({ ...c, latitude: e.target.value }))
+                        }
+                        placeholder="30.0444"
+                      />
+                    </Field>
+                    <Field>
+                      <FieldLabel htmlFor="address_longitude">
+                        {t("Longitude")}
+                      </FieldLabel>
+                      <Input
+                        className={brandInput}
+                        id="address_longitude"
+                        name="longitude"
+                        inputMode="decimal"
+                        dir="ltr"
+                        value={coords.longitude}
+                        onChange={(e) =>
+                          setCoords((c) => ({
+                            ...c,
+                            longitude: e.target.value,
+                          }))
+                        }
+                        placeholder="31.2357"
+                      />
+                    </Field>
+                  </div>
+                </details>
+              </div>
 
               <DialogFooter>
                 <DialogClose asChild>

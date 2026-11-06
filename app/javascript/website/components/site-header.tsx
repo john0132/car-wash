@@ -40,15 +40,18 @@ export function SiteHeader() {
           {auth.user ? (
             <Link
               href={profile()}
-              aria-label={t("My profile")}
               title={auth.user.name}
               className="focus-visible:ring-pine/40 rounded-full focus-visible:ring-2 focus-visible:outline-none"
             >
               <Avatar className="border-pine/15 size-10 border">
-                <AvatarFallback className="bg-pine text-ivory text-sm">
+                <AvatarFallback
+                  aria-hidden
+                  className="bg-pine text-ivory text-sm"
+                >
                   {getInitials(auth.user.name)}
                 </AvatarFallback>
               </Avatar>
+              <span className="sr-only">{t("My profile")}</span>
             </Link>
           ) : (
             <Button

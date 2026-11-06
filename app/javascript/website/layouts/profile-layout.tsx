@@ -73,7 +73,7 @@ export default function ProfileLayout({
                 className={`flex items-center gap-2.5 rounded-[10px] px-3.5 py-2.5 text-[15px] ${
                   active
                     ? "bg-pine/10 font-medium"
-                    : "text-pine/70 hover:bg-pine/5 hover:text-pine"
+                    : "text-pine/80 hover:bg-pine/5 hover:text-pine"
                 }`}
               >
                 <Icon className="size-4" aria-hidden="true" />

@@ -43,7 +43,9 @@ export function SeoHead({
   const { origin } = props.seo
   const { locale } = props
 
-  const [pathname, search = ""] = url.split("?")
+  const [rawPath, search = ""] = url.split("?")
+  // "/ar/" and "/ar" are the same page: keep one form.
+  const pathname = rawPath.length > 1 ? rawPath.replace(/\/+$/, "") : rawPath
   const kept = new URLSearchParams()
   const params = new URLSearchParams(search)
   for (const key of canonicalQuery) {

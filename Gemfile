@@ -86,3 +86,5 @@ group :test do
 end
 
 gem "rails-i18n", "~> 8.1"
+
+gem "axe-core-rspec", "~> 4.14", group: :test

@@ -34,7 +34,7 @@ module BookingSlots
     upcoming(now).group_by(&:to_date).map do |date, slots|
       {
         date: date.iso8601,
-        label: date.strftime("%a %-d %b"),
+        label: I18n.l(date, format: "%a %-d %b"),
         slots: slots.map { |slot| { value: slot.iso8601, label: slot.strftime("%H:%M") } }
       }
     end
