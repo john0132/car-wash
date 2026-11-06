@@ -1,18 +1,18 @@
 import { Head } from "@inertiajs/react"
 
 import { PageHeader } from "@/admin/components/page-header"
-import type { SeoTranslationEntry } from "@/admin/components/seo-fields"
 import { ServiceForm } from "@/admin/features/services/components/service-form"
 import type {
   ServiceCategoryOption,
   ServiceDetail,
+  ServiceTranslationEntry,
 } from "@/admin/features/services/types"
 import AdminLayout from "@/admin/layouts/admin-layout"
 import { adminServices } from "@/routes"
 
 interface Props {
   service: ServiceDetail
-  translations: SeoTranslationEntry[]
+  translations: ServiceTranslationEntry[]
   categories: ServiceCategoryOption[]
 }
 

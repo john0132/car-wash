@@ -35,11 +35,19 @@ export interface ServiceSummary {
   is_active: boolean
 }
 
+/** A service's per-language text: name, headline, description and SEO. */
+export interface ServiceTranslationEntry extends SeoTranslationEntry {
+  title: string
+  description: string
+}
+
 /** Admin::ServicesController#service_props */
 export interface ServiceDetail extends ServiceSummary {
+  slug: string
+  duration_minutes: number | null
   display_in_home_page: boolean
   image: ImageValue | null
-  translations: SeoTranslationEntry[]
+  translations: ServiceTranslationEntry[]
   service_category: { id: number; name: string }
   created_at: string
 }

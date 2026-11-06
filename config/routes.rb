@@ -59,6 +59,8 @@ Rails.application.routes.draw do
       inertia :appearance
     end
 
+    resources :services, only: :show, param: :slug
+
     root "home#index"
 
     # Any other active Page by slug (see Website::PagesController and the

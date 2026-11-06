@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_06_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_06_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -498,6 +498,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_06_120000) do
     t.string "seo_image_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "title"
+    t.text "description"
     t.index ["language_id"], name: "index_service_translations_on_language_id"
     t.index ["service_id", "language_id"], name: "index_service_translations_on_service_and_language", unique: true
     t.index ["service_id"], name: "index_service_translations_on_service_id"
@@ -511,8 +513,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_06_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "display_in_home_page", default: false, null: false
+    t.integer "duration_minutes"
+    t.string "slug", null: false
     t.index ["display_in_home_page"], name: "index_services_on_home_page", where: "display_in_home_page"
     t.index ["service_category_id"], name: "index_services_on_service_category_id"
+    t.index ["slug"], name: "index_services_on_slug", unique: true
   end
 
   create_table "sessions", force: :cascade do |t|

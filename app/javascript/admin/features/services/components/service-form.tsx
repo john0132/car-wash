@@ -1,18 +1,17 @@
 import { Link, useForm } from "@inertiajs/react"
 
 import { asFieldErrors } from "@/admin/components/form-fields"
-import {
-  SeoFields,
-  type SeoTranslationEntry,
-  seoTranslationParams,
-} from "@/admin/components/seo-fields"
+import { SeoFields } from "@/admin/components/seo-fields"
 import { TranslationFields } from "@/admin/components/translation-fields"
 import { FormSection } from "@/admin/features/services/components/form-section"
 import { HomePageFields } from "@/admin/features/services/components/home-page-fields"
+import { ServiceContentFields } from "@/admin/features/services/components/service-content-fields"
 import type {
   ServiceCategoryOption,
   ServiceDetail,
+  ServiceTranslationEntry,
 } from "@/admin/features/services/types"
+import { serviceTranslationParams } from "@/admin/features/services/utils"
 import type { ImageValue } from "@/admin/types"
 import type { RouteDefinition } from "@/routes/runtime"
 import { Button } from "@/shared/components/ui/button"
@@ -36,12 +35,14 @@ import { Switch } from "@/shared/components/ui/switch"
 
 interface ServiceFormData {
   service_category_id: number | null
+  slug: string
   price: string
   sale_price: string
+  duration_minutes: string
   is_active: boolean
   display_in_home_page: boolean
   image: ImageValue | null
-  translations: SeoTranslationEntry[]
+  translations: ServiceTranslationEntry[]
 }
 
 /** Create/edit form for a service. Posts `{ service: {...} }`; a blank sale price clears it. */
@@ -57,7 +58,7 @@ export function ServiceForm({
   service: ServiceDetail | null
   /** Preselected category for a new service. */
   serviceCategoryId: number | null
-  translations: SeoTranslationEntry[]
+  translations: ServiceTranslationEntry[]
   categories: ServiceCategoryOption[]
   action: RouteDefinition<"post" | "patch">
   cancelHref: string
@@ -65,8 +66,11 @@ export function ServiceForm({
 }) {
   const form = useForm<ServiceFormData>({
     service_category_id: service?.service_category.id ?? serviceCategoryId,
+    slug: service?.slug ?? "",
     price: service ? String(service.price) : "",
     sale_price: service?.sale_price != null ? String(service.sale_price) : "",
+    duration_minutes:
+      service?.duration_minutes != null ? String(service.duration_minutes) : "",
     is_active: service?.is_active ?? true,
     display_in_home_page: service?.display_in_home_page ?? false,
     image: service?.image ?? null,
@@ -80,12 +84,14 @@ export function ServiceForm({
   form.transform((values) => ({
     service: {
       service_category_id: values.service_category_id,
+      slug: values.slug,
       price: values.price,
       sale_price: values.sale_price,
+      duration_minutes: values.duration_minutes,
       is_active: values.is_active,
       display_in_home_page: values.display_in_home_page,
       image: values.image?.signed_id ?? "",
-      translations: seoTranslationParams(values.translations),
+      translations: serviceTranslationParams(values.translations),
     },
   }))
 
@@ -138,6 +144,32 @@ export function ServiceForm({
           errors={errors.translations}
         />
 
+        <Field data-invalid={errors.slug ? true : undefined}>
+          <FieldLabel htmlFor="slug">
+            URL slug
+            <span className="text-muted-foreground font-normal">optional</span>
+          </FieldLabel>
+          <Input
+            id="slug"
+            value={data.slug}
+            onChange={(event) =>
+              setData(
+                "slug",
+                event.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, "-"),
+              )
+            }
+            aria-invalid={errors.slug ? true : undefined}
+            placeholder="exterior-wash"
+            className="sm:max-w-sm"
+          />
+          <FieldDescription>
+            The service page lives at /services/
+            {data.slug || "your-slug"}. Leave blank to generate it from the
+            name.
+          </FieldDescription>
+          <FieldError errors={asFieldErrors(errors.slug)} />
+        </Field>
+
         <div className="grid gap-4 sm:grid-cols-2">
           <Field data-invalid={errors.price ? true : undefined}>
             <FieldLabel htmlFor="price">Price (EGP)</FieldLabel>
@@ -179,6 +211,31 @@ export function ServiceForm({
           </Field>
         </div>
 
+        <Field data-invalid={errors.duration_minutes ? true : undefined}>
+          <FieldLabel htmlFor="duration_minutes">
+            Duration (minutes)
+            <span className="text-muted-foreground font-normal">optional</span>
+          </FieldLabel>
+          <Input
+            id="duration_minutes"
+            type="number"
+            inputMode="numeric"
+            min="1"
+            max="1440"
+            step="1"
+            value={data.duration_minutes}
+            onChange={(event) =>
+              setData("duration_minutes", event.target.value)
+            }
+            aria-invalid={errors.duration_minutes ? true : undefined}
+            className="sm:max-w-40"
+          />
+          <FieldDescription>
+            How long the service takes. Shown to customers on its page.
+          </FieldDescription>
+          <FieldError errors={asFieldErrors(errors.duration_minutes)} />
+        </Field>
+
         <HomePageFields
           noun="service"
           image={data.image}
@@ -201,6 +258,16 @@ export function ServiceForm({
             </FieldDescription>
           </FieldContent>
         </Field>
+      </FormSection>
+
+      <FormSection
+        title="Page content"
+        description="The headline and description customers read on the service's page. Optional."
+      >
+        <ServiceContentFields
+          translations={data.translations}
+          onChange={(value) => setData("translations", value)}
+        />
       </FormSection>
 
       <FormSection

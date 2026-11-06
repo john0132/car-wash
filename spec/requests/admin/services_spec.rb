@@ -23,6 +23,53 @@ RSpec.describe "Admin services", type: :request do
     Booking.create!(user: user).booking_items.create!(itemable: service, quantity: 1, price: service.price)
   end
 
+  describe "title, description and duration" do
+    it "stores them and exposes them in the props" do
+      grant(admin, "services.create", "services.read")
+
+      post admin_services_path, params: {
+        service: { service_category_id: category.id, price: "100", duration_minutes: "45",
+                   translations: translations(en: "Wash", ar: "غسيل", title: "The full wash", description: "Inside and out.") }
+      }
+
+      service = Service.last
+      expect(service.duration_minutes).to eq(45)
+      expect(service.translated(:title)).to eq("The full wash")
+
+      get admin_service_path(service)
+      expect(inertia.props[:service]).to include(duration_minutes: 45)
+      expect(inertia.props[:service][:translations].first).to include(title: "The full wash", description: "Inside and out.")
+    end
+
+    it "rejects a non-positive duration" do
+      grant(admin, "services.create")
+
+      expect {
+        post admin_services_path, params: { service: { service_category_id: category.id, price: "100", duration_minutes: "0", translations: translations(en: "Wash") } }
+      }.not_to change(Service, :count)
+    end
+  end
+
+  describe "slug" do
+    it "is generated from the name when blank, and can be set explicitly" do
+      grant(admin, "services.create")
+
+      post admin_services_path, params: { service: { service_category_id: category.id, price: "100", translations: translations(en: "Full Wash") } }
+      post admin_services_path, params: { service: { service_category_id: category.id, price: "100", slug: "Custom-Slug", translations: translations(en: "Full Wash") } }
+
+      expect(Service.order(:id).pluck(:slug)).to eq(%w[full-wash custom-slug])
+    end
+
+    it "rejects a duplicate slug" do
+      grant(admin, "services.create")
+      create_service("Wash", service_category: category)
+
+      expect {
+        post admin_services_path, params: { service: { service_category_id: category.id, price: "100", slug: "wash", translations: translations(en: "Other") } }
+      }.not_to change(Service, :count)
+    end
+  end
+
   describe "GET /admin/services" do
     it "lists services filtered by name, category and status" do
       grant(admin, "services.read")

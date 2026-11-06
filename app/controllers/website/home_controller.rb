@@ -24,6 +24,7 @@ class Website::HomeController < Website::BaseController
       .map do |service|
         {
           id: service.id,
+          slug: service.slug,
           name: service.translation&.name,
           price: service.price.to_f,
           sale_price: service.sale_price&.to_f,

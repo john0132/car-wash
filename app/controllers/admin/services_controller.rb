@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Bookable services, each in a ServiceCategory. Names and SEO text live in
+# Bookable services, each in a ServiceCategory. Names, titles, descriptions and SEO text live in
 # service_translations. Services that were booked can't be deleted, only disabled.
 class Admin::ServicesController < Admin::BaseController
   include Admin::Activation
@@ -8,7 +8,7 @@ class Admin::ServicesController < Admin::BaseController
   include Admin::Pagination
   include Admin::Translations
 
-  TRANSLATION_FIELDS = %i[seo_title seo_description].freeze
+  TRANSLATION_FIELDS = %i[title description seo_title seo_description].freeze
 
   after_action :verify_authorized
 
@@ -100,15 +100,16 @@ class Admin::ServicesController < Admin::BaseController
   end
 
   def service_params
-    @service_params ||= params.expect(service: [ :service_category_id, :price, :sale_price, :is_active, :display_in_home_page, :image,
+    @service_params ||= params.expect(service: [ :service_category_id, :slug, :price, :sale_price, :duration_minutes, :is_active, :display_in_home_page, :image,
                                                  translations: [ [ :language_id, :name, *TRANSLATION_FIELDS ] ] ])
   end
 
   def assign_service(service)
-    service.assign_attributes(service_params.slice(:service_category_id, :price, :is_active, :display_in_home_page))
+    service.assign_attributes(service_params.slice(:service_category_id, :slug, :price, :is_active, :display_in_home_page))
     assign_image(service, :image, service_params[:image]) if service_params.key?(:image)
     # A blank sale price means "no sale", not 0.
     service.sale_price = service_params[:sale_price].presence if service_params.key?(:sale_price)
+    service.duration_minutes = service_params[:duration_minutes].presence if service_params.key?(:duration_minutes)
     assign_translations(service, service_params[:translations], fields: TRANSLATION_FIELDS)
   end
 
@@ -125,9 +126,11 @@ class Admin::ServicesController < Admin::BaseController
   def service_props(service)
     {
       id: service.id,
+      slug: service.slug,
       name: translated_name(service),
       price: service.price.to_f,
       sale_price: service.sale_price&.to_f,
+      duration_minutes: service.duration_minutes,
       is_active: service.is_active,
       display_in_home_page: service.display_in_home_page,
       image: image_prop(service.image),

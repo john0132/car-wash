@@ -8,6 +8,7 @@ import { PageHeader } from "@/admin/components/page-header"
 import { StatCard } from "@/admin/components/stat-card"
 import { TranslationsCard } from "@/admin/features/services/components/translations-card"
 import type { ServiceDetail } from "@/admin/features/services/types"
+import { formatDuration } from "@/admin/features/services/utils"
 import { useCan } from "@/admin/hooks/use-can"
 import AdminLayout from "@/admin/layouts/admin-layout"
 import { formatDate, formatMoney, formatNumber } from "@/admin/lib/format"
@@ -85,7 +86,7 @@ export default function ServiceShow({ service }: Props) {
           }
         />
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard label="Price" value={formatMoney(service.price)} />
           <StatCard
             label="Sale price"
@@ -99,6 +100,10 @@ export default function ServiceShow({ service }: Props) {
                 ? "Not on sale"
                 : `${Math.round((1 - service.sale_price / service.price) * 100)}% off`
             }
+          />
+          <StatCard
+            label="Duration"
+            value={formatDuration(service.duration_minutes) ?? "—"}
           />
           <StatCard
             label="Bookings"

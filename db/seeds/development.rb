@@ -86,10 +86,44 @@ services = [
   translated.(Service, "Full Wash", "غسيل كامل", service_category: exterior, price: 400, sale_price: 350),
   translated.(Service, "Interior Detailing", "تنظيف داخلي", service_category: interior, price: 300)
 ]
+
+# Page content and duration for every service, keyed by English name: [minutes, { code => [title, description] }].
+service_content = {
+  "Exterior Wash" => [ 45, {
+    "en" => [ "A careful hand wash, top to bottom",
+              "We rinse away road film with a pH-neutral foam, wash panel by panel with clean mitts, and dry with soft microfibre so nothing is dragged across the paint.\n\nWheels, arches and door shuts are cleaned too, and the glass is left streak-free." ],
+    "ar" => [ "غسيل يدوي دقيق من الأعلى إلى الأسفل",
+              "نزيل أوساخ الطريق برغوة متعادلة، ونغسل كل جزء من السيارة بقفازات نظيفة، ثم نجففها بقماش ناعم حتى لا يتأذى الطلاء.\n\nننظف العجلات والأطراف الداخلية للأبواب، ونترك الزجاج لامعًا بلا أثر." ]
+  } ],
+  "Full Wash" => [ 120, {
+    "en" => [ "The complete clean, inside and out",
+              "Our full exterior hand wash plus a thorough interior: vacuumed seats and carpets, wiped surfaces and cleaned glass.\n\nThe best choice when the car hasn't had attention in a while, or before a long trip." ],
+    "ar" => [ "تنظيف شامل من الداخل والخارج",
+              "غسيل خارجي يدوي كامل مع تنظيف داخلي دقيق: شفط المقاعد والسجاد، ومسح الأسطح، وتنظيف الزجاج.\n\nالخيار الأمثل عندما تحتاج سيارتك إلى عناية كاملة أو قبل رحلة طويلة." ]
+  } ],
+  "Interior Detailing" => [ 150, {
+    "en" => [ "A cabin that feels new again",
+              "Deep vacuuming, steam cleaning of fabric and carpets, and conditioning for leather and plastics.\n\nWe work through vents, seams and door pockets, where dust and crumbs collect." ],
+    "ar" => [ "مقصورة تبدو كأنها جديدة",
+              "شفط عميق، وتنظيف بالبخار للأقمشة والسجاد، وتغذية الجلد والبلاستيك.\n\nنصل إلى فتحات التهوية والدرزات وجيوب الأبواب حيث يتجمع الغبار والفتات." ]
+  } ]
+}
+services.each do |service|
+  minutes, content = service_content.fetch(service.translation(:en).name)
+  service.update!(duration_minutes: minutes)
+  { "en" => english, "ar" => arabic }.each do |code, language|
+    title, description = content.fetch(code)
+    service.service_translations.find_by!(language: language).update!(title: title, description: description)
+  end
+end
 extras = [
   translated.(Extra, "Tire Shine", "تلميع الإطارات", price: 50),
   translated.(Extra, "Wax Coating", "طبقة شمع", price: 120),
-  translated.(Extra, "Air Freshener", "معطر جو", price: 30)
+  translated.(Extra, "Air Freshener", "معطر جو", price: 30),
+  translated.(Extra, "Headlight Restoration", "تجديد المصابيح الأمامية", price: 180),
+  translated.(Extra, "Engine Bay Cleaning", "تنظيف حجرة المحرك", price: 140),
+  translated.(Extra, "Leather Conditioning", "تغذية الجلد", price: 160),
+  translated.(Extra, "Pet Hair Removal", "إزالة شعر الحيوانات", price: 90)
 ]
 
 # --- Roles and staff ----------------------------------------------------------

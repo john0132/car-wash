@@ -5,6 +5,7 @@ export interface HomeImage {
 /** Website::HomeController#home_services */
 export interface HomeService {
   id: number
+  slug: string
   name: string | null
   price: number
   sale_price: number | null

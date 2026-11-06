@@ -1,3 +1,6 @@
+import { Link } from "@inertiajs/react"
+
+import { service as serviceRoute } from "@/routes"
 import { ImageOrMark } from "@/website/features/home-catalog/components/image-or-mark"
 import type { HomeService } from "@/website/features/home-catalog/types"
 import { formatMoney } from "@/website/features/home-catalog/utils"
@@ -34,7 +37,7 @@ export function ServicesSection({ services }: { services: HomeService[] }) {
           {services.map((service) => (
             <li
               key={service.id}
-              className="group overflow-hidden rounded-3xl border border-[#2B3A32]/10 bg-white transition-shadow duration-300 hover:shadow-[0_24px_48px_-24px_rgba(43,58,50,0.3)]"
+              className="group relative overflow-hidden rounded-3xl border border-[#2B3A32]/10 bg-white transition-shadow duration-300 hover:shadow-[0_24px_48px_-24px_rgba(43,58,50,0.3)]"
             >
               <div className="aspect-[4/3] overflow-hidden">
                 <ImageOrMark image={service.image} />
@@ -47,7 +50,12 @@ export function ServicesSection({ services }: { services: HomeService[] }) {
                 )}
                 <div className="mt-2 flex items-baseline justify-between gap-4">
                   <h3 className="text-lg font-medium text-[#2B3A32]">
-                    {service.name}
+                    <Link
+                      href={serviceRoute(service.slug)}
+                      className="after:absolute after:inset-0 focus-visible:outline-none"
+                    >
+                      {service.name}
+                    </Link>
                   </h3>
                   <p className="flex shrink-0 items-baseline gap-2 text-sm tabular-nums">
                     {service.sale_price !== null ? (
