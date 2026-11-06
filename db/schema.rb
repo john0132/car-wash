@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_06_085519) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_06_100005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -220,6 +220,105 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_06_085519) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["sort_order"], name: "index_faqs_on_sort_order"
+  end
+
+  create_table "footer_column_translations", force: :cascade do |t|
+    t.bigint "footer_column_id", null: false
+    t.bigint "language_id", null: false
+    t.string "title", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["footer_column_id", "language_id"], name: "index_footer_column_translations_on_column_and_language", unique: true
+    t.index ["footer_column_id"], name: "index_footer_column_translations_on_footer_column_id"
+    t.index ["language_id"], name: "index_footer_column_translations_on_language_id"
+  end
+
+  create_table "footer_columns", force: :cascade do |t|
+    t.bigint "footer_id", null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "is_active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["footer_id"], name: "index_footer_columns_on_footer_id"
+  end
+
+  create_table "footer_item_translations", force: :cascade do |t|
+    t.bigint "footer_item_id", null: false
+    t.bigint "language_id", null: false
+    t.string "label", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["footer_item_id", "language_id"], name: "index_footer_item_translations_on_item_and_language", unique: true
+    t.index ["footer_item_id"], name: "index_footer_item_translations_on_footer_item_id"
+    t.index ["language_id"], name: "index_footer_item_translations_on_language_id"
+  end
+
+  create_table "footer_items", force: :cascade do |t|
+    t.bigint "footer_column_id", null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "is_active", default: true, null: false
+    t.string "link_type", default: "page", null: false
+    t.bigint "page_id"
+    t.string "route_key"
+    t.string "url"
+    t.boolean "open_in_new_tab", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["footer_column_id"], name: "index_footer_items_on_footer_column_id"
+    t.index ["page_id"], name: "index_footer_items_on_page_id"
+  end
+
+  create_table "footer_social_links", force: :cascade do |t|
+    t.bigint "footer_id", null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "is_active", default: true, null: false
+    t.string "name", null: false
+    t.string "url", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["footer_id"], name: "index_footer_social_links_on_footer_id"
+  end
+
+  create_table "footer_translations", force: :cascade do |t|
+    t.bigint "footer_id", null: false
+    t.bigint "language_id", null: false
+    t.string "title"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["footer_id", "language_id"], name: "index_footer_translations_on_footer_and_language", unique: true
+    t.index ["footer_id"], name: "index_footer_translations_on_footer_id"
+    t.index ["language_id"], name: "index_footer_translations_on_language_id"
+  end
+
+  create_table "footers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "header_item_translations", force: :cascade do |t|
+    t.bigint "header_item_id", null: false
+    t.bigint "language_id", null: false
+    t.string "label", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["header_item_id", "language_id"], name: "index_header_item_translations_on_item_and_language", unique: true
+    t.index ["header_item_id"], name: "index_header_item_translations_on_header_item_id"
+    t.index ["language_id"], name: "index_header_item_translations_on_language_id"
+  end
+
+  create_table "header_items", force: :cascade do |t|
+    t.integer "position", default: 0, null: false
+    t.boolean "is_active", default: true, null: false
+    t.string "link_type", default: "page", null: false
+    t.bigint "page_id"
+    t.string "route_key"
+    t.string "url"
+    t.boolean "open_in_new_tab", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["page_id"], name: "index_header_items_on_page_id"
+    t.index ["position"], name: "index_header_items_on_position"
   end
 
   create_table "languages", force: :cascade do |t|
@@ -474,6 +573,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_06_085519) do
   add_foreign_key "extra_translations", "languages"
   add_foreign_key "faq_translations", "faqs"
   add_foreign_key "faq_translations", "languages"
+  add_foreign_key "footer_column_translations", "footer_columns"
+  add_foreign_key "footer_column_translations", "languages"
+  add_foreign_key "footer_columns", "footers"
+  add_foreign_key "footer_item_translations", "footer_items"
+  add_foreign_key "footer_item_translations", "languages"
+  add_foreign_key "footer_items", "footer_columns"
+  add_foreign_key "footer_items", "pages"
+  add_foreign_key "footer_social_links", "footers"
+  add_foreign_key "footer_translations", "footers"
+  add_foreign_key "footer_translations", "languages"
+  add_foreign_key "header_item_translations", "header_items"
+  add_foreign_key "header_item_translations", "languages"
+  add_foreign_key "header_items", "pages"
   add_foreign_key "membership_translations", "languages"
   add_foreign_key "membership_translations", "memberships"
   add_foreign_key "page_section_translations", "languages"

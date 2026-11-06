@@ -12,6 +12,9 @@ load Rails.root.join("db/seeds/components.rb")
 # Every environment: the public homepage, built from the components above.
 load Rails.root.join("db/seeds/pages.rb")
 
+# Every environment: the website header links and footer.
+load Rails.root.join("db/seeds/site_chrome.rb")
+
 # Development-only staff account for signing in at /admin/sign_in.
 # Override with ADMIN_EMAIL / ADMIN_PASSWORD. Production admins must be created explicitly.
 if Rails.env.development?

@@ -10,6 +10,8 @@ class Page < ApplicationRecord
   SLUG_REGEXP = /\A#{SLUG_SEGMENT}\z/
 
   has_many :page_translations, dependent: :destroy, autosave: true
+  has_many :header_items, dependent: :destroy
+  has_many :footer_items, dependent: :destroy
   has_many :page_sections, -> { order(:position, :id) }, dependent: :destroy, autosave: true, index_errors: true
 
   requires_default_translation

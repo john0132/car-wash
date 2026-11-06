@@ -12,6 +12,10 @@ class Language < ApplicationRecord
   has_many :service_translations, dependent: :destroy
   has_many :component_translations, dependent: :destroy
   has_many :page_section_translations, dependent: :destroy
+  has_many :header_item_translations, dependent: :destroy
+  has_many :footer_translations, dependent: :destroy
+  has_many :footer_column_translations, dependent: :destroy
+  has_many :footer_item_translations, dependent: :destroy
 
   # Languages added or removed mid-request (seeds, specs) must show up in ids_by_code.
   after_save { Current.language_ids_by_code = nil }

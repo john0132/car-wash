@@ -28,6 +28,27 @@ module ContentHelpers
     end
   end
 
+  def create_header_item(label: "Services", link_type: "url", url: "/services", **attrs)
+    HeaderItem.new(link_type: link_type, url: (url if link_type == "url"), **attrs).tap do |item|
+      item.header_item_translations.build(language: english, label: label)
+      item.save!
+    end
+  end
+
+  def create_footer_column(title: "Company", footer: Footer.instance, **attrs)
+    footer.footer_columns.build(**attrs).tap do |column|
+      column.footer_column_translations.build(language: english, title: title)
+      column.save!
+    end
+  end
+
+  def create_footer_item(column: create_footer_column, label: "About", link_type: "url", url: "/about", **attrs)
+    column.footer_items.build(link_type: link_type, url: (url if link_type == "url"), **attrs).tap do |item|
+      item.footer_item_translations.build(language: english, label: label)
+      item.save!
+    end
+  end
+
   # A blob as if direct-uploaded, for image fields.
   def uploaded_blob(filename: "photo.png")
     ActiveStorage::Blob.create_and_upload!(

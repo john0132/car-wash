@@ -17,8 +17,11 @@ module Translatable
     # Validates that a named translation exists for I18n.default_locale (or,
     # when that language isn't set up, for any language). Translations marked
     # for destruction don't count.
-    def requires_default_translation
-      validate :default_translation_present
+    #
+    # `attribute` is the text that must be present (`name` unless the
+    # translations table calls it something else, e.g. `label`).
+    def requires_default_translation(attribute = :name)
+      validate { default_translation_present(attribute) }
     end
   end
 
@@ -56,14 +59,25 @@ module Translatable
     find.(locale) || find.(I18n.default_locale) || loaded.first
   end
 
+  # One translated attribute (`:label`, `:title`…) for `locale`, taken field by
+  # field: the locale's own text, then the default locale's, then any language's.
+  def translated(attribute, locale = I18n.locale)
+    ids = Language.ids_by_code
+    loaded = translations.to_a
+    preferred = [ ids[locale.to_s], ids[I18n.default_locale.to_s] ].compact
+    ordered = (preferred.filter_map { |id| loaded.find { |t| t.language_id == id } } + loaded).uniq
+
+    ordered.map { |t| t.public_send(attribute) }.find(&:present?)
+  end
+
   private
 
-  def default_translation_present
+  def default_translation_present(attribute = :name)
     default_id = Language.ids_by_code[I18n.default_locale.to_s]
-    named = translations.reject(&:marked_for_destruction?).select { |t| t.name.present? }
+    named = translations.reject(&:marked_for_destruction?).select { |t| t.public_send(attribute).present? }
     return if named.any? { |t| default_id.nil? || t.language_id == default_id }
 
     language = default_id && Language.find_by(id: default_id)&.name
-    errors.add(:translations, language ? "must include a name in #{language}" : "must include at least one name")
+    errors.add(:translations, language ? "must include a #{attribute} in #{language}" : "must include at least one #{attribute}")
   end
 end

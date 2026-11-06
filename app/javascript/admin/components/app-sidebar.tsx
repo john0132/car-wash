@@ -15,6 +15,8 @@ import {
   LayoutGrid,
   Map,
   Newspaper,
+  PanelBottom,
+  PanelTop,
   Receipt,
   ShieldCheck,
   Sparkles,
@@ -37,6 +39,8 @@ import {
   adminEmployees,
   adminExtras,
   adminFaqs,
+  adminFooters,
+  adminHeaderItems,
   adminMemberships,
   adminPages,
   adminPaymentMethods,
@@ -168,6 +172,18 @@ const contentNavItems: (NavItem & { resource: string })[] = [
     href: adminFaqs.index().url,
     icon: HelpCircle,
     resource: "faqs",
+  },
+  {
+    title: "Header",
+    href: adminHeaderItems.edit().url,
+    icon: PanelTop,
+    resource: "header_items",
+  },
+  {
+    title: "Footer",
+    href: adminFooters.edit().url,
+    icon: PanelBottom,
+    resource: "footers",
   },
 ]
 

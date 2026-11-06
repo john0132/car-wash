@@ -28,6 +28,8 @@ Rails.application.routes.draw do
     resources :blogs, except: :show, concerns: :activatable
     resources :components, except: :show, concerns: :activatable
     resources :faqs, except: :show, concerns: :activatable
+    resource :header_navigation, only: %i[edit update], controller: "header_items"
+    resource :footer, only: %i[edit update]
     resources :direct_uploads, only: :create
 
     root "dashboard#index"
