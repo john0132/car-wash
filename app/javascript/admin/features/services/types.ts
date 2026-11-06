@@ -5,6 +5,7 @@ import type { ImageValue } from "@/admin/types"
 /** Admin::ServiceCategoriesController#category_props */
 export interface ServiceCategoryDetail {
   id: number
+  slug: string
   name: string
   is_active: boolean
   display_in_home_page: boolean

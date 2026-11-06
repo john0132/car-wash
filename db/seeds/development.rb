@@ -81,40 +81,106 @@ payment_by_code = payment_methods.index_by(&:code)
 
 exterior = translated.(ServiceCategory, "Exterior", "خارجي")
 interior = translated.(ServiceCategory, "Interior", "داخلي")
-services = [
-  translated.(Service, "Exterior Wash", "غسيل خارجي", service_category: exterior, price: 150),
-  translated.(Service, "Full Wash", "غسيل كامل", service_category: exterior, price: 400, sale_price: 350),
-  translated.(Service, "Interior Detailing", "تنظيف داخلي", service_category: interior, price: 300)
-]
+protection = translated.(ServiceCategory, "Protection", "حماية")
 
-# Page content and duration for every service, keyed by English name: [minutes, { code => [title, description] }].
-service_content = {
-  "Exterior Wash" => [ 45, {
+# Every service gets a full page: prices, duration, copy, SEO text and an image,
+# so no section of the single-service page renders empty.
+# English name => [Arabic name, category, price, sale price, minutes, accent color,
+#                  { code => [title, description, seo title, seo description] }]
+service_catalog = {
+  "Exterior Wash" => [ "غسيل خارجي", exterior, 150, 120, 45, "#2B6CB0", {
     "en" => [ "A careful hand wash, top to bottom",
-              "We rinse away road film with a pH-neutral foam, wash panel by panel with clean mitts, and dry with soft microfibre so nothing is dragged across the paint.\n\nWheels, arches and door shuts are cleaned too, and the glass is left streak-free." ],
+              "We rinse away road film with a pH-neutral foam, wash panel by panel with clean mitts, and dry with soft microfibre so nothing is dragged across the paint.\n\nWheels, arches and door shuts are cleaned too, and the glass is left streak-free.",
+              "Exterior Hand Car Wash",
+              "A careful pH-neutral hand wash with wheels, arches and glass cleaned, done at your door." ],
     "ar" => [ "غسيل يدوي دقيق من الأعلى إلى الأسفل",
-              "نزيل أوساخ الطريق برغوة متعادلة، ونغسل كل جزء من السيارة بقفازات نظيفة، ثم نجففها بقماش ناعم حتى لا يتأذى الطلاء.\n\nننظف العجلات والأطراف الداخلية للأبواب، ونترك الزجاج لامعًا بلا أثر." ]
+              "نزيل أوساخ الطريق برغوة متعادلة، ونغسل كل جزء من السيارة بقفازات نظيفة، ثم نجففها بقماش ناعم حتى لا يتأذى الطلاء.\n\nننظف العجلات والأطراف الداخلية للأبواب، ونترك الزجاج لامعًا بلا أثر.",
+              "غسيل خارجي يدوي للسيارة",
+              "غسيل يدوي دقيق برغوة متعادلة مع تنظيف العجلات والزجاج، حتى باب منزلك." ]
   } ],
-  "Full Wash" => [ 120, {
+  "Full Wash" => [ "غسيل كامل", exterior, 400, 350, 120, "#2F855A", {
     "en" => [ "The complete clean, inside and out",
-              "Our full exterior hand wash plus a thorough interior: vacuumed seats and carpets, wiped surfaces and cleaned glass.\n\nThe best choice when the car hasn't had attention in a while, or before a long trip." ],
+              "Our full exterior hand wash plus a thorough interior: vacuumed seats and carpets, wiped surfaces and cleaned glass.\n\nThe best choice when the car hasn't had attention in a while, or before a long trip.",
+              "Full Interior and Exterior Car Wash",
+              "A full hand wash plus a thorough interior clean: vacuumed seats and carpets, wiped surfaces and spotless glass." ],
     "ar" => [ "تنظيف شامل من الداخل والخارج",
-              "غسيل خارجي يدوي كامل مع تنظيف داخلي دقيق: شفط المقاعد والسجاد، ومسح الأسطح، وتنظيف الزجاج.\n\nالخيار الأمثل عندما تحتاج سيارتك إلى عناية كاملة أو قبل رحلة طويلة." ]
+              "غسيل خارجي يدوي كامل مع تنظيف داخلي دقيق: شفط المقاعد والسجاد، ومسح الأسطح، وتنظيف الزجاج.\n\nالخيار الأمثل عندما تحتاج سيارتك إلى عناية كاملة أو قبل رحلة طويلة.",
+              "غسيل كامل للسيارة داخليًا وخارجيًا",
+              "غسيل يدوي كامل مع تنظيف داخلي شامل للمقاعد والسجاد والأسطح والزجاج." ]
   } ],
-  "Interior Detailing" => [ 150, {
+  "Interior Detailing" => [ "تنظيف داخلي", interior, 300, 260, 150, "#B7791F", {
     "en" => [ "A cabin that feels new again",
-              "Deep vacuuming, steam cleaning of fabric and carpets, and conditioning for leather and plastics.\n\nWe work through vents, seams and door pockets, where dust and crumbs collect." ],
+              "Deep vacuuming, steam cleaning of fabric and carpets, and conditioning for leather and plastics.\n\nWe work through vents, seams and door pockets, where dust and crumbs collect.",
+              "Interior Car Detailing",
+              "Deep vacuuming, steam cleaning and leather conditioning that make your cabin feel new again." ],
     "ar" => [ "مقصورة تبدو كأنها جديدة",
-              "شفط عميق، وتنظيف بالبخار للأقمشة والسجاد، وتغذية الجلد والبلاستيك.\n\nنصل إلى فتحات التهوية والدرزات وجيوب الأبواب حيث يتجمع الغبار والفتات." ]
+              "شفط عميق، وتنظيف بالبخار للأقمشة والسجاد، وتغذية الجلد والبلاستيك.\n\nنصل إلى فتحات التهوية والدرزات وجيوب الأبواب حيث يتجمع الغبار والفتات.",
+              "تنظيف وتلميع داخلي للسيارة",
+              "شفط عميق وتنظيف بالبخار وتغذية للجلد لتبدو مقصورتك كأنها جديدة." ]
+  } ],
+  "Ceramic Coating" => [ "طلاء السيراميك", protection, 2500, 2200, 240, "#6B46C1", {
+    "en" => [ "Lasting gloss and protection",
+              "After a full paint decontamination, we apply a ceramic coating that bonds to the clear coat and repels water, dirt and UV.\n\nThe paint stays glossy and is far easier to wash for up to two years.",
+              "Ceramic Paint Coating",
+              "A durable ceramic coating that repels water, dirt and UV and keeps your paint glossy for up to two years." ],
+    "ar" => [ "لمعان وحماية تدومان طويلًا",
+              "بعد تنظيف الطلاء بالكامل، نضع طبقة سيراميك تلتصق بالطلاء الشفاف وتطرد الماء والأوساخ والأشعة فوق البنفسجية.\n\nيبقى الطلاء لامعًا وأسهل في الغسيل لمدة تصل إلى عامين.",
+              "طلاء السيراميك للسيارة",
+              "طبقة سيراميك متينة تطرد الماء والأوساخ وتحافظ على لمعان الطلاء حتى عامين." ]
+  } ],
+  "Paint Polish & Wax" => [ "تلميع ودهان الشمع", ServiceCategory.find_by(slug: "detailing") || protection, 600, 520, 180, "#C53030", {
+    "en" => [ "Deep shine with a protective wax finish",
+              "We machine-polish the paint to remove swirls and light scratches, then seal it with a hand-applied wax.\n\nThe result is a deep, mirror-like shine that protects the paint for months.",
+              "Paint Polish and Wax",
+              "Machine polishing removes swirls and light scratches, followed by a protective hand-applied wax." ],
+    "ar" => [ "لمعان عميق مع طبقة شمع واقية",
+              "نصقل الطلاء آليًا لإزالة الخدوش الخفيفة والدوامات، ثم نغطيه بطبقة شمع تُوضع يدويًا.\n\nالنتيجة لمعان عميق كالمرآة وحماية للطلاء لعدة أشهر.",
+              "تلميع الطلاء ودهان الشمع",
+              "تلميع آلي يزيل الخدوش الخفيفة متبوعًا بطبقة شمع واقية تُوضع يدويًا." ]
+  } ],
+  "Headlight Polishing" => [ "تلميع المصابيح", protection, 250, 200, 60, "#C05621", {
+    "en" => [ "Clear, bright headlights again",
+              "We sand and polish yellowed or foggy headlight lenses, then seal them against UV so they stay clear.\n\nBetter night visibility and a car that looks years younger.",
+              "Headlight Polishing and Restoration",
+              "Restore yellowed, foggy headlights to a clear finish with a UV seal for better night visibility." ],
+    "ar" => [ "مصابيح أمامية صافية ومضيئة من جديد",
+              "نصقل عدسات المصابيح المصفرة أو الضبابية ونغطيها بطبقة حماية من الأشعة فوق البنفسجية لتبقى صافية.\n\nرؤية أفضل ليلًا ومظهر أحدث للسيارة.",
+              "تلميع وتجديد المصابيح الأمامية",
+              "استعادة صفاء المصابيح المصفرة مع طبقة حماية لرؤية أفضل ليلًا." ]
   } ]
 }
-services.each do |service|
-  minutes, content = service_content.fetch(service.translation(:en).name)
-  service.update!(duration_minutes: minutes)
-  { "en" => english, "ar" => arabic }.each do |code, language|
-    title, description = content.fetch(code)
-    service.service_translations.find_by!(language: language).update!(title: title, description: description)
+
+# A simple branded placeholder illustration: a car silhouette on a tinted backdrop.
+service_image = lambda do |label, color|
+  svg = <<~SVG
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+      <rect width="800" height="600" fill="#{color}" opacity="0.15"/>
+      <rect width="800" height="600" fill="#F6F1E7" opacity="0.6"/>
+      <path d="M130 380 L180 290 Q200 260 240 260 L520 260 Q570 260 600 300 L660 380 Z" fill="#{color}"/>
+      <rect x="110" y="370" width="580" height="60" rx="24" fill="#{color}"/>
+      <circle cx="240" cy="440" r="42" fill="#2B3A32"/><circle cx="240" cy="440" r="18" fill="#F6F1E7"/>
+      <circle cx="560" cy="440" r="42" fill="#2B3A32"/><circle cx="560" cy="440" r="18" fill="#F6F1E7"/>
+      <text x="400" y="540" text-anchor="middle" font-family="sans-serif" font-size="40" fill="#2B3A32">#{label}</text>
+    </svg>
+  SVG
+  { io: StringIO.new(svg), filename: "#{label.parameterize}.svg", content_type: "image/svg+xml" }
+end
+
+protection.update!(is_active: true)
+unless protection.image.attached?
+  protection.image.attach(service_image.("Protection", "#6B46C1"))
+end
+
+services = service_catalog.map do |en_name, (ar_name, category, price, sale_price, minutes, color, content)|
+  service = translated.(Service, en_name, ar_name, service_category: category, price: price)
+  service.update!(price: price, sale_price: sale_price, duration_minutes: minutes, is_active: true)
+  content.each do |code, (title, description, seo_title, seo_description)|
+    language = code == "en" ? english : arabic
+    service.service_translations.find_by!(language: language)
+      .update!(title: title, description: description, seo_title: seo_title, seo_description: seo_description)
   end
+  service.image.attach(service_image.(en_name, color)) unless service.image.attached?
+  service
 end
 extras = [
   translated.(Extra, "Tire Shine", "تلميع الإطارات", price: 50),

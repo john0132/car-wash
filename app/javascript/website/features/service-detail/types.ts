@@ -13,6 +13,7 @@ export interface ServiceDetail {
   sale_price: number | null
   duration_minutes: number | null
   category: string | null
+  category_slug: string
   image: HomeImage | null
 }
 

@@ -1,5 +1,6 @@
 import { Link, useForm } from "@inertiajs/react"
 
+import { asFieldErrors } from "@/admin/components/form-fields"
 import {
   SeoFields,
   type SeoTranslationEntry,
@@ -16,19 +17,22 @@ import {
   Field,
   FieldContent,
   FieldDescription,
+  FieldError,
   FieldLabel,
 } from "@/shared/components/ui/field"
+import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
 import { Switch } from "@/shared/components/ui/switch"
 
 interface ServiceCategoryFormData {
+  slug: string
   is_active: boolean
   display_in_home_page: boolean
   image: ImageValue | null
   translations: SeoTranslationEntry[]
 }
 
-/** Create/edit form for a service category. Posts `{ service_category: { is_active, display_in_home_page, image, translations } }`. */
+/** Create/edit form for a service category. Posts `{ service_category: { slug, is_active, display_in_home_page, image, translations } }`. */
 export function ServiceCategoryForm({
   category,
   translations,
@@ -44,6 +48,7 @@ export function ServiceCategoryForm({
   submitLabel: string
 }) {
   const form = useForm<ServiceCategoryFormData>({
+    slug: category?.slug ?? "",
     is_active: category?.is_active ?? true,
     display_in_home_page: category?.display_in_home_page ?? false,
     image: category?.image ?? null,
@@ -54,6 +59,7 @@ export function ServiceCategoryForm({
 
   form.transform((values) => ({
     service_category: {
+      slug: values.slug,
       is_active: values.is_active,
       display_in_home_page: values.display_in_home_page,
       image: values.image?.signed_id ?? "",
@@ -75,6 +81,31 @@ export function ServiceCategoryForm({
           onChange={(value) => setData("translations", value)}
           errors={errors.translations}
         />
+
+        <Field data-invalid={errors.slug ? true : undefined}>
+          <FieldLabel htmlFor="slug">
+            URL slug
+            <span className="text-muted-foreground font-normal">optional</span>
+          </FieldLabel>
+          <Input
+            id="slug"
+            value={data.slug}
+            onChange={(event) =>
+              setData(
+                "slug",
+                event.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, "-"),
+              )
+            }
+            aria-invalid={errors.slug ? true : undefined}
+            placeholder="exterior"
+            className="sm:max-w-sm"
+          />
+          <FieldDescription>
+            The category page lives at /categories/{data.slug || "your-slug"}.
+            Leave blank to generate it from the name.
+          </FieldDescription>
+          <FieldError errors={asFieldErrors(errors.slug)} />
+        </Field>
 
         <HomePageFields
           noun="category"

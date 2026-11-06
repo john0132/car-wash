@@ -44,6 +44,7 @@ class Website::HomeController < Website::BaseController
     categories.map do |category|
       {
         id: category.id,
+        slug: category.slug,
         name: category.translation&.name,
         services_count: counts.fetch(category.id, 0),
         image: blob_prop(category.image)

@@ -2,6 +2,7 @@
 
 class ServiceCategory < ApplicationRecord
   include Activatable
+  include Sluggable
   include Translatable
 
   # A category can only be deleted once its services are gone (services can be on bookings).
@@ -10,6 +11,7 @@ class ServiceCategory < ApplicationRecord
   has_one_attached :image
 
   requires_default_translation
+  sluggable fallback: "category"
 
   # Shown in the homepage's Service Categories section: flagged and active.
   scope :on_home_page, -> { where(display_in_home_page: true, is_active: true) }

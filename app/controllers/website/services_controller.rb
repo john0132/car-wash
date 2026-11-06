@@ -37,6 +37,7 @@ class Website::ServicesController < Website::BaseController
       sale_price: service.sale_price&.to_f,
       duration_minutes: service.duration_minutes,
       category: service.service_category.translation&.name,
+      category_slug: service.service_category.slug,
       image: blob_prop(service.image)
     }
   end

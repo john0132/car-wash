@@ -60,6 +60,7 @@ Rails.application.routes.draw do
     end
 
     resources :services, only: :show, param: :slug
+    resources :service_categories, only: :show, param: :slug, path: "categories"
 
     root "home#index"
 

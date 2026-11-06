@@ -3,6 +3,7 @@
 class Service < ApplicationRecord
   include Activatable
   include PolymorphicTypeCode
+  include Sluggable
   include Translatable
 
   belongs_to :service_category
@@ -12,8 +13,7 @@ class Service < ApplicationRecord
 
   requires_default_translation
 
-  before_validation :generate_slug, if: -> { slug.blank? }
-  before_validation { self.slug = slug.to_s.strip.downcase.presence }
+  sluggable fallback: "service"
 
   # Shown in the homepage's Services section: flagged, active, and in an active category.
   scope :on_home_page, -> {
@@ -21,22 +21,23 @@ class Service < ApplicationRecord
       .where(service_category_id: ServiceCategory.where(is_active: true).select(:id))
   }
 
-  validates :slug, presence: true, uniqueness: true, format: { with: Page::SLUG_REGEXP }
+  # What the customer pays: the sale price when there is one, else the price.
+  EFFECTIVE_PRICE = Arel.sql("COALESCE(services.sale_price, services.price)")
+
+  scope :publicly_listed, -> { where(is_active: true) }
+  scope :on_sale, -> { where.not(sale_price: nil) }
+  scope :priced_at_least, ->(amount) { amount ? where("COALESCE(services.sale_price, services.price) >= ?", amount) : all }
+  scope :priced_at_most, ->(amount) { amount ? where("COALESCE(services.sale_price, services.price) <= ?", amount) : all }
+  scope :lasting_at_most, ->(minutes) { minutes ? where(duration_minutes: ..minutes) : all }
+  scope :cheapest_first, -> { order(EFFECTIVE_PRICE, :id) }
+  scope :priciest_first, -> { order(Arel.sql("COALESCE(services.sale_price, services.price) DESC"), :id) }
+
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :sale_price, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :duration_minutes, numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 1440 }, allow_nil: true
   validate :sale_price_below_price
 
   private
-
-  # "exterior-wash" from the default-language name; numbered when already taken.
-  def generate_slug
-    name = translated(:name, I18n.default_locale).to_s
-    base = name.parameterize.presence || "service"
-    candidate = base
-    candidate = "#{base}-#{SecureRandom.hex(2)}" while Service.where.not(id: id).exists?(slug: candidate)
-    self.slug = candidate
-  end
 
   def sale_price_below_price
     return if sale_price.blank? || price.blank?

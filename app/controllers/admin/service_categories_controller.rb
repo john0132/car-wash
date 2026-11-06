@@ -104,11 +104,12 @@ class Admin::ServiceCategoriesController < Admin::BaseController
   end
 
   def category_params
-    @category_params ||= params.expect(service_category: [ :is_active, :display_in_home_page, :image,
+    @category_params ||= params.expect(service_category: [ :slug, :is_active, :display_in_home_page, :image,
                                                            translations: [ [ :language_id, :name, *TRANSLATION_FIELDS ] ] ])
   end
 
   def assign_category(category)
+    category.slug = category_params[:slug] if category_params.key?(:slug)
     category.is_active = category_params[:is_active] if category_params.key?(:is_active)
     category.display_in_home_page = category_params[:display_in_home_page] if category_params.key?(:display_in_home_page)
     assign_image(category, :image, category_params[:image]) if category_params.key?(:image)
@@ -118,6 +119,7 @@ class Admin::ServiceCategoriesController < Admin::BaseController
   def category_props(category)
     {
       id: category.id,
+      slug: category.slug,
       name: translated_name(category),
       is_active: category.is_active,
       display_in_home_page: category.display_in_home_page,

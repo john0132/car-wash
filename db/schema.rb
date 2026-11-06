@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_06_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_06_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -472,7 +472,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_06_140000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "display_in_home_page", default: false, null: false
+    t.string "slug", null: false
     t.index ["display_in_home_page"], name: "index_service_categories_on_home_page", where: "display_in_home_page"
+    t.index ["slug"], name: "index_service_categories_on_slug", unique: true
   end
 
   create_table "service_category_translations", force: :cascade do |t|

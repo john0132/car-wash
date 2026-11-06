@@ -1,7 +1,7 @@
 import { Head, Link } from "@inertiajs/react"
 import { useState } from "react"
 
-import { root } from "@/routes"
+import { root, serviceCategory } from "@/routes"
 import { SiteFooter } from "@/website/components/site-footer"
 import { SiteHeader } from "@/website/components/site-header"
 import { ImageOrMark } from "@/website/features/home-catalog/components/image-or-mark"
@@ -78,7 +78,14 @@ function ServicePage({ service, related, extras }: Props) {
                   {service.category && (
                     <>
                       <li aria-hidden>/</li>
-                      <li>{service.category}</li>
+                      <li>
+                        <Link
+                          href={serviceCategory(service.category_slug)}
+                          className="hover:text-[#2B3A32]"
+                        >
+                          {service.category}
+                        </Link>
+                      </li>
                     </>
                   )}
                 </ol>
