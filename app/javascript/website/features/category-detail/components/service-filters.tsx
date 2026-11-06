@@ -106,12 +106,24 @@ export function ServiceFilters({
   const priceHint = (value: number | null | undefined) =>
     value === null || value === undefined ? "" : String(value)
 
+  const labelClass =
+    "text-[11px] font-medium tracking-[0.14em] text-[#5B6B5E] uppercase"
+  const fieldClass =
+    "h-11 rounded-xl border-[#2B3A32]/15 bg-[#F6F1E7]/60 dark:bg-[#F6F1E7]/60 dark:hover:bg-[#F6F1E7]/60 text-sm shadow-none focus-visible:border-[#8A6240] focus-visible:ring-[#8A6240]/25 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+  const triggerClass =
+    "!h-11 w-full rounded-xl border-[#2B3A32]/15 bg-[#F6F1E7]/60 dark:bg-[#F6F1E7]/60 dark:hover:bg-[#F6F1E7]/60 text-sm shadow-none focus-visible:border-[#8A6240] focus-visible:ring-[#8A6240]/25"
+
+  const showOnSale = facets === undefined || facets.on_sale_count > 0
+
   return (
-    <div className="space-y-4" role="search">
+    <div
+      role="search"
+      className="rounded-3xl border border-[#2B3A32]/10 bg-white p-4 sm:p-6"
+    >
       <div className="relative">
         <Search
           aria-hidden
-          className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-[#5B6B5E]"
+          className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-[#8A6240]"
         />
         <Input
           type="search"
@@ -123,20 +135,20 @@ export function ServiceFilters({
           placeholder="Search services"
           aria-label="Search services"
           maxLength={100}
-          className="h-12 rounded-full border-[#2B3A32]/15 bg-white pl-11 text-base"
+          className="h-12 rounded-xl border-[#2B3A32]/15 bg-[#F6F1E7]/60 pl-12 text-base shadow-none focus-visible:border-[#8A6240] focus-visible:ring-[#8A6240]/25 dark:bg-[#F6F1E7]/60 dark:hover:bg-[#F6F1E7]/60"
         />
       </div>
 
-      <div className="flex flex-wrap items-end gap-x-5 gap-y-4">
-        <label className="grid gap-1.5 text-xs font-medium tracking-wide text-[#5B6B5E] uppercase">
-          Price (EGP)
-          <span className="flex items-center gap-2">
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
+        <div className="grid gap-2">
+          <span className={labelClass}>Price (EGP)</span>
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
             <Input
               type="number"
               inputMode="decimal"
               min={0}
               value={minPrice}
-              placeholder={priceHint(facets?.min_price)}
+              placeholder={priceHint(facets?.min_price) || "Min"}
               aria-label="Minimum price"
               onChange={(event) => {
                 setMinPrice(event.target.value)
@@ -145,15 +157,17 @@ export function ServiceFilters({
                   DEBOUNCE_MS,
                 )
               }}
-              className="w-24 rounded-full border-[#2B3A32]/15 bg-white"
+              className={fieldClass}
             />
-            <span aria-hidden>–</span>
+            <span aria-hidden className="text-[#5B6B5E]">
+              –
+            </span>
             <Input
               type="number"
               inputMode="decimal"
               min={0}
               value={maxPrice}
-              placeholder={priceHint(facets?.max_price)}
+              placeholder={priceHint(facets?.max_price) || "Max"}
               aria-label="Maximum price"
               onChange={(event) => {
                 setMaxPrice(event.target.value)
@@ -162,13 +176,15 @@ export function ServiceFilters({
                   DEBOUNCE_MS,
                 )
               }}
-              className="w-24 rounded-full border-[#2B3A32]/15 bg-white"
+              className={fieldClass}
             />
-          </span>
-        </label>
+          </div>
+        </div>
 
-        <div className="grid gap-1.5 text-xs font-medium tracking-wide text-[#5B6B5E] uppercase">
-          <span id="duration-label">Duration</span>
+        <div className="grid gap-2">
+          <span id="duration-label" className={labelClass}>
+            Duration
+          </span>
           <Select
             value={filters.max_duration?.toString() ?? ANY}
             onValueChange={(value) =>
@@ -177,7 +193,7 @@ export function ServiceFilters({
           >
             <SelectTrigger
               aria-labelledby="duration-label"
-              className="w-40 rounded-full border-[#2B3A32]/15 bg-white"
+              className={triggerClass}
             >
               <SelectValue />
             </SelectTrigger>
@@ -192,15 +208,17 @@ export function ServiceFilters({
           </Select>
         </div>
 
-        <div className="grid gap-1.5 text-xs font-medium tracking-wide text-[#5B6B5E] uppercase">
-          <span id="sort-label">Sort by</span>
+        <div className="grid gap-2">
+          <span id="sort-label" className={labelClass}>
+            Sort by
+          </span>
           <Select
             value={filters.sort}
             onValueChange={(value) => apply({ sort: value as SortOption })}
           >
             <SelectTrigger
               aria-labelledby="sort-label"
-              className="w-48 rounded-full border-[#2B3A32]/15 bg-white"
+              className={triggerClass}
             >
               <SelectValue />
             </SelectTrigger>
@@ -213,33 +231,39 @@ export function ServiceFilters({
             </SelectContent>
           </Select>
         </div>
-
-        {(facets === undefined || facets.on_sale_count > 0) && (
-          <button
-            type="button"
-            aria-pressed={filters.on_sale}
-            onClick={() => apply({ on_sale: !filters.on_sale })}
-            className={`h-9 rounded-full border px-4 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:outline-none ${
-              filters.on_sale
-                ? "border-[#2B3A32] bg-[#2B3A32] text-[#F6F1E7]"
-                : "border-[#2B3A32]/15 bg-white text-[#2B3A32] hover:border-[#2B3A32]/40"
-            }`}
-          >
-            On sale
-          </button>
-        )}
-
-        {hasActiveFilters(filters) && (
-          <button
-            type="button"
-            onClick={clearAll}
-            className="flex h-9 items-center gap-1.5 text-sm text-[#8A6240] underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
-          >
-            <X aria-hidden className="size-4" />
-            Clear all
-          </button>
-        )}
       </div>
+
+      {(showOnSale || hasActiveFilters(filters)) && (
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-[#2B3A32]/10 pt-4">
+          {showOnSale ? (
+            <button
+              type="button"
+              aria-pressed={filters.on_sale}
+              onClick={() => apply({ on_sale: !filters.on_sale })}
+              className={`h-9 rounded-full border px-4 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:outline-none ${
+                filters.on_sale
+                  ? "border-[#2B3A32] bg-[#2B3A32] text-[#F6F1E7]"
+                  : "border-[#2B3A32]/15 bg-white text-[#2B3A32] hover:border-[#2B3A32]/40"
+              }`}
+            >
+              On sale
+            </button>
+          ) : (
+            <span />
+          )}
+
+          {hasActiveFilters(filters) && (
+            <button
+              type="button"
+              onClick={clearAll}
+              className="flex h-9 items-center gap-1.5 text-sm text-[#8A6240] underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none"
+            >
+              <X aria-hidden className="size-4" />
+              Clear all
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }

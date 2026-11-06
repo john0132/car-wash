@@ -10,6 +10,19 @@ RSpec.describe "Website services", type: :request do
 
   let(:category) { create_service_category("Exterior") }
 
+  it "lists active services grouped by active category" do
+    create_service("Wax", service_category: category, price: 80)
+    create_service("Hidden", service_category: category, price: 80, is_active: false)
+    create_service("Off", service_category: create_service_category("Off", is_active: false))
+    create_service_category("Empty")
+
+    get services_path
+
+    expect_inertia.to render_component("website/services/index")
+    expect(inertia.props[:categories].pluck(:name)).to eq([ "Exterior" ])
+    expect(inertia.props[:categories].first[:services].pluck(:name)).to eq([ "Wax" ])
+  end
+
   it "renders an active service with its title, description and duration" do
     service = create_service("Exterior Wash", service_category: category, price: 150, duration_minutes: 45)
     service.service_translations.first.update!(title: "A careful hand wash", description: "Two paragraphs.")

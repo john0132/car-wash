@@ -20,6 +20,7 @@ module Linkable
     "sign_in" => :sign_in_path,
     "sign_up" => :sign_up_path,
     "faqs" => :faqs_path,
+    "services" => :services_path,
     "blogs" => :blogs_path,
     "contact" => :contact_path
   }.freeze

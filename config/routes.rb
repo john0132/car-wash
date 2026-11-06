@@ -64,7 +64,7 @@ Rails.application.routes.draw do
     resources :faqs, only: :index
     resource :contact, only: %i[show create]
     resources :blogs, only: %i[index show], param: :slug
-    resources :services, only: :show, param: :slug
+    resources :services, only: %i[index show], param: :slug
     resources :service_categories, only: :show, param: :slug, path: "categories"
 
     root "home#index"

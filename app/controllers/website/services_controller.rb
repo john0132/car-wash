@@ -1,11 +1,34 @@
 # frozen_string_literal: true
 
-# A single service's public page, addressed by slug. Only active services in active
+# The public services list (index) and a single service's page (show, addressed by slug). Only active services in active
 # categories are shown; anything else is a 404. The add-on extras are an optional
 # prop: the page asks for them (page by page) when the visitor opens the extras drawer.
 class Website::ServicesController < Website::BaseController
   skip_before_action :authenticate
   before_action :perform_authentication
+
+  # Every active service in an active category, grouped by category: the starting point
+  # for booking. Categories without active services are left out.
+  def index
+    categories = ServiceCategory.where(is_active: true).ordered_by_name
+      .includes(:service_category_translations).to_a
+    services = Service.publicly_listed.where(service_category_id: categories.map(&:id)).ordered_by_name
+      .includes(:service_translations, image_attachment: :blob).group_by(&:service_category_id)
+
+    render inertia: {
+      categories: categories.filter_map do |category|
+        items = services[category.id]
+        next if items.blank?
+
+        {
+          id: category.id,
+          slug: category.slug,
+          name: category.translation&.name,
+          services: items.map { |item| service_card_props(item) }
+        }
+      end
+    }
+  end
 
   def show
     service = Service.includes(:service_translations, image_attachment: :blob,
@@ -75,6 +98,18 @@ class Website::ServicesController < Website::BaseController
           image: blob_prop(other.image)
         }
       end
+  end
+
+  def service_card_props(service)
+    {
+      id: service.id,
+      slug: service.slug,
+      name: service.translation&.name,
+      price: service.price.to_f,
+      sale_price: service.sale_price&.to_f,
+      duration_minutes: service.duration_minutes,
+      image: blob_prop(service.image)
+    }
   end
 
   def blob_prop(attachment)

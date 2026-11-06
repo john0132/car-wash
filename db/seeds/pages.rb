@@ -20,7 +20,7 @@ unless Page.exists?(slug: "home")
   )
 
   page.page_sections.build(component: hero, position: 0).assign_values(
-    settings: { "alignment" => "left", "button_url" => "/sign_up" },
+    settings: { "alignment" => "left", "button_url" => "/services" },
     content_by_language: {
       english.id => {
         "heading" => "An unhurried shine for your car",
@@ -96,7 +96,7 @@ unless Page.exists?(slug: "home")
   )
 
   page.page_sections.build(component: cta, position: 3).assign_values(
-    settings: { "variant" => "primary", "button_url" => "/sign_up" },
+    settings: { "variant" => "primary", "button_url" => "/services" },
     content_by_language: {
       english.id => {
         "heading" => "Make it a habit, not an errand",

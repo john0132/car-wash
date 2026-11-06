@@ -1,7 +1,7 @@
 import { Link, usePage } from "@inertiajs/react"
 import { User } from "lucide-react"
 
-import { profile, signIn, signUp } from "@/routes"
+import { profile, services, signIn } from "@/routes"
 import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar"
 import { Button } from "@/shared/components/ui/button"
 import { useInitials } from "@/shared/hooks/use-initials"
@@ -57,7 +57,7 @@ export function SiteHeader() {
             asChild
             className="rounded-full bg-[#2B3A32] px-5 text-[#F6F1E7] hover:bg-[#1F2B25]"
           >
-            <Link href={signUp()}>Book your visit</Link>
+            <Link href={services()}>Book your visit</Link>
           </Button>
         </div>
       </div>
