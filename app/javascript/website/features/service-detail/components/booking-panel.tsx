@@ -1,9 +1,9 @@
 import { Link } from "@inertiajs/react"
-import { Clock } from "lucide-react"
+import { Check, Clock, X } from "lucide-react"
 
-import { signUp } from "@/routes"
+import { checkout } from "@/routes"
 import { formatMoney } from "@/website/features/home-catalog/utils"
-import { ExtrasDrawer } from "@/website/features/service-detail/components/extras-drawer"
+import { ExtrasDialog } from "@/website/features/service-detail/components/extras-dialog"
 import type {
   ExtraOption,
   ExtrasPage,
@@ -11,28 +11,33 @@ import type {
 } from "@/website/features/service-detail/types"
 import { formatDuration } from "@/website/features/service-detail/utils"
 
-/** Price, duration and the booking call to action, laid over the image's lower edge. */
+/**
+ * Price, duration, the chosen extras and the "Book now" call to action, laid
+ * over the image's lower edge. Totals are left to checkout, which prices
+ * everything on the server.
+ */
 export function BookingPanel({
   service,
   extras,
   selectedExtras,
-  onToggleExtra,
+  onExtrasChange,
 }: {
   service: ServiceDetail
   extras: ExtrasPage | undefined
   selectedExtras: ExtraOption[]
-  onToggleExtra: (extra: ExtraOption) => void
+  onExtrasChange: (extras: ExtraOption[]) => void
 }) {
   const duration = formatDuration(service.duration_minutes)
   const onSale = service.sale_price !== null
-  const extrasTotal = selectedExtras.reduce(
-    (sum, extra) => sum + extra.price,
-    0,
-  )
-  const total = (service.sale_price ?? service.price) + extrasTotal
   const savings = onSale
     ? Math.round((1 - service.sale_price! / service.price) * 100)
     : 0
+  const bookHref = checkout({
+    query: {
+      service: service.slug,
+      extras: selectedExtras.map((extra) => extra.id),
+    },
+  })
 
   return (
     <div className="relative z-10 mx-4 -mt-20 rounded-3xl border border-[#2B3A32]/10 bg-white p-6 shadow-[0_32px_64px_-32px_rgba(43,58,50,0.45)] sm:mx-10">
@@ -68,33 +73,47 @@ export function BookingPanel({
         )}
       </div>
 
-      <ExtrasDrawer
+      <ExtrasDialog
         serviceSlug={service.slug}
         extras={extras}
         selected={selectedExtras}
-        onToggle={onToggleExtra}
+        onConfirm={onExtrasChange}
       />
 
       {selectedExtras.length > 0 && (
-        <dl className="mt-5 space-y-1.5 border-t border-[#2B3A32]/10 pt-4 text-sm tabular-nums">
+        <ul aria-label="Selected extras" className="mt-4 flex flex-wrap gap-2">
           {selectedExtras.map((extra) => (
-            <div key={extra.id} className="flex justify-between gap-4">
-              <dt className="text-[#5B6B5E]">{extra.name}</dt>
-              <dd>{formatMoney(extra.price)}</dd>
-            </div>
+            <li
+              key={extra.id}
+              className="flex items-center gap-1.5 rounded-full border border-[#2B3A32]/20 bg-[#F6F1E7] py-1 pr-1 pl-3 text-sm"
+            >
+              <Check className="size-3.5 text-[#8A6240]" aria-hidden />
+              {extra.name}
+              <span className="text-[#5B6B5E] tabular-nums">
+                +{formatMoney(extra.price)}
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  onExtrasChange(
+                    selectedExtras.filter((e) => e.id !== extra.id),
+                  )
+                }
+                aria-label={`Remove ${extra.name ?? "extra"}`}
+                className="rounded-full p-1 text-[#5B6B5E] hover:bg-white hover:text-[#2B3A32] focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:outline-none"
+              >
+                <X className="size-3.5" aria-hidden />
+              </button>
+            </li>
           ))}
-          <div className="flex justify-between gap-4 pt-1 font-medium">
-            <dt>Total</dt>
-            <dd>{formatMoney(total)}</dd>
-          </div>
-        </dl>
+        </ul>
       )}
 
       <Link
-        href={signUp()}
-        className="mt-3 block rounded-full bg-[#2B3A32] px-6 py-3.5 text-center font-medium text-[#F6F1E7] transition-colors hover:bg-[#1F2B25] focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:ring-offset-2 focus-visible:outline-none"
+        href={bookHref}
+        className="mt-4 block rounded-full bg-[#2B3A32] px-6 py-3.5 text-center font-medium text-[#F6F1E7] transition-colors hover:bg-[#1F2B25] focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:ring-offset-2 focus-visible:outline-none"
       >
-        Book this service
+        Book now
       </Link>
     </div>
   )

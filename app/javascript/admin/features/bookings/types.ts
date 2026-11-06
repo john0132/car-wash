@@ -62,7 +62,14 @@ export interface BookingDetail {
   scheduled_at: string | null
   created_at: string
   updated_at: string
-  customer: { id: number; full_name: string; email: string }
+  customer: {
+    id: number
+    full_name: string
+    email: string
+    phone: string | null
+  }
+  /** Snapshot taken at checkout, e.g. "Toyota Corolla · White · ABC 123". */
+  car: string | null
   employee: { id: number; full_name: string } | null
   package: { id: number; name: string; price: number } | null
   address: { name: string; area_name: string; city_name: string } | null

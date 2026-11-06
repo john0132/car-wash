@@ -2,6 +2,7 @@ export interface ProfileData {
   name: string
   last_name: string | null
   email: string
+  phone: string | null
   points: number
   wallet: number
   created_at: string

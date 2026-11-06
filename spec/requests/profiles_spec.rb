@@ -38,6 +38,15 @@ RSpec.describe "Profiles", type: :request do
       expect(response).to redirect_to(profile_path)
       expect(users(:one).reload.email).to eq("one@example.com")
     end
+
+    it "sets the phone, and rejects one that isn't a number" do
+      patch profile_path, params: { phone: " +20 100 123 4567 " }
+      expect(users(:one).reload.phone).to eq("+20 100 123 4567")
+
+      patch profile_path, params: { phone: "call me" }
+      expect(session[:inertia_errors]).to include(:phone)
+      expect(users(:one).reload.phone).to eq("+20 100 123 4567")
+    end
   end
 
   describe "PATCH /password" do

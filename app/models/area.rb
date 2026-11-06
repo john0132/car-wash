@@ -18,6 +18,8 @@ class Area < ApplicationRecord
 
   # Uses ST_Covers (not ST_Contains with a ::geometry cast) so the geofence GiST index is used.
   scope :covering, ->(point) { where("ST_Covers(geofence, ?)", point) }
+  # Areas we currently take bookings in: active, in an active city.
+  scope :serviceable, -> { where(is_active: true).joins(:city).where(cities: { is_active: true }) }
 
   # The geofence as a GeoJSON Polygon geometry (outer ring only, [lng, lat] positions).
   def geofence_geojson

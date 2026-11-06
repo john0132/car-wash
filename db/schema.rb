@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_06_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_07_100100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "postgis"
@@ -141,6 +141,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_06_190000) do
     t.datetime "updated_at", null: false
     t.bigint "employee_id"
     t.datetime "scheduled_at"
+    t.bigint "car_id"
+    t.string "car_description"
+    t.index ["car_id"], name: "index_bookings_on_car_id"
     t.index ["employee_id", "status"], name: "index_bookings_on_employee_id_and_status"
     t.index ["package_id"], name: "index_bookings_on_package_id"
     t.index ["user_id"], name: "index_bookings_on_user_id"
@@ -588,6 +591,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_06_190000) do
     t.bigint "package_id"
     t.string "role", default: "customer", null: false
     t.boolean "is_active", default: true, null: false
+    t.string "phone"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["membership_id"], name: "index_users_on_membership_id"
     t.index ["package_id"], name: "index_users_on_package_id"
@@ -605,6 +609,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_06_190000) do
   add_foreign_key "booking_addresses", "addresses", on_delete: :nullify
   add_foreign_key "booking_addresses", "bookings"
   add_foreign_key "booking_items", "bookings"
+  add_foreign_key "bookings", "cars", on_delete: :nullify
   add_foreign_key "bookings", "packages"
   add_foreign_key "bookings", "users"
   add_foreign_key "bookings", "users", column: "employee_id", on_delete: :nullify

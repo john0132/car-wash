@@ -13,7 +13,7 @@ class Website::UsersController < Website::BaseController
 
     if @user.save
       start_new_session_for(@user)
-      redirect_to after_authentication_path, notice: "Welcome! You have signed up successfully"
+      redirect_to after_authentication_url, notice: "Welcome! You have signed up successfully"
     else
       redirect_to sign_up_path, inertia: { errors: @user.errors }
     end

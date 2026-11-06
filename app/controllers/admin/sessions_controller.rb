@@ -20,7 +20,7 @@ class Admin::SessionsController < Admin::BaseController
     elsif staff
       Current.session&.destroy # replace a signed-in customer session instead of orphaning it
       start_new_session_for(staff)
-      redirect_to admin_root_path, notice: "Signed in successfully"
+      redirect_to after_authentication_url, notice: "Signed in successfully"
     else
       redirect_to admin_sign_in_path, alert: "That email or password is incorrect"
     end

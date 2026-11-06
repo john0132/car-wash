@@ -102,7 +102,9 @@ class Admin::BookingsController < Admin::BaseController
       scheduled_at: booking.scheduled_at,
       created_at: booking.created_at,
       updated_at: booking.updated_at,
-      customer: { id: booking.user.id, full_name: booking.user.full_name, email: booking.user.email },
+      customer: { id: booking.user.id, full_name: booking.user.full_name, email: booking.user.email,
+                  phone: booking.user.phone },
+      car: booking.car_description,
       employee: booking.employee && { id: booking.employee.id, full_name: booking.employee.full_name },
       package: booking.package && { id: booking.package.id, name: booking.package.name, price: booking.package.price.to_f },
       address: booking.booking_address&.then { |a|

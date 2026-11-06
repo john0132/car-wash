@@ -117,15 +117,23 @@ export default function BookingShow({ booking }: Props) {
               <div className="text-muted-foreground">
                 {booking.customer.email}
               </div>
+              {booking.customer.phone && (
+                <a
+                  href={`tel:${booking.customer.phone}`}
+                  className="text-muted-foreground block hover:underline"
+                >
+                  {booking.customer.phone}
+                </a>
+              )}
             </CardContent>
           </Card>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Address</CardTitle>
+            <CardTitle>Address & car</CardTitle>
           </CardHeader>
-          <CardContent className="text-sm">
+          <CardContent className="space-y-1 text-sm">
             {booking.address ? (
               <p>
                 {booking.address.name}, {booking.address.area_name},{" "}
@@ -134,6 +142,9 @@ export default function BookingShow({ booking }: Props) {
             ) : (
               <p className="text-muted-foreground">No address on file.</p>
             )}
+            <p className={booking.car ? undefined : "text-muted-foreground"}>
+              {booking.car ?? "No car on file."}
+            </p>
           </CardContent>
         </Card>
 

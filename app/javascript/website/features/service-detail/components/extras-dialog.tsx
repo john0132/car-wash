@@ -5,39 +5,43 @@ import { useState } from "react"
 import { service as serviceRoute } from "@/routes"
 import { Button } from "@/shared/components/ui/button"
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/shared/components/ui/sheet"
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/shared/components/ui/dialog"
 import { formatMoney } from "@/website/features/home-catalog/utils"
 import type {
   ExtraOption,
   ExtrasPage,
 } from "@/website/features/service-detail/types"
 
-interface ExtrasDrawerProps {
+interface ExtrasDialogProps {
   serviceSlug: string
-  /** Loaded on demand; undefined until the drawer is first opened. */
+  /** Loaded on demand; undefined until the dialog is first opened. */
   extras: ExtrasPage | undefined
   selected: ExtraOption[]
-  onToggle: (extra: ExtraOption) => void
+  onConfirm: (extras: ExtraOption[]) => void
 }
 
 /**
- * A side drawer over the service page listing the add-on extras, a page at a time.
- * Paging is an Inertia partial reload of the `extras` prop, so the visitor never
- * leaves the page. Selections live in the parent and survive paging.
+ * A popup listing the add-on extras, a page at a time. Ticking extras only
+ * changes a draft; "Add to booking" hands it to the parent, and closing the
+ * popup any other way discards it. Paging is an Inertia partial reload of the
+ * `extras` prop, so the visitor never leaves the page, and the draft survives it.
  */
-export function ExtrasDrawer({
+export function ExtrasDialog({
   serviceSlug,
   extras,
   selected,
-  onToggle,
-}: ExtrasDrawerProps) {
+  onConfirm,
+}: ExtrasDialogProps) {
+  const [open, setOpen] = useState(false)
+  const [draft, setDraft] = useState<ExtraOption[]>(selected)
   const [loading, setLoading] = useState(false)
 
   const load = (page: number) =>
@@ -54,38 +58,54 @@ export function ExtrasDrawer({
       },
     )
 
-  const isSelected = (id: number) => selected.some((extra) => extra.id === id)
-  const total = selected.reduce((sum, extra) => sum + extra.price, 0)
+  const changeOpen = (next: boolean) => {
+    if (next) {
+      setDraft(selected)
+      if (!extras) load(1)
+    }
+    setOpen(next)
+  }
+
+  const isPicked = (id: number) => draft.some((extra) => extra.id === id)
+  const toggle = (extra: ExtraOption) =>
+    setDraft((current) =>
+      isPicked(extra.id)
+        ? current.filter((e) => e.id !== extra.id)
+        : [...current, extra],
+    )
+
+  const confirm = () => {
+    onConfirm(draft)
+    setOpen(false)
+  }
 
   return (
-    <Sheet onOpenChange={(open) => open && !extras && load(1)}>
-      <SheetTrigger asChild>
+    <Dialog open={open} onOpenChange={changeOpen}>
+      <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="mt-6 h-auto w-full rounded-full border-[#2B3A32]/25 bg-transparent px-6 py-3.5 font-medium text-[#2B3A32] hover:bg-[#F6F1E7] hover:text-[#2B3A32]"
+          className="mt-6 h-auto w-full rounded-full border-[#2B3A32]/25 bg-transparent px-6 py-3.5 font-medium text-[#2B3A32] hover:bg-[#F6F1E7] hover:text-[#2B3A32] dark:border-[#2B3A32]/25 dark:bg-transparent dark:hover:bg-[#F6F1E7]"
         >
           <Plus aria-hidden />
-          {selected.length === 0
-            ? "Add extras"
-            : `${selected.length} ${selected.length === 1 ? "extra" : "extras"} added`}
+          {selected.length === 0 ? "Add extras" : "Change extras"}
         </Button>
-      </SheetTrigger>
+      </DialogTrigger>
 
-      <SheetContent
+      <DialogContent
         style={{ fontFamily: "'Jost', system-ui, sans-serif" }}
-        className="flex w-full flex-col gap-0 border-[#2B3A32]/10 bg-[#F6F1E7] text-[#2B3A32] sm:max-w-md"
+        className="flex max-h-[90dvh] flex-col gap-0 overflow-hidden border-[#2B3A32]/10 bg-[#F6F1E7] p-0 text-[#2B3A32] sm:max-w-md"
       >
-        <SheetHeader className="border-b border-[#2B3A32]/10 p-6">
-          <SheetTitle
+        <DialogHeader className="border-b border-[#2B3A32]/10 p-6 text-left">
+          <DialogTitle
             style={{ fontFamily: "'Italiana', serif" }}
             className="text-3xl font-normal"
           >
             Add extras
-          </SheetTitle>
-          <SheetDescription className="text-[#5B6B5E]">
+          </DialogTitle>
+          <DialogDescription className="text-[#5B6B5E]">
             Optional finishing touches for this service.
-          </SheetDescription>
-        </SheetHeader>
+          </DialogDescription>
+        </DialogHeader>
 
         <div
           className="flex-1 overflow-y-auto p-6"
@@ -101,13 +121,13 @@ export function ExtrasDrawer({
               className={`space-y-3 transition-opacity ${loading ? "opacity-50" : ""}`}
             >
               {extras.items.map((extra) => {
-                const on = isSelected(extra.id)
+                const on = isPicked(extra.id)
                 return (
                   <li key={extra.id}>
                     <button
                       type="button"
                       aria-pressed={on}
-                      onClick={() => onToggle(extra)}
+                      onClick={() => toggle(extra)}
                       className={`flex w-full items-center justify-between gap-4 rounded-2xl border p-4 text-left transition-colors focus-visible:ring-2 focus-visible:ring-[#8A6240] focus-visible:outline-none ${
                         on
                           ? "border-[#2B3A32] bg-white"
@@ -138,7 +158,7 @@ export function ExtrasDrawer({
           )}
         </div>
 
-        <SheetFooter className="gap-4 border-t border-[#2B3A32]/10 p-6">
+        <DialogFooter className="flex-col gap-4 border-t border-[#2B3A32]/10 p-6 sm:flex-col">
           {extras && extras.pages > 1 && (
             <nav
               aria-label="Extras pages"
@@ -165,18 +185,26 @@ export function ExtrasDrawer({
               </Button>
             </nav>
           )}
-          <div className="flex items-baseline justify-between">
-            <span className="text-[#5B6B5E]">
-              {selected.length === 0
-                ? "Nothing selected"
-                : `${selected.length} selected`}
-            </span>
-            <span className="font-medium tabular-nums">
-              {formatMoney(total)}
-            </span>
+          <div className="flex items-center justify-between gap-3">
+            <DialogClose asChild>
+              <Button
+                variant="ghost"
+                className="rounded-full text-[#2B3A32] hover:bg-white"
+              >
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button
+              onClick={confirm}
+              className="rounded-full bg-[#2B3A32] px-6 text-[#F6F1E7] hover:bg-[#1F2B25]"
+            >
+              {draft.length === 0
+                ? "Continue without extras"
+                : `Add ${draft.length} ${draft.length === 1 ? "extra" : "extras"}`}
+            </Button>
           </div>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

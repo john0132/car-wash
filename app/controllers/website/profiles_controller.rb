@@ -6,7 +6,7 @@ class Website::ProfilesController < Website::BaseController
 
   def show
     render inertia: {
-      profile: @user.as_json(only: %i[name last_name email points wallet created_at]),
+      profile: @user.as_json(only: %i[name last_name email phone points wallet created_at]),
       sessions: @user.sessions.order(created_at: :desc).as_json(only: %i[id user_agent ip_address created_at])
     }
   end
@@ -26,6 +26,6 @@ class Website::ProfilesController < Website::BaseController
   end
 
   def user_params
-    params.permit(:name, :last_name, :email)
+    params.permit(:name, :last_name, :email, :phone)
   end
 end

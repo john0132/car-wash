@@ -57,11 +57,16 @@ RSpec.describe "Admin bookings", type: :request do
       grant(admin, "bookings.read")
       service = create_service("Exterior wash", price: 50)
       booking.booking_items.create!(itemable: service, quantity: 2, price: 50)
+      customer.update!(phone: "01001234567")
+      booking.update!(car_description: "Toyota Corolla · White · ABC 123")
 
       get admin_booking_path(booking)
 
       expect_inertia.to render_component("admin/bookings/show")
-      expect(inertia.props[:booking]).to include(id: booking.id, customer: { id: customer.id, full_name: customer.full_name, email: customer.email })
+      expect(inertia.props[:booking]).to include(
+        id: booking.id, car: "Toyota Corolla · White · ABC 123",
+        customer: { id: customer.id, full_name: customer.full_name, email: customer.email, phone: "01001234567" }
+      )
       expect(inertia.props[:booking][:items].first).to include(name: "Exterior wash", quantity: 2, price: 50.0)
     end
   end

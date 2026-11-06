@@ -29,3 +29,10 @@
 
 en:
   hello: "Hello world"
+  activemodel:
+    attributes:
+      # Checkout errors are sent as full messages, e.g. "Car must be chosen".
+      checkout:
+        car_id: "Car"
+        scheduled_at: "Date & time"
+        phone: "Phone number"

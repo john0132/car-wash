@@ -7,8 +7,9 @@ class Website::Profile::CarsController < Website::BaseController
     render inertia: { cars: Current.user.cars.order(:created_at, :id).map { |car| car_props(car) } }
   end
 
+  # Returns to the page that added the car (checkout adds one inline), else the cars tab.
   def create
-    save Current.user.cars.new, notice: "Car added"
+    save Current.user.cars.new, notice: "Car added", back: true
   end
 
   def update
@@ -26,13 +27,14 @@ class Website::Profile::CarsController < Website::BaseController
     @car = Current.user.cars.find(params[:id])
   end
 
-  def save(car, notice:)
+  def save(car, notice:, back: false)
     car.assign_attributes(params.permit(:make, :model, :license_plate, :color))
+    options = car.save ? { notice: notice } : { inertia: { errors: car.errors.to_hash } }
 
-    if car.save
-      redirect_to profile_cars_path, notice: notice
+    if back
+      redirect_back_or_to profile_cars_path, **options
     else
-      redirect_to profile_cars_path, inertia: { errors: car.errors.to_hash }
+      redirect_to profile_cars_path, **options
     end
   end
 

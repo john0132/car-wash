@@ -13,8 +13,13 @@ class ApplicationController < ActionController::Base
 
   private
 
+  # Signed-out GET requests remember where they were going (e.g. a checkout
+  # with its service and extras), so signing in lands back there.
   def authenticate
-    redirect_to authentication_path unless perform_authentication
+    return if perform_authentication
+
+    session[:return_to_after_authenticating] = request.fullpath if request.get? || request.head?
+    redirect_to authentication_path
   end
 
   def require_no_authentication
@@ -32,6 +37,11 @@ class ApplicationController < ActionController::Base
   # Where signed-in users land. Overridden per area (e.g. Admin::BaseController).
   def after_authentication_path
     root_path
+  end
+
+  # Where to go right after signing in or up: the page that asked for sign-in, if any.
+  def after_authentication_url
+    session.delete(:return_to_after_authenticating) || after_authentication_path
   end
 
   def start_new_session_for(user)

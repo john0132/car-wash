@@ -7,6 +7,10 @@ export const formatDuration = (minutes: number | null) => {
   return rest === 0 ? `${hours} h` : `${hours} h ${rest} min`
 }
 
+/** Session storage key for the extras picked on a service's page. */
+export const selectedExtrasKey = (serviceSlug: string) =>
+  `service-extras:${serviceSlug}`
+
 /** Blank-line separated text → paragraphs. */
 export const paragraphs = (text: string | null) =>
   (text ?? "")

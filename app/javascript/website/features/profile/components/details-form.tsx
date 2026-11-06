@@ -72,6 +72,21 @@ export function DetailsForm({ profile }: { profile: ProfileData }) {
               <FieldError errors={toErrors(errors.email)} />
             </Field>
 
+            <Field>
+              <FieldLabel htmlFor="phone">Phone number</FieldLabel>
+              <Input
+                id="phone"
+                name="phone"
+                type="tel"
+                defaultValue={profile.phone ?? ""}
+                autoComplete="tel"
+                inputMode="tel"
+                placeholder="+20 100 123 4567"
+                className={fieldClass}
+              />
+              <FieldError errors={toErrors(errors.phone)} />
+            </Field>
+
             <div className="flex items-center gap-4">
               <Button
                 type="submit"

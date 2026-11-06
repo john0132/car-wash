@@ -62,6 +62,11 @@ Rails.application.routes.draw do
       resources :cars, only: %i[index create update destroy]
     end
 
+    # Booking: one service (+ extras) checked out straight from its page, then
+    # the booking's own page, which doubles as the thank-you page.
+    resource :checkout, only: %i[show create]
+    resources :bookings, only: :show
+
     resources :faqs, only: :index
     resource :contact, only: %i[show create]
     resources :blogs, only: %i[index show], param: :slug

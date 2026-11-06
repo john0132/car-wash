@@ -9,7 +9,7 @@ import {
   DEFAULT_ZOOM,
   TILE_ATTRIBUTION,
   TILE_URL,
-} from "@/admin/features/areas/utils"
+} from "@/shared/lib/map"
 import { cn } from "@/shared/lib/utils"
 
 /**

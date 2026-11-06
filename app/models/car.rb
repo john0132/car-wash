@@ -2,6 +2,7 @@
 
 class Car < ApplicationRecord
   belongs_to :user
+  has_many :bookings, dependent: :nullify
 
   validates :make, :model, :license_plate, :color, presence: true
 
@@ -17,4 +18,9 @@ class Car < ApplicationRecord
       "users.name ILIKE :term OR users.last_name ILIKE :term OR users.email ILIKE :term", term: term
     )
   }
+
+  # "Toyota Corolla · White · ABC 123", snapshotted onto bookings.
+  def description
+    [ "#{make} #{model}", color, license_plate ].join(" · ")
+  end
 end

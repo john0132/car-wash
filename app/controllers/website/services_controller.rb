@@ -31,9 +31,8 @@ class Website::ServicesController < Website::BaseController
   end
 
   def show
-    service = Service.includes(:service_translations, image_attachment: :blob,
-                               service_category: :service_category_translations)
-      .where(is_active: true, service_category_id: ServiceCategory.where(is_active: true).select(:id))
+    service = Service.bookable
+      .includes(:service_translations, image_attachment: :blob, service_category: :service_category_translations)
       .find_by!(slug: params[:slug])
 
     render inertia: {

@@ -28,6 +28,7 @@ import type {
   AreaOption,
   CustomerAddress,
 } from "@/website/features/addresses/types"
+import { useGeolocation } from "@/website/hooks/use-geolocation"
 
 const toErrors = (messages?: string[]) =>
   messages?.map((message) => ({ message }))
@@ -45,22 +46,12 @@ export function AddressDialog({ trigger, areas, address }: Props) {
     latitude: address ? String(address.latitude) : "",
     longitude: address ? String(address.longitude) : "",
   })
-  const [locating, setLocating] = useState(false)
-
-  const useMyLocation = () => {
-    if (!navigator.geolocation) return
-    setLocating(true)
-    navigator.geolocation.getCurrentPosition(
-      ({ coords: c }) => {
-        setCoords({
-          latitude: c.latitude.toFixed(6),
-          longitude: c.longitude.toFixed(6),
-        })
-        setLocating(false)
-      },
-      () => setLocating(false),
-    )
-  }
+  const { locate, locating, error } = useGeolocation((c) =>
+    setCoords({
+      latitude: c.latitude.toFixed(6),
+      longitude: c.longitude.toFixed(6),
+    }),
+  )
 
   const action = address
     ? websiteProfileAddresses.update(address.id)
@@ -153,12 +144,17 @@ export function AddressDialog({ trigger, areas, address }: Props) {
               <Button
                 type="button"
                 variant="outline"
-                onClick={useMyLocation}
+                onClick={locate}
                 disabled={locating}
               >
                 {locating ? <Spinner /> : <LocateFixed />}
                 Use my current location
               </Button>
+              {error && (
+                <p role="alert" className="text-destructive -mt-2 text-sm">
+                  {error}
+                </p>
+              )}
 
               <DialogFooter>
                 <DialogClose asChild>

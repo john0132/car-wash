@@ -27,6 +27,8 @@ class Service < ApplicationRecord
   EFFECTIVE_PRICE = Arel.sql("COALESCE(services.sale_price, services.price)")
 
   scope :publicly_listed, -> { where(is_active: true) }
+  # Can be viewed and booked: active, in an active category.
+  scope :bookable, -> { publicly_listed.where(service_category_id: ServiceCategory.where(is_active: true).select(:id)) }
   scope :on_sale, -> { where.not(sale_price: nil) }
   scope :priced_at_least, ->(amount) { amount ? where("COALESCE(services.sale_price, services.price) >= ?", amount) : all }
   scope :priced_at_most, ->(amount) { amount ? where("COALESCE(services.sale_price, services.price) <= ?", amount) : all }

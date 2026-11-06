@@ -24,6 +24,9 @@ load Rails.root.join("db/seeds/contact.rb")
 # Every environment: example blog posts.
 load Rails.root.join("db/seeds/blogs.rb")
 
+# Every environment: payment methods (checkout books with "cash").
+load Rails.root.join("db/seeds/payment_methods.rb")
+
 # Development-only staff account for signing in at /admin/sign_in.
 # Override with ADMIN_EMAIL / ADMIN_PASSWORD. Production admins must be created explicitly.
 if Rails.env.development?

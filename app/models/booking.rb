@@ -4,6 +4,8 @@ class Booking < ApplicationRecord
   belongs_to :user
   belongs_to :employee, class_name: "User", optional: true, inverse_of: :assigned_bookings
   belongs_to :package, optional: true
+  # Optional: older bookings have none, and a deleted car leaves `car_description`.
+  belongs_to :car, optional: true
   has_one :booking_address, dependent: :destroy
   has_many :booking_items, dependent: :destroy
   has_many :payment_transactions, dependent: :restrict_with_error
@@ -60,6 +62,12 @@ class Booking < ApplicationRecord
 
   def extras
     Extra.joins(:booking_items).where(booking_items: { booking_id: id })
+  end
+
+  # The booked service (a checkout books exactly one). Reads loaded items, so
+  # `includes(booking_items: :itemable)` avoids extra queries.
+  def service
+    booking_items.find { _1.itemable_type == Service.polymorphic_name }&.itemable
   end
 
   private

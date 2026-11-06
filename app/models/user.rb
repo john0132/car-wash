@@ -3,6 +3,9 @@
 class User < ApplicationRecord
   include Activatable
 
+  # Digits with optional leading "+", spaces and dashes; 7–20 characters.
+  PHONE_FORMAT = /\A\+?[\d\s-]{7,20}\z/
+
   has_secure_password
 
   generates_token_for :password_reset, expires_in: 20.minutes do
@@ -28,8 +31,10 @@ class User < ApplicationRecord
   validates :password, allow_nil: true, length: { minimum: 12 }
   validates :role, presence: true
   validates :wallet, :points, :lifetime_points, numericality: { greater_than_or_equal_to: 0 }
+  validates :phone, format: { with: PHONE_FORMAT, message: "must be a valid phone number" }, allow_blank: true
 
   normalizes :email, with: -> { _1.strip.downcase }
+  normalizes :phone, with: -> { _1.squish.presence }
 
   # Adds `lifetime_value` and `bookings_count` columns, one subquery each, for customer lists.
   scope :with_customer_totals, -> {

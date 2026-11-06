@@ -1,49 +1,27 @@
+import { Link } from "@inertiajs/react"
+
+import { booking as bookingRoute } from "@/routes"
 import type { CustomerBooking } from "@/website/features/bookings/types"
-
-const STATUS: Record<
-  CustomerBooking["status"],
-  { label: string; tone: string }
-> = {
-  pending: { label: "Pending", tone: "bg-amber-100 text-amber-900" },
-  confirmed: { label: "Confirmed", tone: "bg-sky-100 text-sky-900" },
-  in_progress: { label: "In progress", tone: "bg-indigo-100 text-indigo-900" },
-  completed: { label: "Completed", tone: "bg-emerald-100 text-emerald-900" },
-  cancelled: { label: "Cancelled", tone: "bg-neutral-200 text-neutral-800" },
-}
-
-const PAYMENT: Record<CustomerBooking["payment_status"], string> = {
-  unpaid: "Unpaid",
-  paid: "Paid",
-  partially_refunded: "Partially refunded",
-  refunded: "Refunded",
-  failed: "Payment failed",
-}
-
-const money = new Intl.NumberFormat("en-EG", {
-  style: "currency",
-  currency: "EGP",
-})
-
-function formatWhen(value: string | null) {
-  if (!value) return "Date to be confirmed"
-  return new Date(value).toLocaleString("en", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  })
-}
+import {
+  BOOKING_STATUS,
+  PAYMENT_STATUS,
+  formatWhen,
+} from "@/website/features/bookings/utils"
+import { formatMoney } from "@/website/features/home-catalog/utils"
 
 export function BookingCard({ booking }: { booking: CustomerBooking }) {
-  const status = STATUS[booking.status]
+  const status = BOOKING_STATUS[booking.status]
 
   return (
     <li className="rounded-[20px] border border-[#2B3A32]/10 bg-white/60 p-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-sm text-[#2B3A32]/65">Booking #{booking.id}</p>
+          <Link
+            href={bookingRoute(booking.id)}
+            className="text-sm text-[#2B3A32]/65 underline-offset-4 hover:text-[#2B3A32] hover:underline"
+          >
+            Booking #{booking.id}
+          </Link>
           <p
             style={{ fontFamily: "'Italiana', serif" }}
             className="text-2xl leading-tight"
@@ -77,10 +55,10 @@ export function BookingCard({ booking }: { booking: CustomerBooking }) {
         </p>
         <p className="text-right">
           <span className="block text-lg font-medium">
-            {money.format(booking.total_amount)}
+            {formatMoney(booking.total_amount)}
           </span>
           <span className="text-sm text-[#2B3A32]/65">
-            {PAYMENT[booking.payment_status]}
+            {PAYMENT_STATUS[booking.payment_status]}
           </span>
         </p>
       </div>

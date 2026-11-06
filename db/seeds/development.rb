@@ -70,13 +70,8 @@ areas = [
   [ record, lat, lng ]
 end
 
-payment_methods = [ [ "cash", "Cash", "نقدي" ], [ "card", "Card", "بطاقة" ], [ "wallet", "Wallet", "المحفظة" ] ].map do |code, en, ar|
-  PaymentMethod.find_or_create_by!(code: code).tap do |method|
-    { english => en, arabic => ar }.each do |language, name|
-      method.payment_method_translations.find_or_create_by!(language: language) { |t| t.name = name }
-    end
-  end
-end
+# Created in every environment by db/seeds/payment_methods.rb.
+payment_methods = PaymentMethod.where(code: %w[cash card wallet]).to_a
 payment_by_code = payment_methods.index_by(&:code)
 
 exterior = translated.(ServiceCategory, "Exterior", "خارجي")

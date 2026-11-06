@@ -1,5 +1,4 @@
 import { Head, Link } from "@inertiajs/react"
-import { useState } from "react"
 
 import { root, serviceCategory } from "@/routes"
 import { SiteFooter } from "@/website/components/site-footer"
@@ -13,7 +12,11 @@ import type {
   RelatedService,
   ServiceDetail,
 } from "@/website/features/service-detail/types"
-import { paragraphs } from "@/website/features/service-detail/utils"
+import {
+  paragraphs,
+  selectedExtrasKey,
+} from "@/website/features/service-detail/utils"
+import { useSessionState } from "@/website/hooks/use-session-state"
 
 interface Props {
   service: ServiceDetail
@@ -27,14 +30,14 @@ export default function ServiceShow(props: Props) {
   return <ServicePage key={props.service.id} {...props} />
 }
 
+const NO_EXTRAS: ExtraOption[] = []
+
 function ServicePage({ service, related, extras }: Props) {
-  const [selectedExtras, setSelectedExtras] = useState<ExtraOption[]>([])
-  const toggleExtra = (extra: ExtraOption) =>
-    setSelectedExtras((current) =>
-      current.some((e) => e.id === extra.id)
-        ? current.filter((e) => e.id !== extra.id)
-        : [...current, extra],
-    )
+  // Kept for this tab, so a refresh or coming back keeps the picks.
+  const [selectedExtras, setSelectedExtras] = useSessionState(
+    selectedExtrasKey(service.slug),
+    NO_EXTRAS,
+  )
   const name = service.name ?? "Service"
   const heading = service.title ?? name
   const body = paragraphs(service.description)
@@ -121,7 +124,7 @@ function ServicePage({ service, related, extras }: Props) {
                 service={service}
                 extras={extras}
                 selectedExtras={selectedExtras}
-                onToggleExtra={toggleExtra}
+                onExtrasChange={setSelectedExtras}
               />
             </div>
           </article>

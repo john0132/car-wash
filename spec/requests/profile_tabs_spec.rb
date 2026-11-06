@@ -70,6 +70,12 @@ RSpec.describe "Profile tabs", type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
+    it "returns to the page that added a car, such as checkout" do
+      post profile_cars_path, params: { make: "Toyota", model: "Corolla", license_plate: "abc 123", color: "White" },
+                              headers: { "Referer" => "http://www.example.com/checkout?service=wash" }
+      expect(response).to redirect_to("http://www.example.com/checkout?service=wash")
+    end
+
     it "rejects an incomplete car" do
       expect { post profile_cars_path, params: { make: "Toyota" } }.not_to change(Car, :count)
       expect(session[:inertia_errors]).to include(:model, :license_plate, :color)
