@@ -39,16 +39,18 @@ import {
 } from "@/shared/components/ui/card"
 import type { BreadcrumbItem } from "@/shared/types"
 
+/** Each report is null when the admin's roles don't allow reading its data. */
+interface AdminReports {
+  kpis: DashboardKpis
+  status_breakdown: BookingStatusCounts | null
+  payment_status_breakdown: PaymentStatusCounts | null
+  revenue_trend: RevenueTrendPoint[] | null
+  top_items: TopItem[] | null
+  upcoming_bookings: BookingRow[] | null
+}
+
 type Props =
-  | {
-      view: "admin"
-      kpis: DashboardKpis
-      status_breakdown: BookingStatusCounts
-      payment_status_breakdown: PaymentStatusCounts
-      revenue_trend: RevenueTrendPoint[]
-      top_items: TopItem[]
-      upcoming_bookings: BookingRow[]
-    }
+  | ({ view: "admin" } & AdminReports)
   | {
       view: "employee"
       stats: EmployeeStats
@@ -80,14 +82,25 @@ function AdminDashboard({
   revenue_trend,
   top_items,
   upcoming_bookings,
-}: {
-  kpis: DashboardKpis
-  status_breakdown: BookingStatusCounts
-  payment_status_breakdown: PaymentStatusCounts
-  revenue_trend: RevenueTrendPoint[]
-  top_items: TopItem[]
-  upcoming_bookings: BookingRow[]
-}) {
+}: AdminReports) {
+  const hasReports =
+    Object.values(kpis).some((value) => value !== null) ||
+    upcoming_bookings !== null
+
+  if (!hasReports) {
+    return (
+      <div className="space-y-6 p-4">
+        <PageHeader title="Dashboard" />
+        <Card>
+          <CardContent className="text-muted-foreground py-10 text-center text-sm">
+            Your roles don&apos;t include any dashboard reports. Use the sidebar
+            to get to the sections you manage.
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6 p-4">
       <PageHeader
@@ -95,61 +108,91 @@ function AdminDashboard({
         description="Bookings and revenue at a glance."
       />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          label="Revenue this month"
-          icon={Wallet}
-          value={formatMoney(kpis.revenue_this_month)}
-          hint="Paid bookings"
-        />
-        <StatCard
-          label="Scheduled today"
-          icon={CalendarClock}
-          value={formatNumber(kpis.bookings_today)}
-        />
-        <StatCard
-          label="Open bookings"
-          icon={ClipboardList}
-          value={formatNumber(kpis.open_bookings)}
-          hint="Pending, confirmed or in progress"
-        />
-        <StatCard
-          label="New customers"
-          icon={UserPlus}
-          value={formatNumber(kpis.new_customers_this_month)}
-          hint="This month"
-        />
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <RevenueTrendChart points={revenue_trend} />
-        </div>
-        <StatusBreakdownCard counts={status_breakdown} windowDays={30} />
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <PaymentBreakdownCard
-          counts={payment_status_breakdown}
-          windowDays={30}
-        />
-        <TopItemsCard items={top_items} windowDays={30} />
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Upcoming bookings</CardTitle>
-          <CardDescription>
-            The next {upcoming_bookings.length} open bookings, soonest first.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <BookingsTable
-            bookings={upcoming_bookings}
-            party="both"
-            emptyMessage="Nothing scheduled."
+        {kpis.revenue_this_month !== null && (
+          <StatCard
+            label="Revenue this month"
+            icon={Wallet}
+            value={formatMoney(kpis.revenue_this_month)}
+            hint="Paid bookings"
           />
-        </CardContent>
-      </Card>
+        )}
+        {kpis.bookings_today !== null && (
+          <StatCard
+            label="Scheduled today"
+            icon={CalendarClock}
+            value={formatNumber(kpis.bookings_today)}
+          />
+        )}
+        {kpis.open_bookings !== null && (
+          <StatCard
+            label="Open bookings"
+            icon={ClipboardList}
+            value={formatNumber(kpis.open_bookings)}
+            hint="Pending, confirmed or in progress"
+          />
+        )}
+        {kpis.new_customers_this_month !== null && (
+          <StatCard
+            label="New customers"
+            icon={UserPlus}
+            value={formatNumber(kpis.new_customers_this_month)}
+            hint="This month"
+          />
+        )}
+      </div>
+
+      {(revenue_trend !== null || status_breakdown !== null) && (
+        <div className="grid gap-4 lg:grid-cols-3">
+          {revenue_trend && (
+            <div
+              className={status_breakdown ? "lg:col-span-2" : "lg:col-span-3"}
+            >
+              <RevenueTrendChart points={revenue_trend} />
+            </div>
+          )}
+          {status_breakdown && (
+            <div className={revenue_trend ? undefined : "lg:col-span-3"}>
+              <StatusBreakdownCard counts={status_breakdown} windowDays={30} />
+            </div>
+          )}
+        </div>
+      )}
+
+      {(payment_status_breakdown !== null || top_items !== null) && (
+        <div
+          className={
+            payment_status_breakdown && top_items
+              ? "grid gap-4 lg:grid-cols-2"
+              : "grid gap-4"
+          }
+        >
+          {payment_status_breakdown && (
+            <PaymentBreakdownCard
+              counts={payment_status_breakdown}
+              windowDays={30}
+            />
+          )}
+          {top_items && <TopItemsCard items={top_items} windowDays={30} />}
+        </div>
+      )}
+
+      {upcoming_bookings && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Upcoming bookings</CardTitle>
+            <CardDescription>
+              The next {upcoming_bookings.length} open bookings, soonest first.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <BookingsTable
+              bookings={upcoming_bookings}
+              party="both"
+              emptyMessage="Nothing scheduled."
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

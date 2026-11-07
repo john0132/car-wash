@@ -83,4 +83,35 @@ RSpec.describe Booking, type: :model do
       expect(booking.extras).to contain_exactly(extra)
     end
   end
+
+  describe "payment status and the payments ledger" do
+    let(:cash) { create_payment_method("cash") }
+    let(:booking) { Booking.create!(user: user, total_amount: 130) }
+    let!(:transaction) { booking.payment_transactions.create!(user: user, payment_method: cash, amount: 130) }
+
+    it "completes the pending transaction when the booking is marked paid" do
+      booking.update!(payment_status: :paid)
+      expect(transaction.reload.status).to eq("completed")
+    end
+
+    it "follows a refund, and a return to unpaid" do
+      booking.update!(payment_status: :paid)
+      booking.update!(payment_status: :refunded)
+      expect(transaction.reload.status).to eq("refunded")
+
+      booking.update!(payment_status: :unpaid)
+      expect(transaction.reload.status).to eq("pending")
+    end
+
+    it "leaves the ledger alone for a partial refund, which it can't represent" do
+      booking.update!(payment_status: :paid)
+      booking.update!(payment_status: :partially_refunded)
+      expect(transaction.reload.status).to eq("completed")
+    end
+
+    it "leaves the ledger alone when something else about the booking changes" do
+      booking.update!(status: :confirmed)
+      expect(transaction.reload.status).to eq("pending")
+    end
+  end
 end

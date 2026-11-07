@@ -175,6 +175,50 @@ RSpec.describe "Admin administrators", type: :request do
       expect { delete admin_administrator_path(super_admin) }.not_to change(User, :count)
     end
 
+    context "when the other admin holds permissions the signed-in admin lacks" do
+      before do
+        grant(admin, "admins.read", "admins.update", "admins.delete")
+        grant(other_admin, "roles.delete")
+      end
+
+      it "does not let them reset that admin's email or password" do
+        patch admin_administrator_path(other_admin), params: {
+          user: { email: "taken-over@example.com", password: "brand-new-password-1", password_confirmation: "brand-new-password-1" }
+        }
+
+        other_admin.reload
+        expect(other_admin.email).to eq("sara@example.com")
+        expect(other_admin.authenticate("brand-new-password-1")).to be(false)
+      end
+
+      it "does not let them disable or delete that admin" do
+        patch activation_admin_administrator_path(other_admin), params: { is_active: false }
+        expect(other_admin.reload).to be_is_active
+
+        expect { delete admin_administrator_path(other_admin) }.not_to change(User, :count)
+      end
+
+      it "offers no actions on that admin in the dashboard" do
+        get admin_administrator_path(other_admin)
+        expect(inertia.props[:abilities]).to include(update: false, destroy: false, manage_access: false)
+
+        get admin_administrators_path
+        row = inertia.props[:administrators].find { _1[:id] == other_admin.id }
+        expect(row[:can_manage_access]).to be(false)
+      end
+    end
+
+    it "lets an admin manage an admin whose permissions they all hold" do
+      grant(admin, "admins.read", "admins.update", "admins.delete", "customers.read")
+      grant(other_admin, "customers.read")
+
+      patch admin_administrator_path(other_admin), params: { user: { name: "Sarah" } }
+      expect(other_admin.reload.name).to eq("Sarah")
+
+      get admin_administrator_path(other_admin)
+      expect(inertia.props[:abilities]).to include(update: true, destroy: true, manage_access: true)
+    end
+
     it "lets a Super Admin assign the Super Admin role" do
       sign_in super_admin
 

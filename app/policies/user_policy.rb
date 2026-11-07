@@ -40,11 +40,15 @@ class UserPolicy < ApplicationPolicy
     record.is_a?(User) ? record.role : record.to_s
   end
 
-  # A Super Admin account can only be edited, disabled or deleted by another
-  # Super Admin; otherwise anyone with "administrators.update" could reset its
-  # password and sign in as it.
+  # Another account can only be edited, disabled or deleted by someone who
+  # holds every permission it holds, and a Super Admin account only by another
+  # Super Admin. Otherwise "admins.update" would let you reset a stronger
+  # admin's password and sign in as them. (Customers and employees hold no
+  # permissions, so this only ever restricts acting on administrators.)
   def protected_record?
-    record.is_a?(User) && record.super_admin? && !user.super_admin?
+    return false unless record.is_a?(User) && !self? && !user.super_admin?
+
+    record.super_admin? || (record.permission_names - user.permission_names).any?
   end
 
   def staff_record?

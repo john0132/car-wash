@@ -105,13 +105,19 @@ class User < ApplicationRecord
   #
   # Memoized on the instance, so a request (one Current.user) loads it once and
   # every policy check reuses it. `reload` clears it.
+  # Lists that preload `roles: :permissions` are answered from memory, so
+  # checking every row of an administrators page costs no extra queries.
   def permission_names
     return [] unless admin?
 
-    @permission_names ||= Permission.joins(:role_permissions)
-      .where(role_permissions: { role_id: user_roles.select(:role_id) })
-      .distinct.order(:resource, :action)
-      .pluck(:resource, :action).map { |resource, action| "#{resource}.#{action}" }
+    @permission_names ||= if roles_with_permissions_loaded?
+      roles.flat_map(&:permissions).map(&:key).uniq.sort
+    else
+      Permission.joins(:role_permissions)
+        .where(role_permissions: { role_id: user_roles.select(:role_id) })
+        .distinct.order(:resource, :action)
+        .pluck(:resource, :action).map { |resource, action| "#{resource}.#{action}" }
+    end
   end
 
   def permission?(resource, action)
@@ -121,5 +127,11 @@ class User < ApplicationRecord
   def reload(*)
     @permission_names = nil
     super
+  end
+
+  private
+
+  def roles_with_permissions_loaded?
+    association(:roles).loaded? && roles.all? { |role| role.association(:permissions).loaded? }
   end
 end
