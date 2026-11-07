@@ -114,7 +114,7 @@ This is a portfolio project, and some parts are intentionally simplified:
 | Security | Brakeman, bundler-audit, `npm audit` |
 | Model, request and authorization specs | RSpec |
 | Browser specs: booking flow, navigation, RTL, mobile, accessibility | RSpec system specs, headless Chrome, axe-core |
-| Seeds load cleanly | `db:seed:replant` |
+| Seeds load cleanly, with and without demo data | `db:seed:replant`, `SEED_DEMO=1 db:seed:replant` |
 
 ## Running locally
 
@@ -129,7 +129,7 @@ bin/setup --skip-server   # install gems and npm packages, create, migrate and s
 bin/dev                   # Rails on :3000 + Vite dev server
 ```
 
-In development the seeds load a demo catalog, service areas, customers, staff and bookings. Every demo account uses the password `password123456`:
+In development the seeds load demo data (`db/seeds/demo.rb`): a catalog with photos, service areas, customers, staff, bookings and contact messages. Every demo account uses the password `password123456`:
 
 | Where | Account | Access |
 |---|---|---|
@@ -137,6 +137,17 @@ In development the seeds load a demo catalog, service areas, customers, staff an
 | | `sara.manager@example.com` | Operations Manager role |
 | | `omar.support@example.com` | Support Agent role |
 | [localhost:3000/sign_in](http://localhost:3000/sign_in) | `mona.ibrahim@example.com` | Customer with saved cars, addresses and bookings |
+
+### Demo data in other environments
+
+Seeding a server (`bin/rails db:seed`) always creates the base content: languages, permissions, the Super Admin role, pages, header and footer, FAQs, blog posts and payment methods. Two optional pieces are controlled by environment variables:
+
+| Variable | Effect |
+|---|---|
+| `ADMIN_EMAIL` + `ADMIN_PASSWORD` | Creates a Super Admin with these credentials (set both or neither). An existing account's password is never changed. |
+| `SEED_DEMO=1` | Also loads the demo data. The demo staff and customers get a random password that nobody knows, or `DEMO_PASSWORD` if you set it. The development password is never used outside development. |
+
+The seeds are idempotent, so running them again only fills in what is missing. Photo sources and licenses are in `db/seeds/images/CREDITS.md`.
 
 ### Common commands
 

@@ -137,7 +137,9 @@ jobs:
         env:
           RAILS_ENV: test
           DATABASE_URL: postgis://postgres:postgres@localhost:5432
-        run: bin/rails db:seed:replant
+        run: |
+          bin/rails db:seed:replant
+          SEED_DEMO=1 bin/rails db:seed:replant
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v7
