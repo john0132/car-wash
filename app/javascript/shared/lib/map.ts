@@ -14,3 +14,8 @@ export const TILE_URL =
 export const TILE_ATTRIBUTION =
   env.VITE_MAP_TILE_ATTRIBUTION ??
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+
+// OpenStreetMap refuses tile requests that carry no Referer ("Access blocked"). Set the policy on
+// each tile so it holds even when a proxy in front of the app sends a stricter page-wide
+// Referrer-Policy (CloudPanel's Nginx adds `same-origin` to every site, which strips it).
+export const TILE_REFERRER_POLICY = "strict-origin-when-cross-origin"
