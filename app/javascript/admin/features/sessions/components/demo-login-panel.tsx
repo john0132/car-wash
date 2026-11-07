@@ -24,9 +24,13 @@ export function DemoLoginPanel({ email, password }: DemoLogin) {
         </p>
         <dl className="text-foreground mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5">
           <dt className="text-muted-foreground">Email</dt>
-          <dd className="font-mono break-all select-all">{email}</dd>
+          <dd className="font-mono text-xs leading-5 break-words select-all">
+            {email}
+          </dd>
           <dt className="text-muted-foreground">Password</dt>
-          <dd className="font-mono break-all select-all">{password}</dd>
+          <dd className="font-mono text-xs leading-5 break-words select-all">
+            {password}
+          </dd>
         </dl>
         <Form action={adminSessions.create()} className="mt-3 w-full">
           {({ processing }) => (
