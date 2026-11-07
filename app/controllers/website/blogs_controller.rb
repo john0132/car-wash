@@ -5,19 +5,21 @@ class Website::BlogsController < Website::BaseController
   skip_before_action :authenticate
   before_action :perform_authentication
 
+  include Website::Paginates
+
   PER_PAGE = 9
 
   def index
-    scope = Blog.where(is_active: true)
-    pages = [ (scope.count.to_f / PER_PAGE).ceil, 1 ].max
-    page = params[:page].to_i.clamp(1, pages)
-    blogs = scope.order(created_at: :desc, id: :desc).limit(PER_PAGE).offset((page - 1) * PER_PAGE)
-      .includes(:blog_translations, cover_image_attachment: :blob)
+    blogs, pagination = paginate(
+      Blog.where(is_active: true).order(created_at: :desc, id: :desc)
+        .includes(:blog_translations, cover_image_attachment: :blob),
+      per_page: PER_PAGE
+    )
 
     render inertia: {
       blogs: blogs.map { |blog| card_props(blog) },
-      page: page,
-      pages: pages
+      page: pagination[:page],
+      pages: pagination[:pages]
     }
   end
 

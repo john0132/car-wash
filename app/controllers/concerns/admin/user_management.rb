@@ -8,6 +8,7 @@ module Admin::UserManagement
 
   included do
     include Admin::Pagination
+    include Admin::BookingProps
 
     after_action :verify_authorized
   end
@@ -43,20 +44,5 @@ module Admin::UserManagement
   def user_props(user)
     user.as_json(only: %i[id name last_name email is_active created_at])
       .merge(full_name: user.full_name)
-  end
-
-  def booking_props(booking)
-    {
-      id: booking.id,
-      status: booking.status,
-      payment_status: booking.payment_status,
-      total_amount: booking.total_amount.to_f,
-      items_count: booking.booking_items.sum(&:quantity),
-      scheduled_at: booking.scheduled_at,
-      created_at: booking.created_at,
-      address: booking.booking_address&.then { |a| "#{a.name}, #{a.area_name}" },
-      customer: booking.user && { id: booking.user.id, full_name: booking.user.full_name },
-      employee: booking.employee && { id: booking.employee.id, full_name: booking.employee.full_name }
-    }
   end
 end

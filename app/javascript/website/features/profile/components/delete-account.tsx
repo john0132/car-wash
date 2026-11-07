@@ -30,7 +30,7 @@ export function DeleteAccount() {
           <SectionHeading
             title={t("Delete account")}
             description={t(
-              "Permanently removes your account and data. This cannot be undone.",
+              "Closes your account and signs you out on every device. Your booking history is kept.",
             )}
           />
         </div>
@@ -50,7 +50,7 @@ export function DeleteAccount() {
             </DialogTitle>
             <DialogDescription>
               {t(
-                "Once your account is deleted, all of its data is permanently removed. Enter your password to confirm.",
+                "Once your account is closed, you can no longer sign in. Enter your password to confirm.",
               )}
             </DialogDescription>
             <Form

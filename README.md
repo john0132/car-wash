@@ -9,7 +9,7 @@ Rails + Inertia.js + React application.
 - [Tailwind CSS](https://tailwindcss.com) + [shadcn/ui](https://ui.shadcn.com) components
 - PostgreSQL
 - RSpec for tests, [Kamal](https://kamal-deploy.org) for deployment
-- User authentication (sign up, log in, password reset, settings)
+- User authentication (sign up, log in, password reset, profile)
 
 ## Requirements
 
@@ -40,15 +40,21 @@ Open http://localhost:3000.
 ## Where things live
 
 - `app/controllers/` — Rails controllers; render pages with `render inertia: "page/name", props: { ... }`
-- `app/javascript/pages/` — React page components (Inertia pages)
-- `app/javascript/components/` — shared React components (`ui/` holds shadcn/ui components)
-- `app/javascript/layouts/` — app and auth layouts
+- `app/controllers/admin/`, `app/controllers/website/` — the staff dashboard and the public site/customer account
+- `app/javascript/admin/` — dashboard app (`pages/`, `layouts/`, `components/`, `features/`, `hooks/`, `lib/`)
+- `app/javascript/website/` — public website app, server-rendered, same structure
+- `app/javascript/shared/` — domain-free code used by both (`components/ui/` holds shadcn/ui)
+- `app/javascript/entrypoints/` — one Vite entrypoint per app
+- `app/javascript/routes/` — generated from `config/routes.rb`; never edit by hand
+
+Tests (`*.test.ts[x]`) sit next to the code they cover.
 
 ## Common commands
 
 ```bash
 bundle exec rspec        # Ruby tests
 npm run check            # TypeScript type check
+npm test                 # Vitest (frontend unit/component tests)
 npm run lint             # ESLint
 npm run format:fix       # Prettier
 bin/rails db:migrate     # run migrations

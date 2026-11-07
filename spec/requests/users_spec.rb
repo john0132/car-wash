@@ -54,12 +54,15 @@ RSpec.describe "Users", type: :request do
   end
 
   describe "DELETE /users" do
-    it "destroys current user with valid password" do
-      sign_in users(:one)
+    it "deactivates the current user and signs them out with a valid password" do
+      user = users(:one)
+      sign_in user
       expect {
         delete users_path, params: { delete_password: "Secret1*3*5*" }
-      }.to change(User, :count).by(-1)
+      }.not_to change(User, :count)
       expect(response).to redirect_to(root_path)
+      expect(user.reload).not_to be_is_active
+      expect(user.sessions).to be_empty
     end
 
     it "rejects account deletion with wrong password" do
@@ -67,6 +70,7 @@ RSpec.describe "Users", type: :request do
       expect {
         delete users_path, params: { delete_password: "wrongpassword" }
       }.not_to change(User, :count)
+      expect(users(:one).reload).to be_is_active
       expect(response).to redirect_to(profile_path)
     end
   end

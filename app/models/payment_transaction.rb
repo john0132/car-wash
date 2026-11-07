@@ -21,17 +21,4 @@ class PaymentTransaction < ApplicationRecord
   }
 
   scope :with_status, ->(status) { statuses.key?(status.to_s) ? where(status: status) : all }
-
-  # Matches the reference or the paying customer's name/email.
-  scope :search, ->(query) {
-    next all if query.blank?
-
-    term = "%#{sanitize_sql_like(query.strip)}%"
-    joins(:user).where(
-      "payment_transactions.reference ILIKE :term OR users.name ILIKE :term OR " \
-      "users.last_name ILIKE :term OR users.email ILIKE :term", term: term
-    )
-  }
-
-  scope :with_status, ->(status) { statuses.key?(status.to_s) ? where(status: status) : all }
 end

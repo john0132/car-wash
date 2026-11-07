@@ -15,16 +15,20 @@ class SiteChrome
     Rails.cache.fetch([ "site_chrome", locale.to_s, cache_version ]) { new(locale).props }
   end
 
-  def self.cache_version
-    [ HeaderItem, Footer, Page, Language, ServiceCategory, Service ].map { |model| version_of(model) }
-  end
+  # Everything the header and footer read: an edit to any of these changes the cache key.
+  VERSIONED_MODELS = [ HeaderItem, Footer, Page, Language, ServiceCategory, Service ].freeze
 
-  # Row count (deletions don't move the newest timestamp) and the newest
-  # `updated_at`, to the microsecond: Time#to_param in a cache key is only
-  # accurate to the second, so two edits in one second would look the same.
-  def self.version_of(model)
-    count, newest = model.pick(Arel.sql("COUNT(*)"), Arel.sql("MAX(updated_at)"))
-    [ count, newest&.utc&.to_fs(:usec) ]
+  # One query for all of them: each table's row count (deletions don't move the
+  # newest timestamp) and newest `updated_at`, read as text so the microseconds
+  # survive (Time#to_param in a cache key is only accurate to the second, so two
+  # edits in one second would look the same).
+  def self.cache_version
+    columns = VERSIONED_MODELS.flat_map do |model|
+      table = model.quoted_table_name
+      [ "(SELECT COUNT(*) FROM #{table})", "(SELECT MAX(updated_at)::text FROM #{table})" ]
+    end
+
+    ApplicationRecord.connection.select_rows("SELECT #{columns.join(', ')}").first
   end
 
   def initialize(locale)

@@ -22,7 +22,7 @@ class Website::UsersController < Website::BaseController
   def destroy
     user = Current.user
     if user.authenticate(params[:delete_password] || "")
-      user.destroy!
+      user.update!(is_active: false) # keeps bookings and payments; the model signs the account out everywhere
       Current.session = nil
       redirect_to root_path, notice: t("website.flash.account_deleted"), inertia: { clear_history: true }
     else

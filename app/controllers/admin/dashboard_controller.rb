@@ -4,6 +4,8 @@
 # (DashboardStats); employees have no dashboard permissions, so they see only
 # their own assignments for today (EmployeeStats, same as Admin::EmployeesController#show).
 class Admin::DashboardController < Admin::BaseController
+  include Admin::BookingProps
+
   def index
     if Current.user.admin?
       render inertia: admin_dashboard_props
@@ -38,22 +40,6 @@ class Admin::DashboardController < Admin::BaseController
       view: "employee",
       stats: stats.to_h,
       today_bookings: today.map { |booking| booking_props(booking) }
-    }
-  end
-
-  # Same shape as Admin::UserManagement#booking_props / Admin::BookingsController#booking_props.
-  def booking_props(booking)
-    {
-      id: booking.id,
-      status: booking.status,
-      payment_status: booking.payment_status,
-      total_amount: booking.total_amount.to_f,
-      items_count: booking.booking_items.sum(&:quantity),
-      scheduled_at: booking.scheduled_at,
-      created_at: booking.created_at,
-      address: booking.booking_address&.then { |a| "#{a.name}, #{a.area_name}" },
-      customer: booking.user && { id: booking.user.id, full_name: booking.user.full_name },
-      employee: booking.employee && { id: booking.employee.id, full_name: booking.employee.full_name }
     }
   end
 end
