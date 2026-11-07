@@ -5,6 +5,9 @@ class Website::Identity::PasswordResetsController < Website::BaseController
 
   before_action :set_user, only: %i[edit update]
 
+  rate_limit to: 5, within: 10.minutes, only: :create,
+             with: -> { redirect_to new_identity_password_reset_path, alert: t("website.flash.too_many_attempts") }
+
   def new
   end
 

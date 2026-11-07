@@ -89,6 +89,17 @@ RSpec.describe "Admin bookings", type: :request do
       expect(response).to redirect_to(admin_booking_path(booking))
     end
 
+    it "records the payment in the ledger when the booking is marked paid" do
+      grant(admin, "payment_transactions.read")
+      transaction = booking.payment_transactions.create!(user: customer, payment_method: create_payment_method("cash"), amount: 100)
+
+      patch admin_booking_path(booking), params: { booking: { payment_status: "paid" } }
+      expect(transaction.reload.status).to eq("completed")
+
+      get admin_payment_transactions_path
+      expect(inertia.props[:stats]).to include(collected: 100.0, pending_count: 0)
+    end
+
     it "unassigns the employee when employee_id is blank" do
       booking.update!(employee: employee)
 

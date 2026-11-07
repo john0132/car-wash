@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from "@inertiajs/react"
+import { Head, Link } from "@inertiajs/react"
 import { Plus } from "lucide-react"
 
 import { ActivationSwitch } from "@/admin/components/activation-switch"
@@ -31,7 +31,6 @@ export default function AdministratorsIndex({
   pagination,
 }: Props) {
   const can = useCan()
-  const { auth } = usePage().props
 
   return (
     <AdminLayout
@@ -105,9 +104,7 @@ export default function AdministratorsIndex({
                   active={admin.is_active}
                   name={admin.full_name}
                   action={adminAdministrators.activation(admin.id)}
-                  disabled={
-                    !can("admins", "update") || admin.id === auth.user?.id
-                  }
+                  disabled={!admin.can_manage_access}
                 />
               </TableCell>
             </TableRow>

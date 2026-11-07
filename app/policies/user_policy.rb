@@ -20,13 +20,13 @@ class UserPolicy < ApplicationPolicy
   end
 
   def update?
-    permit?("update")
+    permit?("update") && !protected_record?
   end
 
   # Customers are never deleted (their bookings reference them), only disabled.
   # Nobody deletes their own account from here.
   def destroy?
-    staff_record? && !self? && permit?("delete")
+    staff_record? && !self? && permit?("delete") && !protected_record?
   end
 
   # Disabling or changing roles is not allowed on yourself, to avoid locking yourself out.
@@ -38,6 +38,17 @@ class UserPolicy < ApplicationPolicy
 
   def kind
     record.is_a?(User) ? record.role : record.to_s
+  end
+
+  # Another account can only be edited, disabled or deleted by someone who
+  # holds every permission it holds, and a Super Admin account only by another
+  # Super Admin. Otherwise "admins.update" would let you reset a stronger
+  # admin's password and sign in as them. (Customers and employees hold no
+  # permissions, so this only ever restricts acting on administrators.)
+  def protected_record?
+    return false unless record.is_a?(User) && !self? && !user.super_admin?
+
+    record.super_admin? || (record.permission_names - user.permission_names).any?
   end
 
   def staff_record?

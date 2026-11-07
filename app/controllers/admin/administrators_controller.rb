@@ -6,11 +6,14 @@ class Admin::AdministratorsController < Admin::StaffController
     authorize_kind :admin, :index?
 
     administrators, pagination = paginate(filtered_users(:admin).order(:name))
-    administrators = administrators.includes(:roles)
+    administrators = administrators.includes(roles: :permissions)
 
     render inertia: {
       administrators: administrators.map { |admin|
-        user_props(admin).merge(roles: admin.roles.sort_by(&:name).map { |role| { id: role.id, name: role.name } })
+        user_props(admin).merge(
+          roles: admin.roles.sort_by(&:name).map { |role| { id: role.id, name: role.name } },
+          can_manage_access: policy(admin).manage_access?
+        )
       },
       filters: list_filters,
       pagination: pagination
@@ -32,7 +35,13 @@ class Admin::AdministratorsController < Admin::StaffController
           permissions: role.permissions.map(&:key).sort
         }
       },
-      permissions: @user.permission_names
+      permissions: @user.permission_names,
+      # What the signed-in admin may do to this account (UserPolicy decides; the UI only hides).
+      abilities: {
+        update: policy(@user).update?,
+        destroy: policy(@user).destroy?,
+        manage_access: policy(@user).manage_access?
+      }
     }
   end
 
@@ -41,7 +50,9 @@ class Admin::AdministratorsController < Admin::StaffController
   def form_props(user)
     super.deep_merge(
       user: { role_ids: user.role_ids },
-      roles: Role.includes(:permissions).order(:name).map { |role|
+      roles: Role.includes(:permissions).order(:name).select { |role|
+        user.role_ids.include?(role.id) || Current.user.can_grant_role?(role)
+      }.map { |role|
         { id: role.id, name: role.name, description: role.description, permissions_count: role.permissions.size }
       }
     )

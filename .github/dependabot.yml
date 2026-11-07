@@ -14,3 +14,11 @@ updates:
   directory: "/"
   schedule:
     interval: weekly
+  # react and react-dom must always be the same version, so bump them together.
+  groups:
+    react:
+      patterns:
+        - "react"
+        - "react-dom"
+        - "@types/react"
+        - "@types/react-dom"

@@ -47,11 +47,12 @@ RSpec.describe "Admin dashboard", type: :request do
       expect(response).to have_http_status(:conflict)
     end
 
-    it "gives admins company-wide reports" do
+    it "gives admins the company-wide reports their roles can read" do
       customer = User.create!(name: "Jane", email: "jane@example.com", password: "a-very-long-password")
       customer.bookings.create!(total_amount: 100, payment_status: :paid, status: :completed)
       # Other fixture users ("one", "two") count toward this too — compare against the same query.
       new_customers = User.customer.where(created_at: Time.current.beginning_of_month..).count
+      grant(users(:admin), "bookings.read", "payment_transactions.read", "customers.read")
 
       sign_in users(:admin)
       get admin_root_path
@@ -62,6 +63,31 @@ RSpec.describe "Admin dashboard", type: :request do
           revenue_this_month: 100.0, bookings_today: 0, open_bookings: 0, new_customers_this_month: new_customers
         }
       )
+      expect(inertia.props).to include(:revenue_trend, :top_items, :status_breakdown, :upcoming_bookings)
+      expect(inertia.props[:revenue_trend]).to be_present
+    end
+
+    it "gives an admin without matching permissions no revenue, booking or customer data" do
+      Booking.create!(user: users(:one), total_amount: 100, payment_status: :paid, status: :completed)
+
+      sign_in users(:admin)
+      get admin_root_path
+
+      expect(inertia.props[:kpis].values).to all(be_nil)
+      expect(inertia.props.values_at(:status_breakdown, :payment_status_breakdown, :revenue_trend,
+        :top_items, :upcoming_bookings)).to all(be_nil)
+    end
+
+    it "shows booking reports without revenue to an admin who reads bookings but not payments" do
+      grant(users(:admin), "bookings.read")
+
+      sign_in users(:admin)
+      get admin_root_path
+
+      expect(inertia.props[:kpis]).to include(revenue_this_month: nil, bookings_today: 0, new_customers_this_month: nil)
+      expect(inertia.props[:revenue_trend]).to be_nil
+      expect(inertia.props[:top_items]).to be_nil
+      expect(inertia.props[:upcoming_bookings]).to eq([])
     end
 
     it "gives employees their own bookings for today instead of company-wide reports" do

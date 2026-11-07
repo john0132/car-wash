@@ -14,12 +14,28 @@ class DashboardStats
   TOP_ITEMS_LIMIT = 5
 
   def kpis
-    @kpis ||= {
-      revenue_this_month: Booking.paid.where(created_at: Time.current.beginning_of_month..).sum(:total_amount).to_f,
-      bookings_today: Booking.where(scheduled_at: Date.current.all_day).count,
-      open_bookings: Booking.open.count,
-      new_customers_this_month: User.customer.where(created_at: Time.current.beginning_of_month..).count
+    {
+      revenue_this_month: revenue_this_month,
+      bookings_today: bookings_today,
+      open_bookings: open_bookings,
+      new_customers_this_month: new_customers_this_month
     }
+  end
+
+  def revenue_this_month
+    @revenue_this_month ||= Booking.paid.where(created_at: Time.current.beginning_of_month..).sum(:total_amount).to_f
+  end
+
+  def bookings_today
+    @bookings_today ||= Booking.where(scheduled_at: Date.current.all_day).count
+  end
+
+  def open_bookings
+    @open_bookings ||= Booking.open.count
+  end
+
+  def new_customers_this_month
+    @new_customers_this_month ||= User.customer.where(created_at: Time.current.beginning_of_month..).count
   end
 
   def status_breakdown

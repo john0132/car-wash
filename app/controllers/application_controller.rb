@@ -43,12 +43,32 @@ class ApplicationController < ActionController::Base
 
   def start_new_session_for(user)
     user.sessions.create!.tap do |session|
-      cookies.signed.permanent[:session_token] = { value: session.id, httponly: true }
+      write_session_cookie(session)
     end
   end
 
+  def write_session_cookie(session)
+    cookies.signed[:session_token] = { value: session.id, httponly: true, expires: Session::IDLE_TIMEOUT.from_now }
+  end
+
+  # Sessions idle for longer than Session::IDLE_TIMEOUT are deleted instead of
+  # accepted; active ones are touched (at most daily) so they keep sliding forward.
   def perform_authentication
-    Current.session ||= Session.find_by_id(cookies.signed[:session_token])
+    Current.session ||= begin
+      session = Session.find_by_id(cookies.signed[:session_token])
+
+      if session&.expired?
+        session.destroy
+        cookies.delete(:session_token)
+        nil
+      elsif session&.stale?
+        session.touch
+        write_session_cookie(session)
+        session
+      else
+        session
+      end
+    end
   end
 
   def set_current_request_details

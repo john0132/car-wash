@@ -79,7 +79,19 @@ class Admin::StaffController < Admin::BaseController
       attrs = attrs.except(:is_active, *access_params) unless policy(user).manage_access?
     end
 
-    attrs
+    restrict_grantable_roles(attrs, user)
+  end
+
+  # Drops role ids the current user may not hand out (see User#can_grant_role?).
+  # Roles the account already holds are kept as they are.
+  def restrict_grantable_roles(attrs, user)
+    return attrs unless attrs.key?(:role_ids)
+
+    held = user&.persisted? ? user.role_ids : []
+    requested = Array(attrs[:role_ids]).compact_blank.map(&:to_i)
+    allowed = Role.includes(:permissions).where(id: requested - held).select { |role| Current.user.can_grant_role?(role) }.map(&:id)
+
+    attrs.merge(role_ids: (requested & held) + allowed)
   end
 
   def form_props(user)

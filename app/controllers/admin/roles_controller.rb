@@ -102,9 +102,20 @@ class Admin::RolesController < Admin::BaseController
   def save_role(role)
     Role.transaction do
       role.assign_attributes(name: role_params[:name], description: role_params[:description].presence)
-      role.permission_keys = role_params.fetch(:permission_keys, [])
+      role.permission_keys = grantable_permission_keys(role)
       role.save || raise(ActiveRecord::Rollback)
     end.present?
+  end
+
+  # A Super Admin may set any permission; everyone else only ones they hold
+  # themselves (plus whatever the role already has), so editing a role can't be
+  # used to give yourself more access.
+  def grantable_permission_keys(role)
+    requested = role_params.fetch(:permission_keys, [])
+    return requested if Current.user.super_admin?
+
+    kept = role.persisted? ? role.permission_keys : []
+    requested.select { |key| Current.user.permission_names.include?(key) || kept.include?(key) }
   end
 
   def role_props(role)

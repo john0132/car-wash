@@ -3,7 +3,10 @@ import { Pencil, ShieldCheck } from "lucide-react"
 
 import { ActivationSwitch } from "@/admin/components/activation-switch"
 import { PageHeader } from "@/admin/components/page-header"
-import type { AssignedRole } from "@/admin/features/administrators/types"
+import type {
+  AdministratorAbilities,
+  AssignedRole,
+} from "@/admin/features/administrators/types"
 import { AccountCard } from "@/admin/features/users/components/account-card"
 import { DeleteUserDialog } from "@/admin/features/users/components/delete-user-dialog"
 import type { ManagedUser } from "@/admin/features/users/types"
@@ -24,12 +27,14 @@ interface Props {
   administrator: ManagedUser & { last_seen_at: string | null }
   roles: AssignedRole[]
   permissions: string[]
+  abilities: AdministratorAbilities
 }
 
 export default function AdministratorShow({
   administrator,
   roles,
   permissions,
+  abilities,
 }: Props) {
   const can = useCan()
   const { auth } = usePage().props
@@ -53,14 +58,14 @@ export default function AdministratorShow({
           description={`Administrator #${administrator.id}${isSelf ? " · this is you" : ""}`}
           actions={
             <>
-              {can("admins", "update") && (
+              {abilities.update && (
                 <Button variant="outline" asChild>
                   <Link href={adminAdministrators.edit(administrator.id)}>
                     <Pencil /> Edit
                   </Link>
                 </Button>
               )}
-              {can("admins", "delete") && !isSelf && (
+              {abilities.destroy && (
                 <DeleteUserDialog
                   name={administrator.full_name}
                   action={adminAdministrators.destroy(administrator.id)}
@@ -79,7 +84,7 @@ export default function AdministratorShow({
                 active={administrator.is_active}
                 name={administrator.full_name}
                 action={adminAdministrators.activation(administrator.id)}
-                disabled={!can("admins", "update") || isSelf}
+                disabled={!abilities.manage_access}
               />
             }
           />

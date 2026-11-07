@@ -2,12 +2,15 @@ import type { PaymentStatus } from "@/admin/features/bookings/types"
 
 export type PaymentStatusCounts = Record<PaymentStatus, number>
 
-/** Admin::DashboardController#admin_dashboard_props */
+/**
+ * Admin::DashboardController#admin_dashboard_props. A figure is null when the
+ * admin's roles don't allow reading what it's built from.
+ */
 export interface DashboardKpis {
-  revenue_this_month: number
-  bookings_today: number
-  open_bookings: number
-  new_customers_this_month: number
+  revenue_this_month: number | null
+  bookings_today: number | null
+  open_bookings: number | null
+  new_customers_this_month: number | null
 }
 
 export interface RevenueTrendPoint {

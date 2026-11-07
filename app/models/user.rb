@@ -90,18 +90,34 @@ class User < ApplicationRecord
     admin? && roles.any?(&:super_admin?)
   end
 
+  # Privilege-escalation guard: only a Super Admin may hand out the Super Admin
+  # role, and everybody else may only hand out roles made of permissions they
+  # hold themselves (so nobody can grant more access than they have).
+  def can_grant_role?(role)
+    return true if super_admin?
+    return false if role.super_admin?
+
+    (role.permission_keys - permission_names).empty?
+  end
+
   # "resource.action" keys granted through the user's roles, e.g. ["customers.read"].
   # Only admins hold roles; employees and customers have no dashboard permissions.
   #
   # Memoized on the instance, so a request (one Current.user) loads it once and
   # every policy check reuses it. `reload` clears it.
+  # Lists that preload `roles: :permissions` are answered from memory, so
+  # checking every row of an administrators page costs no extra queries.
   def permission_names
     return [] unless admin?
 
-    @permission_names ||= Permission.joins(:role_permissions)
-      .where(role_permissions: { role_id: user_roles.select(:role_id) })
-      .distinct.order(:resource, :action)
-      .pluck(:resource, :action).map { |resource, action| "#{resource}.#{action}" }
+    @permission_names ||= if roles_with_permissions_loaded?
+      roles.flat_map(&:permissions).map(&:key).uniq.sort
+    else
+      Permission.joins(:role_permissions)
+        .where(role_permissions: { role_id: user_roles.select(:role_id) })
+        .distinct.order(:resource, :action)
+        .pluck(:resource, :action).map { |resource, action| "#{resource}.#{action}" }
+    end
   end
 
   def permission?(resource, action)
@@ -111,5 +127,11 @@ class User < ApplicationRecord
   def reload(*)
     @permission_names = nil
     super
+  end
+
+  private
+
+  def roles_with_permissions_loaded?
+    association(:roles).loaded? && roles.all? { |role| role.association(:permissions).loaded? }
   end
 end

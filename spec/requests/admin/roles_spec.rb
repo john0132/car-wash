@@ -67,7 +67,7 @@ RSpec.describe "Admin roles", type: :request do
 
   describe "POST /admin/roles" do
     it "creates a role with its permissions, ignoring keys outside the catalog" do
-      grant(admin, "roles.create")
+      grant(admin, "roles.create", "customers.read", "customers.update")
 
       post admin_roles_path, params: {
         role: { name: " Dispatcher ", description: "", permission_keys: %w[customers.read customers.update bogus.read] }
@@ -77,6 +77,14 @@ RSpec.describe "Admin roles", type: :request do
       expect(response).to redirect_to(admin_role_path(role))
       expect(role.description).to be_nil
       expect(role.permission_keys).to eq(%w[customers.read customers.update])
+    end
+
+    it "never grants permissions the admin doesn't hold" do
+      grant(admin, "roles.create", "customers.read")
+
+      post admin_roles_path, params: { role: { name: "Sneaky", permission_keys: %w[customers.read roles.delete] } }
+
+      expect(Role.find_by!(name: "Sneaky").permission_keys).to eq(%w[customers.read])
     end
 
     it "returns errors for an invalid role and creates nothing" do
@@ -98,7 +106,7 @@ RSpec.describe "Admin roles", type: :request do
 
   describe "PATCH /admin/roles/:id" do
     it "replaces the role's permissions" do
-      grant(admin, "roles.update")
+      grant(admin, "roles.update", "blogs.update")
       role = create_role("Editor", "pages.read", "blogs.read")
 
       patch admin_role_path(role), params: { role: { name: "Writer", permission_keys: %w[blogs.read blogs.update] } }

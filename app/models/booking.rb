@@ -16,6 +16,16 @@ class Booking < ApplicationRecord
   # Still to be carried out: not yet completed or cancelled.
   OPEN_STATUSES = %w[pending confirmed in_progress].freeze
 
+  # Until there is a payment gateway, staff record the cash collected on arrival
+  # by changing the booking's payment status, and its transactions follow, so the
+  # dashboard's revenue and the payments ledger agree. `partially_refunded` has
+  # no ledger equivalent (a transaction can't be split yet), so it leaves them as they are.
+  TRANSACTION_STATUS_FOR_PAYMENT = {
+    "unpaid" => "pending", "paid" => "completed", "failed" => "failed", "refunded" => "refunded"
+  }.freeze
+
+  after_update :sync_payment_transactions, if: :saved_change_to_payment_status?
+
   scope :open, -> { where(status: OPEN_STATUSES) }
   scope :upcoming, -> { where(scheduled_at: Time.current..) }
   scope :newest_first, -> { order(Arel.sql("bookings.scheduled_at DESC NULLS LAST, bookings.id DESC")) }
@@ -71,6 +81,14 @@ class Booking < ApplicationRecord
   end
 
   private
+
+  # Runs inside the booking's save transaction, so both change or neither does.
+  def sync_payment_transactions
+    status = TRANSACTION_STATUS_FOR_PAYMENT[payment_status]
+    return unless status
+
+    payment_transactions.where.not(status: status).find_each { |transaction| transaction.update!(status: status) }
+  end
 
   def employee_is_employee
     return if employee.nil? || employee.employee?
