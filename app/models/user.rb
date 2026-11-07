@@ -90,6 +90,16 @@ class User < ApplicationRecord
     admin? && roles.any?(&:super_admin?)
   end
 
+  # Privilege-escalation guard: only a Super Admin may hand out the Super Admin
+  # role, and everybody else may only hand out roles made of permissions they
+  # hold themselves (so nobody can grant more access than they have).
+  def can_grant_role?(role)
+    return true if super_admin?
+    return false if role.super_admin?
+
+    (role.permission_keys - permission_names).empty?
+  end
+
   # "resource.action" keys granted through the user's roles, e.g. ["customers.read"].
   # Only admins hold roles; employees and customers have no dashboard permissions.
   #

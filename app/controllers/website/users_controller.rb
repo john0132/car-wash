@@ -4,6 +4,9 @@ class Website::UsersController < Website::BaseController
   skip_before_action :authenticate, only: %i[new create]
   before_action :require_no_authentication, only: %i[new create]
 
+  rate_limit to: 10, within: 3.minutes, only: :create,
+             with: -> { redirect_to sign_up_path, alert: t("website.flash.too_many_attempts") }
+
   def new
     @user = User.new
   end

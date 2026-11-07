@@ -83,4 +83,34 @@ RSpec.describe "Sessions", type: :request do
       expect(Session.exists?(session_record.id)).to be(false)
     end
   end
+
+  describe "session expiry" do
+    it "rejects and deletes a session idle longer than the timeout" do
+      user = users(:one)
+      sign_in user
+      user.sessions.update_all(updated_at: (Session::IDLE_TIMEOUT + 1.day).ago)
+
+      get profile_path
+
+      expect(response).to redirect_to(sign_in_path)
+      expect(user.sessions.count).to eq(0)
+    end
+
+    it "keeps a recently used session" do
+      sign_in users(:one)
+      get profile_path
+      expect(response).to have_http_status(:success)
+    end
+
+    it "slides an active but day-old session forward" do
+      user = users(:one)
+      sign_in user
+      user.sessions.update_all(updated_at: 2.days.ago)
+
+      get profile_path
+
+      expect(response).to have_http_status(:success)
+      expect(user.sessions.first.updated_at).to be > 1.minute.ago
+    end
+  end
 end

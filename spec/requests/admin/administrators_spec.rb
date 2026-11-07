@@ -125,4 +125,62 @@ RSpec.describe "Admin administrators", type: :request do
       expect { delete admin_administrator_path(admin) }.not_to change(User, :count)
     end
   end
+
+  describe "privilege escalation" do
+    let(:super_admin) do
+      User.create!(name: "Root", email: "root@example.com", password: "a-very-long-password", role: :admin)
+        .tap { _1.roles << Role.super_admin! }
+    end
+
+    it "does not let a non-Super Admin assign the Super Admin role" do
+      grant(admin, "admins.update")
+      other_admin
+
+      patch admin_administrator_path(other_admin), params: { user: { role_ids: [ Role.super_admin!.id ] } }
+
+      expect(other_admin.reload.roles).to be_empty
+    end
+
+    it "does not let an admin hand out roles with permissions they lack" do
+      grant(admin, "admins.update")
+      stronger = Role.create!(name: "Stronger")
+      stronger.permissions << Permission.find_or_create_by!(resource: "roles", action: "delete")
+
+      patch admin_administrator_path(other_admin), params: { user: { role_ids: [ stronger.id ] } }
+
+      expect(other_admin.reload.roles).to be_empty
+    end
+
+    it "lets an admin hand out roles made of permissions they hold" do
+      grant(admin, "admins.update", "customers.read")
+      support.permissions << Permission.find_or_create_by!(resource: "customers", action: "read")
+
+      patch admin_administrator_path(other_admin), params: { user: { role_ids: [ support.id ] } }
+
+      expect(other_admin.reload.roles).to eq([ support ])
+    end
+
+    it "does not let a non-Super Admin edit a Super Admin account" do
+      grant(admin, "admins.update")
+
+      patch admin_administrator_path(super_admin), params: { user: { password: "brand-new-password-1", password_confirmation: "brand-new-password-1" } }
+
+      expect(super_admin.reload.authenticate("brand-new-password-1")).to be(false)
+    end
+
+    it "does not let a non-Super Admin delete a Super Admin account" do
+      grant(admin, "admins.delete")
+      super_admin
+
+      expect { delete admin_administrator_path(super_admin) }.not_to change(User, :count)
+    end
+
+    it "lets a Super Admin assign the Super Admin role" do
+      sign_in super_admin
+
+      patch admin_administrator_path(other_admin), params: { user: { role_ids: [ Role.super_admin!.id ] } }
+
+      expect(other_admin.reload).to be_super_admin
+    end
+  end
 end

@@ -8,6 +8,7 @@ en:
       signed_in: "Signed in successfully"
       account_disabled: "Your account has been disabled"
       bad_credentials: "That email or password is incorrect"
+      too_many_attempts: "Too many attempts. Please try again in a few minutes."
       session_logged_out: "That session has been logged out"
       profile_updated: "Your profile has been updated"
       car_added: "Car added"
