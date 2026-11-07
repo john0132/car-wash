@@ -20,6 +20,7 @@ CI.run do
   # Truncate afterwards: seeds load in every environment (languages, components), and
   # leftover rows would break the next local `bin/rspec` run.
   step "Tests: Seeds", "env RAILS_ENV=test bin/rails db:seed:replant && env RAILS_ENV=test bin/rails db:truncate_all"
+  step "Tests: Demo seeds", "env RAILS_ENV=test SEED_DEMO=1 bin/rails db:seed:replant && env RAILS_ENV=test bin/rails db:truncate_all"
 
   # Optional: set a green GitHub commit status to unblock PR merge.
   # Requires the `gh` CLI and `gh extension install basecamp/gh-signoff`.

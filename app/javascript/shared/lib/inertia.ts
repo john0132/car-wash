@@ -15,7 +15,7 @@ export const titleFor =
 
 /** createInertiaApp options common to every frontend app (admin, website). */
 export const inertiaAppOptions = {
-  title: titleFor(import.meta.env.VITE_APP_NAME ?? "Car Wash"),
+  title: titleFor(import.meta.env.VITE_APP_NAME ?? "Auto Atelier"),
   strictMode: true,
   defaults: {
     form: {

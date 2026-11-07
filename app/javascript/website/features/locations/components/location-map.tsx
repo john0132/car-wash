@@ -14,6 +14,7 @@ import {
   DEFAULT_CENTER,
   DEFAULT_ZOOM,
   TILE_ATTRIBUTION,
+  TILE_REFERRER_POLICY,
   TILE_URL,
 } from "@/shared/lib/map"
 import type { Coordinates } from "@/website/hooks/use-geolocation"
@@ -57,7 +58,11 @@ export default function LocationMap({
         keyboard={false}
         className="size-full"
       >
-        <TileLayer url={TILE_URL} attribution={TILE_ATTRIBUTION} />
+        <TileLayer
+          url={TILE_URL}
+          attribution={TILE_ATTRIBUTION}
+          referrerPolicy={TILE_REFERRER_POLICY}
+        />
         <PickOnClick onChange={onChange} />
         <KeyboardPin position={position} onChange={onChange} label={label} />
         {position && (

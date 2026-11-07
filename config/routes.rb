@@ -7,6 +7,10 @@ Rails.application.routes.draw do
   match "/422", to: "website/errors#show", via: :all
   match "/500", to: "website/errors#show", via: :all
 
+  # Health check for kamal-proxy: 200 if the app boots with no exceptions, otherwise 500.
+  # Declared before the website's catch-all page slug, which would otherwise answer /up with a 404.
+  get "up" => "rails/health#show", as: :rails_health_check
+
   get "/sitemap.xml", to: "website/sitemaps#show", as: :sitemap, defaults: { format: :xml }
   get "/robots.txt", to: "website/sitemaps#robots", as: :robots, defaults: { format: :text }
 
@@ -93,7 +97,4 @@ Rails.application.routes.draw do
   # ActiveStorage's own direct-upload endpoint is open to anyone; send it through
   # the staff-only controller instead. App routes match before the engine's.
   post "/rails/active_storage/direct_uploads", to: "admin/direct_uploads#create"
-
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  get "up" => "rails/health#show", as: :rails_health_check
 end

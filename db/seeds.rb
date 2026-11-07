@@ -31,16 +31,24 @@ load Rails.root.join("db/seeds/arabic.rb")
 # Every environment: payment methods (checkout books with "cash").
 load Rails.root.join("db/seeds/payment_methods.rb")
 
-# Development-only staff account for signing in at /admin/sign_in.
-# Override with ADMIN_EMAIL / ADMIN_PASSWORD. Production admins must be created explicitly.
-if Rails.env.development?
-  admin = User.find_or_create_by!(email: ENV.fetch("ADMIN_EMAIL", "admin@example.com")) do |user|
+# Super Admin account for signing in at /admin/sign_in. Development falls back to admin@example.com /
+# password123456; other environments create it only when ADMIN_EMAIL and ADMIN_PASSWORD are both set.
+# Only a new account gets the password, so re-seeding never resets it.
+admin_email = ENV["ADMIN_EMAIL"].presence || ("admin@example.com" if Rails.env.development?)
+admin_password = ENV["ADMIN_PASSWORD"].presence || ("password123456" if Rails.env.development?)
+if admin_email.present? != admin_password.present?
+  abort "Set both ADMIN_EMAIL and ADMIN_PASSWORD to create the admin account, or neither."
+elsif admin_email
+  admin = User.find_or_create_by!(email: admin_email) do |user|
     user.name = "Admin"
-    user.password = ENV.fetch("ADMIN_PASSWORD", "password123456")
+    user.password = admin_password
     user.role = :admin
   end
   admin.roles << super_admin unless admin.roles.include?(super_admin)
+end
 
-  # Demo catalog, customers, staff and bookings so the dashboard has something to show.
-  load Rails.root.join("db/seeds/development.rb")
+# Demo catalog with photos, customers, staff, bookings and messages, so the site and the dashboard have
+# something to show. Always loaded in development; elsewhere only with SEED_DEMO=1 (e.g. a portfolio deploy).
+if Rails.env.development? || ActiveModel::Type::Boolean.new.cast(ENV["SEED_DEMO"])
+  load Rails.root.join("db/seeds/demo.rb")
 end

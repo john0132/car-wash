@@ -8,6 +8,7 @@ class Admin::SessionsController < Admin::BaseController
              with: -> { redirect_to admin_sign_in_path, alert: "Too many attempts. Try again later." }
 
   def new
+    render inertia: { demo_login: demo_login }
   end
 
   def create
@@ -33,6 +34,14 @@ class Admin::SessionsController < Admin::BaseController
   end
 
   private
+
+  # Public credentials for a view-only account, shown on the sign-in page of a portfolio deploy.
+  # Set both DEMO_LOGIN_EMAIL and DEMO_LOGIN_PASSWORD to show the panel; it is hidden otherwise.
+  def demo_login
+    email = ENV["DEMO_LOGIN_EMAIL"].presence
+    password = ENV["DEMO_LOGIN_PASSWORD"].presence
+    { email: email, password: password } if email && password
+  end
 
   # Only staff are bounced to the dashboard. A signed-in customer still gets the
   # form, so they can switch to a staff account without signing out of the website first.

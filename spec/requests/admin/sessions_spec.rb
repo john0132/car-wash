@@ -5,6 +5,12 @@ require "rails_helper"
 RSpec.describe "Admin sessions", type: :request do
   fixtures :users
 
+  def stub_demo_login(email:, password:)
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with("DEMO_LOGIN_EMAIL").and_return(email)
+    allow(ENV).to receive(:[]).with("DEMO_LOGIN_PASSWORD").and_return(password)
+  end
+
   describe "GET /admin/sign_in" do
     it "renders the admin sign in page" do
       get admin_sign_in_path
@@ -16,6 +22,23 @@ RSpec.describe "Admin sessions", type: :request do
     it "redirects signed-in users to the admin dashboard" do
       sign_in users(:admin)
       get admin_sign_in_path
+      expect(response).to redirect_to(admin_root_path)
+    end
+
+    it "shares no demo login unless both demo env vars are set" do
+      stub_demo_login(email: users(:admin).email, password: nil)
+      get admin_sign_in_path
+
+      expect(inertia.props[:demo_login]).to be_nil
+    end
+
+    it "shares the demo login when both demo env vars are set" do
+      stub_demo_login(email: users(:admin).email, password: "Secret1*3*5*")
+      get admin_sign_in_path
+
+      expect(inertia.props[:demo_login]).to eq("email" => users(:admin).email, "password" => "Secret1*3*5*")
+
+      post admin_sign_in_path, params: inertia.props[:demo_login]
       expect(response).to redirect_to(admin_root_path)
     end
 

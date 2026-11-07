@@ -1,10 +1,21 @@
 # frozen_string_literal: true
 
-# Demo data for local development. Loaded by db/seeds.rb in development only.
+# Demo data: catalog with photos, staff, customers, bookings, payments and contact messages.
+# Loaded by db/seeds.rb in development, and elsewhere with SEED_DEMO=1.
 # Idempotent: records are looked up by a natural key (email, code, English name)
 # and bookings are only generated for customers who have none yet.
 
-demo_password = "password123456"
+# The development password is in the repo, so other environments never use it: demo staff and customers
+# get DEMO_PASSWORD, or a random password nobody knows (they exist to fill the dashboard, not to sign in).
+demo_password =
+  if Rails.env.development?
+    "password123456"
+  else
+    ENV["DEMO_PASSWORD"].presence || SecureRandom.base58(32)
+  end
+if demo_password.length < 12
+  abort "DEMO_PASSWORD must be at least 12 characters."
+end
 rng = Random.new(2026)
 geo = RGeo::Geographic.spherical_factory(srid: 4326)
 
@@ -74,16 +85,40 @@ end
 payment_methods = PaymentMethod.where(code: %w[cash card wallet]).to_a
 payment_by_code = payment_methods.index_by(&:code)
 
-exterior = translated.(ServiceCategory, "Exterior", "خارجي")
-interior = translated.(ServiceCategory, "Interior", "داخلي")
-protection = translated.(ServiceCategory, "Protection", "حماية")
+# Photos live in db/seeds/images/ (sources and licenses in CREDITS.md). They are JPEGs on purpose:
+# Active Storage serves SVG as a download, so browsers will not render it in an <img>.
+photo = lambda do |path|
+  { io: File.open(Rails.root.join("db/seeds/images", path)), filename: File.basename(path),
+    content_type: "image/jpeg", identify: false }
+end
+# Attaches the photo unless the record already has a real image. Replaces the SVG placeholders
+# that older versions of this file attached.
+attach_photo = lambda do |record, path|
+  next if record.image.attached? && record.image.content_type != "image/svg+xml"
 
-# Every service gets a full page: prices, duration, copy, SEO text and an image,
-# so no section of the single-service page renders empty.
-# English name => [Arabic name, category, price, sale price, minutes, accent color,
+  record.image.attach(photo.(path))
+end
+
+# English name => [Arabic name, shown on the homepage, image]
+category_catalog = {
+  "Exterior" => [ "خارجي", true, "categories/exterior.jpg" ],
+  "Interior" => [ "داخلي", true, "services/interior-detailing.jpg" ],
+  "Detailing" => [ "التلميع والعناية", true, "services/paint-polish-wax.jpg" ],
+  "Protection" => [ "حماية", false, "categories/protection.jpg" ]
+}
+exterior, interior, detailing, protection = category_catalog.map do |en_name, (ar_name, on_home_page, image)|
+  category = translated.(ServiceCategory, en_name, ar_name)
+  category.update!(is_active: true, display_in_home_page: on_home_page)
+  attach_photo.(category, image)
+  category
+end
+
+# Every service gets a full page: prices, duration, copy, SEO text and a photo
+# (db/seeds/images/services/<slug>.jpg), so no section of the single-service page renders empty.
+# English name => [Arabic name, category, price, sale price, minutes,
 #                  { code => [title, description, seo title, seo description] }]
 service_catalog = {
-  "Exterior Wash" => [ "غسيل خارجي", exterior, 150, 120, 45, "#2B6CB0", {
+  "Exterior Wash" => [ "غسيل خارجي", exterior, 150, 120, 45, {
     "en" => [ "A careful hand wash, top to bottom",
               "We rinse away road film with a pH-neutral foam, wash panel by panel with clean mitts, and dry with soft microfibre so nothing is dragged across the paint.\n\nWheels, arches and door shuts are cleaned too, and the glass is left streak-free.",
               "Exterior Hand Car Wash",
@@ -93,7 +128,7 @@ service_catalog = {
               "غسيل خارجي يدوي للسيارة",
               "غسيل يدوي دقيق برغوة متعادلة مع تنظيف العجلات والزجاج، حتى باب منزلك." ]
   } ],
-  "Full Wash" => [ "غسيل كامل", exterior, 400, 350, 120, "#2F855A", {
+  "Full Wash" => [ "غسيل كامل", exterior, 400, 350, 120, {
     "en" => [ "The complete clean, inside and out",
               "Our full exterior hand wash plus a thorough interior: vacuumed seats and carpets, wiped surfaces and cleaned glass.\n\nThe best choice when the car hasn't had attention in a while, or before a long trip.",
               "Full Interior and Exterior Car Wash",
@@ -103,7 +138,7 @@ service_catalog = {
               "غسيل كامل للسيارة داخليًا وخارجيًا",
               "غسيل يدوي كامل مع تنظيف داخلي شامل للمقاعد والسجاد والأسطح والزجاج." ]
   } ],
-  "Interior Detailing" => [ "تنظيف داخلي", interior, 300, 260, 150, "#B7791F", {
+  "Interior Detailing" => [ "تنظيف داخلي", interior, 300, 260, 150, {
     "en" => [ "A cabin that feels new again",
               "Deep vacuuming, steam cleaning of fabric and carpets, and conditioning for leather and plastics.\n\nWe work through vents, seams and door pockets, where dust and crumbs collect.",
               "Interior Car Detailing",
@@ -113,7 +148,7 @@ service_catalog = {
               "تنظيف وتلميع داخلي للسيارة",
               "شفط عميق وتنظيف بالبخار وتغذية للجلد لتبدو مقصورتك كأنها جديدة." ]
   } ],
-  "Ceramic Coating" => [ "طلاء السيراميك", protection, 2500, 2200, 240, "#6B46C1", {
+  "Ceramic Coating" => [ "طلاء السيراميك", protection, 2500, 2200, 240, {
     "en" => [ "Lasting gloss and protection",
               "After a full paint decontamination, we apply a ceramic coating that bonds to the clear coat and repels water, dirt and UV.\n\nThe paint stays glossy and is far easier to wash for up to two years.",
               "Ceramic Paint Coating",
@@ -123,7 +158,7 @@ service_catalog = {
               "طلاء السيراميك للسيارة",
               "طبقة سيراميك متينة تطرد الماء والأوساخ وتحافظ على لمعان الطلاء حتى عامين." ]
   } ],
-  "Paint Polish & Wax" => [ "تلميع ودهان الشمع", ServiceCategory.find_by(slug: "detailing") || protection, 600, 520, 180, "#C53030", {
+  "Paint Polish & Wax" => [ "تلميع ودهان الشمع", detailing, 600, 520, 180, {
     "en" => [ "Deep shine with a protective wax finish",
               "We machine-polish the paint to remove swirls and light scratches, then seal it with a hand-applied wax.\n\nThe result is a deep, mirror-like shine that protects the paint for months.",
               "Paint Polish and Wax",
@@ -133,7 +168,7 @@ service_catalog = {
               "تلميع الطلاء ودهان الشمع",
               "تلميع آلي يزيل الخدوش الخفيفة متبوعًا بطبقة شمع واقية تُوضع يدويًا." ]
   } ],
-  "Headlight Polishing" => [ "تلميع المصابيح", protection, 250, 200, 60, "#C05621", {
+  "Headlight Polishing" => [ "تلميع المصابيح", protection, 250, 200, 60, {
     "en" => [ "Clear, bright headlights again",
               "We sand and polish yellowed or foggy headlight lenses, then seal them against UV so they stay clear.\n\nBetter night visibility and a car that looks years younger.",
               "Headlight Polishing and Restoration",
@@ -145,36 +180,16 @@ service_catalog = {
   } ]
 }
 
-# A simple branded placeholder illustration: a car silhouette on a tinted backdrop.
-service_image = lambda do |label, color|
-  svg = <<~SVG
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
-      <rect width="800" height="600" fill="#{color}" opacity="0.15"/>
-      <rect width="800" height="600" fill="#F6F1E7" opacity="0.6"/>
-      <path d="M130 380 L180 290 Q200 260 240 260 L520 260 Q570 260 600 300 L660 380 Z" fill="#{color}"/>
-      <rect x="110" y="370" width="580" height="60" rx="24" fill="#{color}"/>
-      <circle cx="240" cy="440" r="42" fill="#2B3A32"/><circle cx="240" cy="440" r="18" fill="#F6F1E7"/>
-      <circle cx="560" cy="440" r="42" fill="#2B3A32"/><circle cx="560" cy="440" r="18" fill="#F6F1E7"/>
-      <text x="400" y="540" text-anchor="middle" font-family="sans-serif" font-size="40" fill="#2B3A32">#{label}</text>
-    </svg>
-  SVG
-  { io: StringIO.new(svg), filename: "#{label.parameterize}.svg", content_type: "image/svg+xml" }
-end
-
-protection.update!(is_active: true)
-unless protection.image.attached?
-  protection.image.attach(service_image.("Protection", "#6B46C1"))
-end
-
-services = service_catalog.map do |en_name, (ar_name, category, price, sale_price, minutes, color, content)|
+services = service_catalog.map do |en_name, (ar_name, category, price, sale_price, minutes, content)|
   service = translated.(Service, en_name, ar_name, service_category: category, price: price)
-  service.update!(price: price, sale_price: sale_price, duration_minutes: minutes, is_active: true)
+  service.update!(service_category: category, price: price, sale_price: sale_price, duration_minutes: minutes,
+                  is_active: true)
   content.each do |code, (title, description, seo_title, seo_description)|
     language = code == "en" ? english : arabic
     service.service_translations.find_by!(language: language)
       .update!(title: title, description: description, seo_title: seo_title, seo_description: seo_description)
   end
-  service.image.attach(service_image.(en_name, color)) unless service.image.attached?
+  attach_photo.(service, "services/#{en_name.parameterize}.jpg")
   service
 end
 extras = [
@@ -342,6 +357,23 @@ end
 unless winter_blog.cover_image.attached?
   winter_blog.cover_image.attach(io: File.open(Rails.root.join("db/seeds/images/blogs/winter-car-care-tips.png")),
                                  filename: "winter-car-care-tips.png", content_type: "image/png", identify: false)
+end
+
+# Messages from the contact us form, for the dashboard inbox. Looked up by email.
+[
+  [ "Ahmed", "Fawzy", "ahmed.fawzy@example.com", "+20 100 123 4567", 2,
+    "Hello, do you cover 6th of October City? I would like a full wash for two cars every Friday morning." ],
+  [ "Rana", "Samy", "rana.samy@example.com", "+20 111 765 4321", 5,
+    "I booked a ceramic coating for next week. How long should I avoid washing the car after it is applied?" ],
+  [ "Karim", "Lotfy", "karim.lotfy@example.com", "+20 122 555 0198", 9,
+    "We run a small office with eight company cars. Do you offer a monthly contract with an invoice for businesses?" ],
+  [ "Mai", "Adel", "mai.adel@example.com", "+20 109 222 3344", 16,
+    "Your team did a great job on my interior today, thank you! Can I request the same washer for my next booking?" ]
+].each do |first_name, last_name, email, phone, days_ago, message|
+  ContactMessage.find_or_create_by!(email: email) do |m|
+    m.assign_attributes(first_name: first_name, last_name: last_name, phone: phone, message: message,
+      created_at: days_ago.days.ago.change(hour: 10 + days_ago % 8))
+  end
 end
 
 # Header "Services" dropdown: categories, and each category's services.
