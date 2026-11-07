@@ -43,6 +43,10 @@ env:
     DB_HOST: car_wash-db
     # Run the Solid Queue supervisor inside Puma (single small server).
     SOLID_QUEUE_IN_PUMA: true
+    # Shown publicly on /admin/sign_in for portfolio reviewers. The account holds a view-only role
+    # ("Portfolio Reviewer": every *.read permission) and is created on the server, not by seeds.
+    DEMO_LOGIN_EMAIL: reviewer@autoatelier.erp-eg.com
+    DEMO_LOGIN_PASSWORD: AutoAtelier-Demo-2026
 
 aliases:
   console: app exec --interactive --reuse "bin/rails console"

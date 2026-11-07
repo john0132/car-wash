@@ -4,7 +4,15 @@ A full-stack booking platform for a mobile car wash business. Customers pick a s
 
 **Rails 8.1 · React 19 · TypeScript · Inertia.js · PostgreSQL + PostGIS · Tailwind CSS · shadcn/ui · RSpec · Vitest**
 
-<!-- Live demo: add the URL here once deployed -->
+## Live demo
+
+| | |
+|---|---|
+| **Website** | [autoatelier.erp-eg.com](https://autoatelier.erp-eg.com) · Arabic: [autoatelier.erp-eg.com/ar](https://autoatelier.erp-eg.com/ar) |
+| **Staff dashboard** | [autoatelier.erp-eg.com/admin/sign_in](https://autoatelier.erp-eg.com/admin/sign_in) |
+| **Dashboard login** | `reviewer@autoatelier.erp-eg.com` / `AutoAtelier-Demo-2026` (view-only: every screen, no changes) |
+
+**Try it:** create an account on the website and book a wash, then sign in to the dashboard and find your booking. Sign-up is open, and the dashboard sign-in page has a one-click demo login. This is a demo, so please use a made-up email and phone number.
 
 <!--
 ## Screenshots
@@ -146,6 +154,7 @@ Seeding a server (`bin/rails db:seed`) always creates the base content: language
 |---|---|
 | `ADMIN_EMAIL` + `ADMIN_PASSWORD` | Creates a Super Admin with these credentials (set both or neither). An existing account's password is never changed. |
 | `SEED_DEMO=1` | Also loads the demo data. The demo staff and customers get a random password that nobody knows, or `DEMO_PASSWORD` if you set it. The development password is never used outside development. |
+| `DEMO_LOGIN_EMAIL` + `DEMO_LOGIN_PASSWORD` | Shows these credentials, with a one-click sign-in, on `/admin/sign_in`. Use them for a public portfolio deploy, for an existing admin with a view-only role. Seeds don't create that account. |
 
 The seeds are idempotent, so running them again only fills in what is missing. Photo sources and licenses are in `db/seeds/images/CREDITS.md`.
 

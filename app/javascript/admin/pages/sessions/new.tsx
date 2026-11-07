@@ -1,5 +1,7 @@
 import { Form, Head } from "@inertiajs/react"
 
+import { DemoLoginPanel } from "@/admin/features/sessions/components/demo-login-panel"
+import type { DemoLogin } from "@/admin/features/sessions/types"
 import AuthLayout from "@/admin/layouts/auth-layout"
 import { adminSessions, newIdentityPasswordReset } from "@/routes"
 import { Button } from "@/shared/components/ui/button"
@@ -12,13 +14,18 @@ import {
 import { Input } from "@/shared/components/ui/input"
 import { Spinner } from "@/shared/components/ui/spinner"
 
-export default function AdminLogin() {
+export default function AdminLogin({
+  demo_login,
+}: {
+  demo_login: DemoLogin | null
+}) {
   return (
     <AuthLayout
       title="Admin sign in"
       description="Staff access only. Enter your email and password to continue."
     >
       <Head title="Admin sign in" />
+      {demo_login && <DemoLoginPanel {...demo_login} />}
       <Form
         action={adminSessions.create()}
         resetOnSuccess={["password"]}
