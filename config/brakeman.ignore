@@ -1,0 +1,28 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "ed36ba622a19d300d2baf4fac152033b48d8d8f896453b487ee58984d2cee2ad",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/site_chrome.rb",
+      "line": 31,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ApplicationRecord.connection.select_rows(\"SELECT #{[HeaderItem, Footer, Page, Language, ServiceCategory, Service].flat_map do\n table = model.quoted_table_name\n[\"(SELECT COUNT(*) FROM #{model.quoted_table_name})\", \"(SELECT MAX(updated_at)::text FROM #{model.quoted_table_name})\"]\n end.join(\", \")}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SiteChrome",
+        "method": "SiteChrome.cache_version"
+      },
+      "user_input": "[HeaderItem, Footer, Page, Language, ServiceCategory, Service].flat_map",
+      "confidence": "High",
+      "cwe_id": [
+        89
+      ],
+      "note": "False positive: the interpolated names are the quoted_table_name of a fixed constant list of models (SiteChrome::VERSIONED_MODELS); no request data reaches this SQL."
+    }
+  ],
+  "brakeman_version": "8.1.0"
+}

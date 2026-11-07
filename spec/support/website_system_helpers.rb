@@ -24,9 +24,14 @@ module WebsiteSystemHelpers
   end
 
   # Radix selects are not <select>s: open the trigger, then pick the option by its text.
+  # Radix closes the list and then hands focus back to the trigger a moment
+  # later. Wait for both, or that focus can steal the next key press (e.g. the
+  # arrow keys meant for the location map).
   def pick_option(trigger_selector, text)
     find(trigger_selector).click
     find("[role=option]", text: text).click
+    assert_no_selector("[role=listbox]")
+    assert_selector("#{trigger_selector}:focus")
   end
 
   def focused_id

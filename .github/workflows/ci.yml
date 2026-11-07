@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   scan_ruby:
@@ -54,6 +54,9 @@ jobs:
 
       - name: Check Arabic strings
         run: npm run i18n:check
+
+      - name: Scan for known security vulnerabilities in npm packages
+        run: npm audit
 
   lint:
     runs-on: ubuntu-latest
@@ -120,6 +123,21 @@ jobs:
           RAILS_ENV: test
           DATABASE_URL: postgis://postgres:postgres@localhost:5432
         run: bin/rails db:test:prepare spec
+
+      - name: Check generated route helpers are up to date
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgis://postgres:postgres@localhost:5432
+        run: |
+          bin/rails typelizer:generate:refresh
+          git diff --exit-code -- app/javascript/routes
+          test -z "$(git ls-files --others --exclude-standard -- app/javascript/routes)"
+
+      - name: Check seeds load
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgis://postgres:postgres@localhost:5432
+        run: bin/rails db:seed:replant
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v7
