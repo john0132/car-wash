@@ -90,6 +90,7 @@ production:
     database: car_wash_production
     username: car_wash
     password: <%= ENV["CAR_WASH_DATABASE_PASSWORD"] %>
+    host: <%= ENV.fetch("DB_HOST", "localhost") %>
   cache:
     <<: *primary_production
     database: car_wash_production_cache

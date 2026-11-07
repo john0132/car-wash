@@ -1,123 +1,75 @@
-# Name of your application. Used to uniquely configure containers.
-service: car_wash
+# Kamal deploy config. Docs: https://kamal-deploy.org/docs/configuration/overview/
+#
+# Layout on the server (a Hetzner VPS that also runs CloudPanel and other sites):
+#
+#   visitor ─https─▶ CloudPanel Nginx :443 ─http─▶ kamal-proxy 127.0.0.1:3080 ─▶ car_wash app container
+#                    (TLS via Let's Encrypt,          (zero-downtime swaps)          └▶ car_wash-db (PostGIS)
+#                     "Reverse Proxy" site)
+#
+# CloudPanel already owns ports 80/443 (and 8080/8443), so kamal-proxy listens on 127.0.0.1:3080 only.
+# Docker-published ports bypass the ufw firewall, so nothing here is published on a public interface.
 
-# Name of the container image (use your-user/app-name on external registries).
+service: car_wash
 image: car_wash
 
-# Deploy to these servers.
 servers:
   web:
-    - 192.168.0.1
-  # job:
-  #   hosts:
-  #     - 192.168.0.1
-  #   cmd: bin/jobs
+    - autoatelier.erp-eg.com
 
-# Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
-# If used with Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
-#
-# Using an SSL proxy like this requires turning on config.assume_ssl and config.force_ssl in production.rb!
-#
-# Don't use this when deploying to multiple web servers (then you have to terminate SSL at your load balancer).
-#
-# proxy:
-#   ssl: true
-#   host: app.example.com
+proxy:
+  # TLS is terminated by CloudPanel's Nginx in front of kamal-proxy.
+  ssl: false
+  host: autoatelier.erp-eg.com
+  # Pass X-Forwarded-For/Proto from Nginx through to Rails (real client IPs for rate limits and logs).
+  forward_headers: true
+  run:
+    http_port: 3080
+    https_port: 3443
+    bind_ips:
+      - 127.0.0.1
 
-# Where you keep your container images.
+# Local registry: Kamal runs it on this machine and the server pulls the image through the SSH tunnel,
+# so no Docker Hub / GHCR account is needed.
 registry:
-  # Alternatives: hub.docker.com / registry.digitalocean.com / ghcr.io / ...
   server: localhost:5555
 
-  # Needed for authenticated registries.
-  # username: your-user
-
-  # Always use an access token rather than real password when possible.
-  # password:
-  #   - KAMAL_REGISTRY_PASSWORD
-
-# Inject ENV variables into containers (secrets come from .kamal/secrets).
 env:
   secret:
     - RAILS_MASTER_KEY
+    - CAR_WASH_DATABASE_PASSWORD
   clear:
-    # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
-    # When you start using multiple servers, you should split out job processing to a dedicated machine.
+    APP_HOST: autoatelier.erp-eg.com
+    # The PostGIS accessory below, reached over Kamal's private Docker network.
+    DB_HOST: car_wash-db
+    # Run the Solid Queue supervisor inside Puma (single small server).
     SOLID_QUEUE_IN_PUMA: true
 
-    # Set number of processes dedicated to Solid Queue (default: 1)
-    # JOB_CONCURRENCY: 3
-
-    # Set number of cores available to the application on each server (default: 1).
-    # WEB_CONCURRENCY: 2
-
-    # Match this to any external database server to configure Active Record correctly
-    # Use car_wash-db for a db accessory server on same machine via local kamal docker network.
-    # DB_HOST: 192.168.0.2
-
-    # Log everything from Rails
-    # RAILS_LOG_LEVEL: debug
-
-# Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
-# "bin/kamal logs -r job" will tail logs from the first server in the job section.
 aliases:
   console: app exec --interactive --reuse "bin/rails console"
   shell: app exec --interactive --reuse "bash"
   logs: app logs -f
   dbc: app exec --interactive --reuse "bin/rails dbconsole --include-password"
 
-# Use a persistent storage volume for sqlite database files and local Active Storage files.
-# Recommended to change this to a mounted volume path that is backed up off server.
+# Active Storage uploads (config.active_storage.service = :local) live in /rails/storage.
 volumes:
   - "car_wash_storage:/rails/storage"
 
-# Bridge fingerprinted assets, like JS and CSS, between versions to avoid
-# hitting 404 on in-flight requests. Combines all files from new and old
-# version inside the asset_path.
+# Bridge fingerprinted assets between versions to avoid 404s on in-flight requests.
 asset_path: /rails/public
 
-# Configure the image builder.
 builder:
   arch: amd64
-  cache:
-    type: registry
-    image: your-user/car-wash-build-cache
-    options: mode=max
 
-  # # Build image via remote server (useful for faster amd64 builds on arm64 computers)
-  # remote: ssh://docker@docker-builder-server
-  #
-  # # Pass arguments and secrets to the Docker build process
-  # args:
-  #   RUBY_VERSION: ruby-4.0.1
-  # secrets:
-  #   - GITHUB_TOKEN
-  #   - RAILS_MASTER_KEY
-
-# Use a different ssh user than root
-# ssh:
-#   user: app
-
-# Use accessory services (secrets come from .kamal/secrets).
-# accessories:
-#   db:
-#     image: mysql:8.0
-#     host: 192.168.0.2
-#     # Change to 3306 to expose port to the world instead of just local network.
-#     port: "127.0.0.1:3306:3306"
-#     env:
-#       clear:
-#         MYSQL_ROOT_HOST: '%'
-#       secret:
-#         - MYSQL_ROOT_PASSWORD
-#     files:
-#       - config/mysql/production.cnf:/etc/mysql/my.cnf
-#       - db/production.sql:/docker-entrypoint-initdb.d/setup.sql
-#     directories:
-#       - data:/var/lib/mysql
-#   redis:
-#     image: valkey/valkey:8
-#     host: 192.168.0.2
-#     port: 6379
-#     directories:
-#       - data:/data
+accessories:
+  db:
+    image: postgis/postgis:16-3.5
+    host: autoatelier.erp-eg.com
+    # No `port:` on purpose: the database is reachable only from containers on Kamal's network.
+    env:
+      clear:
+        POSTGRES_USER: car_wash
+        POSTGRES_DB: car_wash_production
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - data:/var/lib/postgresql/data
